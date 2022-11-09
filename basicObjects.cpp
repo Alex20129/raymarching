@@ -168,51 +168,15 @@ void Ray::Reset()
 
 void Ray::Run()
 {
-	double diff, spec;
-	Vec3d SurfaceNormal, toLightSource, reflection, firstCollisionPoint, lightDirection;
-	LightSource *NearestLightSource;
-	Object *firstCollisionObject=RunTo(pDefaultDirection);
-	if(firstCollisionObject==nullptr) // finished in space
+	double illuninationLevel;
+	pFirstCollisionObject=RunTo(pDefaultDirection);
+	if(pFirstCollisionObject==nullptr) // finished in space
 	{
 		SetColor(DEFAULT_OBJECT_COLOR);
 		return;
 	}
-	firstCollisionPoint=Position;
-	NearestLightSource=GetNearestLightSource();
-	toLightSource=(*NearestLightSource->Position-*this->Position).Normal();
-	//incorrect, it works only for spheres WIP
-	SurfaceNormal=(firstCollisionPoint-*firstCollisionObject->Position).Normal();
-	//
-	reflection=(*pDefaultDirection-SurfaceNormal*2.0*(*pDefaultDirection*SurfaceNormal)).Normal();
-	diff=(SurfaceNormal*toLightSource);
-	if(diff<0)
-	{
-		diff=0;
-	}
-	spec=(reflection*toLightSource);
-	if(spec<0)
-	{
-		spec=0;
-	}
-	spec=pow(spec, 16);
-	pObjectToIgnore=NearestLightSource;
-	this->SetPosition(NearestLightSource->Position);
-	lightDirection=(firstCollisionPoint-*NearestLightSource->Position).Normal();
-	if(RunTo(&lightDirection))
-	{
-		if(pNrstObj==firstCollisionObject)
-		{
-			SetColor(firstCollisionObject->Color()*diff + firstCollisionObject->Color()*spec);
-		}
-		else
-		{
-			SetColor(firstCollisionObject->Color()*diff*0.5);
-		}
-	}
-	else
-	{
-		SetColor(firstCollisionObject->Color()*diff*0.5);
-	}
+	illuninationLevel=CalcIlluminationLevel(this->Position);
+	SetColor(pFirstCollisionObject->Color()*illuninationLevel);
 }
 
 Object *Ray::RunTo(Vec3d *direction)
@@ -220,21 +184,18 @@ Object *Ray::RunTo(Vec3d *direction)
 	double mindist=-1U, dist=0;
 	size_t objectID, objectsTotal=SceneObjects->size();
 	Object *Obj;
-	pNrstObj=nullptr;
-//	vector <double> distanceMap;
-//	distanceMap.resize(objectsTotal, 999);
+	pNearestObject=nullptr;
 	if(direction==nullptr)
 	{
 		direction=pDefaultDirection;
 	}
-	while(mindist>0.125)
+	while(!pNearestObject)
 	{
-		pStepsDone++;
-		if(pStepsDone>RAY_STEPS_MAX)
+		if(++pStepsDone>RAY_STEPS_MAX)
 		{
-			return(pNrstObj);
+			break;
 		}
-		for(objectID=0; objectID<objectsTotal; objectID++)
+		for(objectID=0; objectID<objectsTotal && !pNearestObject; objectID++)
 		{
 			Obj=SceneObjects->at(objectID);
 			if(!Obj->Visible())
@@ -246,33 +207,72 @@ Object *Ray::RunTo(Vec3d *direction)
 				continue;
 			}
 			dist=Obj->GetDistance(*Position);
-//			distanceMap.at(objectid)=dist;
 			if(mindist>dist)
 			{
 				mindist=dist;
-				pNrstObj=Obj;
+			}
+			if(mindist<0.125)
+			{
+				pNearestObject=Obj;
 			}
 		}
 		SetPosition(*Position+*direction*mindist);
 	}
-	return(pNrstObj);
+	return(pNearestObject);
 }
 
 // totally incorrect. NTF, WIP
-LightSource *Ray::GetNearestLightSource()
+double Ray::CalcIlluminationLevel(Vec3d *point)
 {
-	double mindist=-1U, dist;
-	LightSource *lsource=nullptr;
+	double illuninationLevel=0, mindist=-1U, dist, spec, diff;
+	Vec3d SurfaceNormal, fromPointToLightSource, fromLightSourceToPoint, reflection;
+	LightSource *NearestLightSource=nullptr;
 	for(Object *obj: *SceneLights)
 	{
-		dist=(*obj->Position-*this->Position).Length();
+		dist=(*obj->Position-*point).Length();
 		if(dist<mindist)
 		{
 			mindist=dist;
-			lsource=(LightSource *)obj;
+			NearestLightSource=(LightSource *)obj;
 		}
 	}
-	return(lsource);
+	fromPointToLightSource=(*NearestLightSource->Position-*point).Normal();
+	fromLightSourceToPoint=(*point-*NearestLightSource->Position).Normal();
+
+	//incorrect, it works only for spheres WIP
+	SurfaceNormal=(*point-*pFirstCollisionObject->Position).Normal();
+	//
+
+	reflection=(*pDefaultDirection-SurfaceNormal*2.0*(*pDefaultDirection*SurfaceNormal)).Normal();
+	diff=(SurfaceNormal*fromPointToLightSource);
+	if(diff<0)
+	{
+		diff=0;
+	}
+	spec=(reflection*fromPointToLightSource);
+	if(spec<0)
+	{
+		spec=0;
+	}
+	spec=pow(spec, 16);
+	pObjectToIgnore=NearestLightSource;
+	this->SetPosition(NearestLightSource->Position);
+	if(RunTo(&fromLightSourceToPoint))
+	{
+		if((*point-*this->Position).Length()<2)
+		{
+			illuninationLevel=diff + spec;
+		}
+		else
+		{
+			illuninationLevel=0;
+		}
+	}
+	else
+	{
+		illuninationLevel=diff * 0.5;
+	}
+	return(illuninationLevel);
 }
 
 // ========= SPHERE ===

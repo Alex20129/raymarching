@@ -5,10 +5,10 @@
 #include <string>
 #include "commonVectorFun.hpp"
 
-#define RAY_STEPS_MAX					512
+#define RAY_STEPS_MAX					1024
 
 #define DEFAULT_LIGHTSOURCE_BRIGHTNESS	0xFFFF
-#define DEFAULT_OBJECT_COLOR			0xCC,0xCC,0xCC
+#define DEFAULT_OBJECT_COLOR			0x20,0x20,0x20
 
 using namespace std;
 
@@ -79,9 +79,9 @@ public:
 	void Reset();
 	void Run();
 	Object *RunTo(Vec3d *direction);
-	LightSource *GetNearestLightSource();
+	double CalcIlluminationLevel(Vec3d *point);
 private:
-	Object *pObjectToIgnore, *pNrstObj;
+	Object *pObjectToIgnore, *pNearestObject, *pFirstCollisionObject;
 	Vec3d *pDefaultDirection;
 	unsigned int pStepsDone;
 	unsigned char pIsFinished;

@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
 	MainScene->AddObject(newSphere1);
 
 	Sphere *newSphere2=new Sphere();
-	newSphere2->SetPosition(25, 0, 120);
+	newSphere2->SetPosition(30, 0, 120);
 	newSphere2->SetRadius(20);
 	newSphere2->SetColor(200, 0, 200);
 	MainScene->AddObject(newSphere2);
@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
 	//fprintf(stdout, "RenderTime: %lims\n", FrameRenderTime.count());
 	//MainScene->SavePPMImage("009.ppm");
 	QImage img1(MainScene->ImageData->data(), MainScene->ScreenWidth(), MainScene->ScreenHeight(), QImage::Format_RGBA8888);
-	img1.save(QString("010.png"));
+	img1.save(QString("011.png"));
 
 	SceneW=new Widget;
 	ControlsW=new ControlWidget;
