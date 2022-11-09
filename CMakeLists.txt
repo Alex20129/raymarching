@@ -17,17 +17,13 @@ FIND_PACKAGE(Qt5 COMPONENTS Widgets REQUIRED)
 
 LINK_LIBRARIES(pthread Qt5::Widgets)
 
-ADD_EXECUTABLE(raymarching
-    main.cpp
-    widget.cpp
-    widget.h
+ADD_EXECUTABLE(${CMAKE_PROJECT_NAME}
+	main.cpp
+	widget.cpp
 	basicObjects.cpp
-	basicObjects.hpp
 	commonVectorFun.cpp
-	commonVectorFun.hpp
 	controlwidget.cpp
-	controlwidget.h
 	scene.cpp
-	scene.hpp
 	widget.ui
 	controlwidget.ui)
+
