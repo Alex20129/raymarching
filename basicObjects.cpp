@@ -174,7 +174,7 @@ void Ray::Run()
 	double illuninationLevel=0;
 	double specular, diffuse;
 	Vec3d SurfaceNormal, Reflection;
-	Vec3d fromPointToLightSource, fromLightSourceToPoint;
+	Vec3d fromPointToLightSource;
 	Vec3d FirstCollisionPoint;
 
 	pFirstCollisionObject=RunTo(*pDirection);
@@ -194,7 +194,6 @@ void Ray::Run()
 	for(Object *LightSource: *SceneLights)
 	{
 		fromPointToLightSource=(*LightSource->Position-FirstCollisionPoint).Normal();
-		fromLightSourceToPoint=(FirstCollisionPoint-*LightSource->Position).Normal();
 
 		diffuse=(SurfaceNormal*fromPointToLightSource);
 		if(diffuse<0)
@@ -214,14 +213,6 @@ void Ray::Run()
 		pObjectToIgnore=pFirstCollisionObject;
 		if(RunTo(fromPointToLightSource)->ItsALightSource())
 		{
-//			if((*point-*this->Position).Length()<2)
-//			{
-//				illuninationLevel=diff + spec;
-//			}
-//			else
-//			{
-//				illuninationLevel=0;
-//			}
 		}
 		else
 		{
@@ -229,7 +220,6 @@ void Ray::Run()
 		}
 	}
 	illuninationLevel/=SceneLights->size();
-
 
 	SetColor(pFirstCollisionObject->Color()*illuninationLevel);
 }
