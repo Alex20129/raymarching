@@ -1,22 +1,21 @@
 #include "./ui_controlwidget.h"
-#include "controlwidget.h"
-#include "widget.h"
+#include "controlwidget.hpp"
+#include "widget.hpp"
 
 #include <QPaintEvent>
 #include <QPainter>
 #include <QLineEdit>
 #include <QComboBox>
 
-extern Scene *MainScene;
+extern Scene *NewScene;
 extern Widget *SceneW;
-extern ControlWidget *ControlsW;
 
 ControlWidget::ControlWidget(QWidget *parent) : QWidget(parent), ui(new Ui::ControlWidget)
 {
 	ui->setupUi(this);
-	for(int obj=0; obj<MainScene->SceneObjects->size(); obj++)
+	for(int obj=0; obj<NewScene->SceneObjects->size(); obj++)
 	{
-		ui->comboBox->addItem(QString::fromStdString(MainScene->SceneObjects->at(obj)->Name()));
+		ui->comboBox->addItem(QString::fromStdString(NewScene->SceneObjects->at(obj)->Name()));
 	}
 	obID=0;
 }
@@ -28,21 +27,21 @@ ControlWidget::~ControlWidget()
 
 void ControlWidget::on_Zdial_valueChanged(int value)
 {
-	objpos=MainScene->SceneObjects->at(obID)->Position;
+	objpos=NewScene->SceneObjects->at(obID)->Position;
 	ui->lineEditZ->setText(QString::number(value));
 	objpos->Z=value;
 }
 
 void ControlWidget::on_YScrollBar_valueChanged(int value)
 {
-	objpos=MainScene->SceneObjects->at(obID)->Position;
+	objpos=NewScene->SceneObjects->at(obID)->Position;
 	ui->lineEditY->setText(QString::number(value));
 	objpos->Y=value;
 }
 
 void ControlWidget::on_XScrollBar_valueChanged(int value)
 {
-	objpos=MainScene->SceneObjects->at(obID)->Position;
+	objpos=NewScene->SceneObjects->at(obID)->Position;
 	ui->lineEditX->setText(QString::number(value));
 	objpos->X=value;
 }
@@ -50,7 +49,7 @@ void ControlWidget::on_XScrollBar_valueChanged(int value)
 void ControlWidget::on_comboBox_currentIndexChanged(int index)
 {
 	obID=index;
-	objpos=MainScene->SceneObjects->at(obID)->Position;
+	objpos=NewScene->SceneObjects->at(obID)->Position;
 	ui->lineEditX->setText(QString::number(objpos->X));
 	ui->XScrollBar->setValue(objpos->X);
 	ui->lineEditY->setText(QString::number(objpos->Y));
@@ -62,7 +61,7 @@ void ControlWidget::on_comboBox_currentIndexChanged(int index)
 void ControlWidget::on_renderButton_clicked()
 {
 	obID=ui->comboBox->currentIndex();
-	objpos=MainScene->SceneObjects->at(obID)->Position;
+	objpos=NewScene->SceneObjects->at(obID)->Position;
 
 	objpos->X=ui->lineEditX->text().toDouble();
 	objpos->Y=ui->lineEditY->text().toDouble();
@@ -72,7 +71,7 @@ void ControlWidget::on_renderButton_clicked()
 	ui->YScrollBar->setValue(objpos->Y);
 	ui->Zdial->setValue(objpos->Z);
 
-	MainScene->Render();
-	ui->rendertime->setText(QString::number(MainScene->FrameRenderTime.count()));
+	NewScene->Render();
+	ui->rendertime->setText(QString::number(NewScene->FrameRenderTime.count()));
 	SceneW->update();
 }

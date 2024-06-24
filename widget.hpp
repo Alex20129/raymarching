@@ -1,5 +1,5 @@
-#ifndef WIDGET_H
-#define WIDGET_H
+#ifndef WIDGET_HPP
+#define WIDGET_HPP
 
 #include <QWidget>
 #include <QBrush>
@@ -18,6 +18,7 @@ public:
 	Widget(QWidget *parent=nullptr);
 	~Widget();
 	void keyPressEvent(QKeyEvent *event);
+	void closeEvent(QCloseEvent *event);
 	void paintEvent(QPaintEvent *event);
 	void resizeEvent(QResizeEvent *event);
 public slots:
@@ -25,4 +26,4 @@ private:
 	Ui::Widget *ui;
 private slots:
 };
-#endif // WIDGET_H
+#endif // WIDGET_HPP

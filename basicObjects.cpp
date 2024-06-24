@@ -5,12 +5,13 @@
 Object::Object()
 {
 	pVisible=1;
+	pBrightness=0;
 	Position=new Vec3d(0, 0, 0);
-	pColor=nullptr;
-	pName=new string("Object");
+	pColor=new Vec3uc(DEFAULT_OBJECT_COLOR);
+	pName=new string(DEFAULT_OBJECT_NAME);
 }
 
-bool Object::Visible()
+bool Object::Visible() const
 {
 	return(pVisible);
 }
@@ -20,10 +21,20 @@ void Object::SetVisible(bool visible)
 	pVisible=visible;
 }
 
+uint Object::Brightness() const
+{
+	return(pBrightness);
+}
+
+void Object::SetBrightness(uint brightness)
+{
+	pBrightness=brightness;
+}
+
 Vec3f Object::Color()
 {
 	Vec3f retColor;
-	if(pColor!=nullptr)
+	if(pColor)
 	{
 		retColor.X=pColor->X;
 		retColor.Y=pColor->Y;
@@ -32,49 +43,61 @@ Vec3f Object::Color()
 	return(retColor);
 }
 
-void Object::SetColor(Color_t new_color)
+void Object::SetColor(Color_t color)
 {
-	if(pColor==nullptr)
+	if(color.X>255)
 	{
-		pColor=new Vec3uc(DEFAULT_OBJECT_COLOR);
+		color.X=255;
 	}
-	pColor->X=new_color.X;
-	pColor->Y=new_color.Y;
-	pColor->Z=new_color.Z;
+	if(color.Y>255)
+	{
+		color.Y=255;
+	}
+	if(color.Z>255)
+	{
+		color.Z=255;
+	}
+	pColor->X=color.X;
+	pColor->Y=color.Y;
+	pColor->Z=color.Z;
 }
 
-void Object::SetColor(Vec3f new_color)
+void Object::SetColor(Vec3f color)
 {
-	if(new_color.X>255)
+	if(color.X>255.0F)
 	{
-		new_color.X=255;
+		color.X=255.0F;
 	}
-	if(new_color.Y>255)
+	if(color.Y>255.0F)
 	{
-		new_color.Y=255;
+		color.Y=255.0F;
 	}
-	if(new_color.Z>255)
+	if(color.Z>255.0F)
 	{
-		new_color.Z=255;
+		color.Z=255.0F;
 	}
-	SetColor(Vec3uc(new_color.X, new_color.Y, new_color.Z));
+	pColor->X=color.X;
+	pColor->Y=color.Y;
+	pColor->Z=color.Z;
 }
 
 void Object::SetColor(float r, float g, float b)
 {
-	if(r>255)
+	if(r>255.0F)
 	{
-		r=255;
+		r=255.0F;
 	}
-	if(g>255)
+	if(g>255.0F)
 	{
-		g=255;
+		g=255.0F;
 	}
-	if(b>255)
+	if(b>255.0F)
 	{
-		b=255;
+		b=255.0F;
 	}
-	SetColor(Vec3uc(r, g, b));
+	pColor->X=r;
+	pColor->Y=g;
+	pColor->Z=b;
 }
 
 void Object::SetPosition(Vec3d position)
@@ -112,92 +135,113 @@ double Object::GetDistance(Vec3d from)
 
 bool Object::ItsALightSource()
 {
-	return(false);
-}
-
-// ========= LIGHT SOURCE ===
-
-LightSource::LightSource()
-{
-	Brightness=DEFAULT_LIGHTSOURCE_BRIGHTNESS;
-	SetName("LightSource");
-}
-
-bool LightSource::ItsALightSource()
-{
-	return(true);
+	return(pBrightness>0);
 }
 
 // ========= RAY ===
 
 Ray::Ray()
 {
-	pDefaultDirection=new Vec3d(0, 0, 0);
+	pDirection=new Vec3d(0, 0, 0);
 	pStepsDone=0;
-	pIsFinished=0;
 	SetName("Ray");
 }
 
 Vec3d Ray::Direction()
 {
-	return(*pDefaultDirection);
+	return(*pDirection);
 }
 
 void Ray::SetDirection(Vec3d direction)
 {
-	*pDefaultDirection=direction.Normal();
+	*pDirection=direction.Normal();
 }
 
 void Ray::SetDirection(double x, double y, double z)
 {
-	*pDefaultDirection=Vec3d(x, y, z).Normal();
-}
-
-void Ray::Reload()
-{
-	pStepsDone=0;
-	pIsFinished=0;
-	pObjectToIgnore=nullptr;
+	*pDirection=Vec3d(x, y, z).Normal();
 }
 
 void Ray::Reset()
 {
-	Reload();
+	pStepsDone=0;
+	pObjectToIgnore=nullptr;
 	SetPosition(0, 0, 0);
 }
 
 void Ray::Run()
 {
-	double illuninationLevel;
-	pFirstCollisionObject=RunTo(pDefaultDirection);
+	double illuninationLevel=0;
+	double specular, diffuse;
+	Vec3d SurfaceNormal, Reflection;
+	Vec3d fromPointToLightSource, fromLightSourceToPoint;
+	Vec3d FirstCollisionPoint;
+
+	pFirstCollisionObject=RunTo(*pDirection);
 	if(pFirstCollisionObject==nullptr) // finished in space
 	{
 		SetColor(DEFAULT_OBJECT_COLOR);
 		return;
 	}
-	illuninationLevel=CalcIlluminationLevel(this->Position);
+
+	FirstCollisionPoint=*Position;
+
+	// WIP
+	//incorrect, it works only for spheres
+	SurfaceNormal=(FirstCollisionPoint-*pFirstCollisionObject->Position).Normal();
+	Reflection=(*pDirection-SurfaceNormal*2.0*(*pDirection*SurfaceNormal)).Normal();
+
+	for(Object *LightSource: *SceneLights)
+	{
+		fromPointToLightSource=(*LightSource->Position-FirstCollisionPoint).Normal();
+		fromLightSourceToPoint=(FirstCollisionPoint-*LightSource->Position).Normal();
+
+		diffuse=(SurfaceNormal*fromPointToLightSource);
+		if(diffuse<0)
+		{
+			diffuse=0;
+		}
+		illuninationLevel+=diffuse;
+
+		specular=(Reflection*fromPointToLightSource);
+		if(specular<0)
+		{
+			specular=0;
+		}
+		specular=pow(specular, 16);
+		illuninationLevel+=specular;
+
+		pObjectToIgnore=pFirstCollisionObject;
+		if(RunTo(fromPointToLightSource)->ItsALightSource())
+		{
+//			if((*point-*this->Position).Length()<2)
+//			{
+//				illuninationLevel=diff + spec;
+//			}
+//			else
+//			{
+//				illuninationLevel=0;
+//			}
+		}
+		else
+		{
+			illuninationLevel *= 0.5;
+		}
+	}
+	illuninationLevel/=SceneLights->size();
+
+
 	SetColor(pFirstCollisionObject->Color()*illuninationLevel);
 }
 
-Object *Ray::RunTo(Vec3d *direction)
+Object *Ray::RunTo(Vec3d direction)
 {
-	double mindist=-1U, dist=0;
-	size_t objectID, objectsTotal=SceneObjects->size();
-	Object *Obj;
-	pNearestObject=nullptr;
-	if(direction==nullptr)
+	double mindist=__INT_MAX__, dist=0;
+	Object *NearestObject=nullptr;
+	while(pStepsDone<RAY_STEPS_MAX)
 	{
-		direction=pDefaultDirection;
-	}
-	while(!pNearestObject)
-	{
-		if(++pStepsDone>RAY_STEPS_MAX)
+		for(Object *Obj: *SceneObjects)
 		{
-			break;
-		}
-		for(objectID=0; objectID<objectsTotal && !pNearestObject; objectID++)
-		{
-			Obj=SceneObjects->at(objectID);
 			if(!Obj->Visible())
 			{
 				continue;
@@ -211,68 +255,20 @@ Object *Ray::RunTo(Vec3d *direction)
 			{
 				mindist=dist;
 			}
-			if(mindist<0.125)
+			if(mindist<0.25)
 			{
-				pNearestObject=Obj;
+				NearestObject=Obj;
+				break;
 			}
 		}
-		SetPosition(*Position+*direction*mindist);
-	}
-	return(pNearestObject);
-}
-
-// totally incorrect. NTF, WIP
-double Ray::CalcIlluminationLevel(Vec3d *point)
-{
-	double illuninationLevel=0, mindist=-1U, dist, spec, diff;
-	Vec3d SurfaceNormal, fromPointToLightSource, fromLightSourceToPoint, reflection;
-	LightSource *NearestLightSource=nullptr;
-	for(Object *obj: *SceneLights)
-	{
-		dist=(*obj->Position-*point).Length();
-		if(dist<mindist)
+		if(NearestObject)
 		{
-			mindist=dist;
-			NearestLightSource=(LightSource *)obj;
+			break;
 		}
+		SetPosition(*Position+direction*mindist);
+		pStepsDone++;
 	}
-	fromPointToLightSource=(*NearestLightSource->Position-*point).Normal();
-	fromLightSourceToPoint=(*point-*NearestLightSource->Position).Normal();
-
-	//incorrect, it works only for spheres WIP
-	SurfaceNormal=(*point-*pFirstCollisionObject->Position).Normal();
-	//
-
-	reflection=(*pDefaultDirection-SurfaceNormal*2.0*(*pDefaultDirection*SurfaceNormal)).Normal();
-	diff=(SurfaceNormal*fromPointToLightSource);
-	if(diff<0)
-	{
-		diff=0;
-	}
-	spec=(reflection*fromPointToLightSource);
-	if(spec<0)
-	{
-		spec=0;
-	}
-	spec=pow(spec, 16);
-	pObjectToIgnore=NearestLightSource;
-	this->SetPosition(NearestLightSource->Position);
-	if(RunTo(&fromLightSourceToPoint))
-	{
-		if((*point-*this->Position).Length()<2)
-		{
-			illuninationLevel=diff + spec;
-		}
-		else
-		{
-			illuninationLevel=0;
-		}
-	}
-	else
-	{
-		illuninationLevel=diff * 0.5;
-	}
-	return(illuninationLevel);
+	return(NearestObject);
 }
 
 // ========= SPHERE ===

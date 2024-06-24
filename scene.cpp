@@ -1,5 +1,4 @@
 #include "scene.hpp"
-#include <thread>
 #include <cstdio>
 
 Scene::Scene()
@@ -10,8 +9,18 @@ Scene::Scene()
 	SceneObjects=new vector <Object *>;
 	SceneLights=new vector <Object *>;
 	SceneRays=new vector <Ray *>;
+	pRenderThreads=new vector <thread *>;
 
-	ImageData=new vector <unsigned char>;
+	ImageData=new vector <uint8_t>;
+
+	if(thread::hardware_concurrency()>1)
+	{
+		pRenderThreadsNum=thread::hardware_concurrency();
+	}
+	else
+	{
+		pRenderThreadsNum=DEFAULT_RENDER_THREADS_NUM;
+	}
 
 	SetScreenSize(DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT);
 
@@ -31,12 +40,12 @@ Scene::Scene()
 
 Scene::~Scene()
 {
-	while(SceneObjects->size())
+	while(!SceneObjects->empty())
 	{
 		delete SceneObjects->back();
 		SceneObjects->pop_back();
 	}
-	while(SceneRays->size())
+	while(!SceneRays->empty())
 	{
 		delete SceneRays->back();
 		SceneRays->pop_back();
@@ -45,45 +54,43 @@ Scene::~Scene()
 
 void Scene::AddObject(Object *object)
 {
+	this->SceneObjects->push_back(object);
 	if(object->ItsALightSource())
 	{
 		this->SceneLights->push_back(object);
 	}
-	else
-	{
-		this->SceneObjects->push_back(object);
-	}
-
 	object->SceneObjects=this->SceneObjects;
 	object->SceneLights=this->SceneLights;
 }
 
-static void RayRunningWrapperFun(Ray **rays, unsigned int numofrays, unsigned int threadid)
+static void RayRunningWrapperFun(Ray **rays, unsigned int rays_per_thread, unsigned int thread_id)
 {
-	unsigned int rayid, raysPerThread=numofrays/RENDER_THREADS_NUM;
-	for(rayid=0; rayid<raysPerThread; rayid++)
+	unsigned int rayid;
+	for(rayid=0; rayid<rays_per_thread; rayid++)
 	{
-		rays[threadid*raysPerThread+rayid]->Reset();
-		rays[threadid*raysPerThread+rayid]->Run();
+		rays[thread_id*rays_per_thread+rayid]->Reset();
+		rays[thread_id*rays_per_thread+rayid]->Run();
 	}
 }
 
 void Scene::Render()
 {
+	thread *newThread;
 	unsigned int threadid;
-	thread *threadsToRun[RENDER_THREADS_NUM];
 	chrono::time_point <chrono::high_resolution_clock> start=chrono::high_resolution_clock::now(), end;
-	for(threadid=0; threadid<RENDER_THREADS_NUM; threadid++)
+	for(threadid=0; threadid<pRenderThreadsNum; threadid++)
 	{
-		threadsToRun[threadid]=new thread(RayRunningWrapperFun, SceneRays->data(), SceneRays->size(), threadid);
+		newThread=new thread(RayRunningWrapperFun, SceneRays->data(), SceneRays->size()/pRenderThreadsNum, threadid);
+		pRenderThreads->push_back(newThread);
 	}
-	for(threadid=0; threadid<RENDER_THREADS_NUM; threadid++)
+	for(threadid=0; threadid<pRenderThreadsNum; threadid++)
 	{
-		threadsToRun[threadid]->join();
+		pRenderThreads->at(threadid)->join();
 	}
-	for(threadid=0; threadid<RENDER_THREADS_NUM; threadid++)
+	while(!pRenderThreads->empty())
 	{
-		delete threadsToRun[threadid];
+		delete pRenderThreads->back();
+		pRenderThreads->pop_back();
 	}
 	end=chrono::high_resolution_clock::now();
 	FrameRenderTime=chrono::duration_cast <chrono::milliseconds>(end - start);
@@ -93,17 +100,30 @@ unsigned int Scene::ScreenWidth()
 {
 	return(pScreenWidth);
 }
+
 unsigned int Scene::ScreenHeight()
 {
 	return(pScreenHeight);
 }
+
+unsigned int Scene::RenderThreadsNum()
+{
+	return(pRenderThreadsNum);
+}
+
 void Scene::SetScreenWidth(unsigned int width)
 {
 	SetScreenSize(width, pScreenHeight);
 }
+
 void Scene::SetScreenHeight(unsigned int height)
 {
 	SetScreenSize(pScreenWidth, height);
+}
+
+void Scene::SetRenderThreadsNum(unsigned int threads_num)
+{
+	pRenderThreadsNum=threads_num;
 }
 
 void Scene::SetScreenSize(unsigned int width, unsigned int height)

@@ -1,5 +1,5 @@
-#ifndef CONTROLWIDGET_H
-#define CONTROLWIDGET_H
+#ifndef CONTROLWIDGET_HPP
+#define CONTROLWIDGET_HPP
 
 #include <QWidget>
 #include <QBrush>
@@ -30,4 +30,4 @@ private:
 	uint obID;
 	Ui::ControlWidget *ui;
 };
-#endif // CONTROLWIDGET_H
+#endif // CONTROLWIDGET_HPP
