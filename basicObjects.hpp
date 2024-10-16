@@ -6,9 +6,9 @@
 #include "commonVectorFun.hpp"
 
 #define RAY_STEPS_MAX			1024
-#define RAY_REFLECTIONS_MAX		32
+#define RAY_REFLECTIONS_MAX		4
 
-#define DEFAULT_OBJECT_COLOR	0x20,0x20,0x20
+#define DEFAULT_OBJECT_COLOR	0x00,0x00,0x00
 #define DEFAULT_OBJECT_NAME		"Default object"
 
 using namespace std;
@@ -23,8 +23,7 @@ public:
 	uint Brightness() const;
 	void SetBrightness(uint brightness);
 
-	Vec3f Color();
-	void SetColor(Color_t color);
+	Vec3f Color() const;
 	void SetColor(Vec3f color);
 	void SetColor(float r, float g, float b);
 
@@ -45,7 +44,7 @@ private:
 	bool pVisible;
 	uint pBrightness;
 	string *pName;
-	Color_t *pColor;
+	Vec3uc *pColor;
 };
 
 // ========= RAY ===
@@ -54,16 +53,16 @@ class Ray : public Object
 {
 public:
 	Ray();
-	Vec3d Direction();
+	Vec3d Direction() const;
 	void SetDirection(Vec3d direction);
 	void SetDirection(double x, double y, double z);
 	void Reset();
 	void Run();
 	Object *RunTo(Vec3d direction);
 private:
-	Object *pObjectToIgnore, *pFirstCollisionObject;
+	Object *pObjectToSkipOnce;
 	Vec3d *pDirection;
-	unsigned int pStepsDone;
+	unsigned int pStepsDone, pReflectionsHappened;
 };
 
 // ========= SPHERE ===

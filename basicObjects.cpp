@@ -31,35 +31,10 @@ void Object::SetBrightness(uint brightness)
 	pBrightness=brightness;
 }
 
-Vec3f Object::Color()
+Vec3f Object::Color() const
 {
-	Vec3f retColor;
-	if(pColor)
-	{
-		retColor.X=pColor->X;
-		retColor.Y=pColor->Y;
-		retColor.Z=pColor->Z;
-	}
-	return(retColor);
-}
-
-void Object::SetColor(Color_t color)
-{
-	if(color.X>255)
-	{
-		color.X=255;
-	}
-	if(color.Y>255)
-	{
-		color.Y=255;
-	}
-	if(color.Z>255)
-	{
-		color.Z=255;
-	}
-	pColor->X=color.X;
-	pColor->Y=color.Y;
-	pColor->Z=color.Z;
+	Vec3f color(pColor->X, pColor->Y, pColor->Z);
+	return(color);
 }
 
 void Object::SetColor(Vec3f color)
@@ -144,10 +119,11 @@ Ray::Ray()
 {
 	pDirection=new Vec3d(0, 0, 0);
 	pStepsDone=0;
+	pReflectionsHappened=0;
 	SetName("Ray");
 }
 
-Vec3d Ray::Direction()
+Vec3d Ray::Direction() const
 {
 	return(*pDirection);
 }
@@ -165,63 +141,94 @@ void Ray::SetDirection(double x, double y, double z)
 void Ray::Reset()
 {
 	pStepsDone=0;
-	pObjectToIgnore=nullptr;
+	pReflectionsHappened=0;
+	pObjectToSkipOnce=nullptr;
 	SetPosition(0, 0, 0);
 }
 
 void Ray::Run()
 {
-	double illuninationLevel=0;
-	double specular, diffuse;
+	double illuninationLevel=1.0;
+	double diffused_lighting, color_acc_k=1.0;
 	Vec3d SurfaceNormal, Reflection;
 	Vec3d fromPointToLightSource;
-	Vec3d FirstCollisionPoint;
+	Vec3d CollisionPoint, FirstCollisionPoint;
+	Vec3f NewColor(DEFAULT_OBJECT_COLOR);
+	Object *Obstacle=nullptr, *FirstCollisionObstacle=nullptr;
 
-	pFirstCollisionObject=RunTo(*pDirection);
-	if(pFirstCollisionObject==nullptr) // finished in space
+	while(pReflectionsHappened<RAY_REFLECTIONS_MAX)
 	{
-		SetColor(DEFAULT_OBJECT_COLOR);
-		return;
+		Obstacle=RunTo(*pDirection);
+		if(Obstacle==nullptr) // finished in space
+		{
+			break;
+		}
+
+		CollisionPoint=*Position;
+		if(!FirstCollisionObstacle)
+		{
+			if(!Obstacle->ItsALightSource())
+			{
+				FirstCollisionObstacle=Obstacle;
+				FirstCollisionPoint=*Position;
+			}
+		}
+
+		NewColor=NewColor*(1.0-color_acc_k) + Obstacle->Color()*color_acc_k;
+		color_acc_k/=2.0;
+
+		if(Obstacle->ItsALightSource())
+		{
+			break;
+		}
+
+		pObjectToSkipOnce=Obstacle;
+
+		// WIP
+		//incorrect, it works only for spheres
+		SurfaceNormal=(CollisionPoint-*Obstacle->Position).Normal();
+		Reflection=(*pDirection-SurfaceNormal*2.0*(*pDirection*SurfaceNormal)).Normal();
+
+		SetDirection(Reflection);
+		pReflectionsHappened++;
 	}
 
-	FirstCollisionPoint=*Position;
-
-	// WIP
-	//incorrect, it works only for spheres
-	SurfaceNormal=(FirstCollisionPoint-*pFirstCollisionObject->Position).Normal();
-	Reflection=(*pDirection-SurfaceNormal*2.0*(*pDirection*SurfaceNormal)).Normal();
-
-	for(Object *LightSource: *SceneLights)
+	if(FirstCollisionObstacle)
 	{
-		fromPointToLightSource=(*LightSource->Position-FirstCollisionPoint).Normal();
+		illuninationLevel=0.0;
+		SurfaceNormal=(FirstCollisionPoint-*FirstCollisionObstacle->Position).Normal();
+		for(Object *LightSource: *SceneLights)
+		{
+			fromPointToLightSource=(*LightSource->Position-FirstCollisionPoint).Normal();
 
-		diffuse=(SurfaceNormal*fromPointToLightSource);
-		if(diffuse<0)
-		{
-			diffuse=0;
-		}
-		illuninationLevel+=diffuse;
+//			diffused_lighting=(SurfaceNormal*fromPointToLightSource);
+//			if(diffused_lighting<0.0)
+//			{
+//				diffused_lighting=0.0;
+//			}
 
-		specular=(Reflection*fromPointToLightSource);
-		if(specular<0)
-		{
-			specular=0;
-		}
-		specular=pow(specular, 16);
-		illuninationLevel+=specular;
+			SetPosition(FirstCollisionPoint);
+			pObjectToSkipOnce=FirstCollisionObstacle;
 
-		pObjectToIgnore=pFirstCollisionObject;
-		if(RunTo(fromPointToLightSource)->ItsALightSource())
-		{
+			Obstacle=RunTo(fromPointToLightSource);
+			if(Obstacle)
+			{
+				if(Obstacle->ItsALightSource())
+				{
+//					illuninationLevel+=diffused_lighting*2.0;
+					illuninationLevel+=1.25;
+				}
+				else
+				{
+//					illuninationLevel+=diffused_lighting/2.0;
+					illuninationLevel+=0.75;
+				}
+			}
 		}
-		else
-		{
-			illuninationLevel *= 0.5;
-		}
+		illuninationLevel/=SceneLights->size();
 	}
-	illuninationLevel/=SceneLights->size();
 
-	SetColor(pFirstCollisionObject->Color()*illuninationLevel);
+	SetColor(NewColor*illuninationLevel);
 }
 
 Object *Ray::RunTo(Vec3d direction)
@@ -236,8 +243,9 @@ Object *Ray::RunTo(Vec3d direction)
 			{
 				continue;
 			}
-			if(Obj==pObjectToIgnore)
+			if(Obj==pObjectToSkipOnce)
 			{
+				pObjectToSkipOnce=nullptr;
 				continue;
 			}
 			dist=Obj->GetDistance(*Position);
@@ -265,7 +273,7 @@ Object *Ray::RunTo(Vec3d direction)
 
 Sphere::Sphere()
 {
-	pRadius=1;
+	pRadius=1.0;
 	SetName("Sphere");
 }
 
@@ -284,7 +292,7 @@ double Sphere::GetDistance(Vec3d from)
 
 Cube::Cube()
 {
-	pLength=1;
+	pLength=1.0;
 	SetName("Cube");
 }
 
@@ -304,8 +312,8 @@ double Cube::GetDistance(Vec3d from)
 
 Torus::Torus()
 {
-	pRadius1=2;
-	pRadius2=1;
+	pRadius1=2.0;
+	pRadius2=1.0;
 	SetName("Torus");
 }
 

@@ -8,10 +8,11 @@ class Vec2d
 public:
 	double X, Y;
 	Vec2d();
-	Vec2d(const Vec2d *vec);
-	Vec2d(const Vec2d &vec);
+	Vec2d(const Vec2d *other);
+	Vec2d(const Vec2d &other);
 	Vec2d(double x, double y);
 	Vec2d Normal(double length=1.0);
+	void Normalize();
 	Vec2d Abs();
 	double Length();
 	Vec2d Max(const Vec2d &other);
@@ -31,10 +32,11 @@ class Vec3d
 public:
 	double X, Y, Z;
 	Vec3d();
-	Vec3d(const Vec3d *vec);
-	Vec3d(const Vec3d &vec);
+	Vec3d(const Vec3d *other);
+	Vec3d(const Vec3d &other);
 	Vec3d(double x, double y, double z);
 	Vec3d Normal(double length=1.0);
+	void Normalize();
 	Vec3d Abs();
 	double Length();
 	Vec3d Max(const Vec3d &other);
@@ -54,10 +56,11 @@ class Vec3f
 public:
 	float X, Y, Z;
 	Vec3f();
-	Vec3f(const Vec3f *vec);
-	Vec3f(const Vec3f &vec);
+	Vec3f(const Vec3f *other);
+	Vec3f(const Vec3f &other);
 	Vec3f(float x, float y, float z);
 	Vec3f Normal(float length=1.0);
+	void Normalize();
 	Vec3f Abs();
 	float Length();
 	Vec3f operator=(const Vec3f &other);
@@ -93,7 +96,5 @@ public:
 	Vec3uc operator/(float m);
 	Vec3uc operator/(double m);
 };
-
-typedef Vec3uc Color_t;
 
 #endif // COMMONVECTORFUN_HPP

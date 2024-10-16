@@ -94,6 +94,7 @@ void Scene::Render()
 	}
 	end=chrono::high_resolution_clock::now();
 	FrameRenderTime=chrono::duration_cast <chrono::milliseconds>(end - start);
+	fprintf(stdout, "FrameRenderTime: %li ms\n", FrameRenderTime.count());
 }
 
 unsigned int Scene::ScreenWidth()

@@ -13,7 +13,8 @@ extern Widget *SceneW;
 ControlWidget::ControlWidget(QWidget *parent) : QWidget(parent), ui(new Ui::ControlWidget)
 {
 	ui->setupUi(this);
-	for(int obj=0; obj<NewScene->SceneObjects->size(); obj++)
+	size_t obj;
+	for(obj=0; obj<NewScene->SceneObjects->size(); obj++)
 	{
 		ui->comboBox->addItem(QString::fromStdString(NewScene->SceneObjects->at(obj)->Name()));
 	}

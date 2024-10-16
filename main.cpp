@@ -18,34 +18,34 @@ int main(int argc, char *argv[])
 	NewScene=new Scene;
 
 	Sphere *NewSphere1=new Sphere();
-	NewSphere1->SetName("Sphere 1");
+	NewSphere1->SetName("Small sphere 1");
 	NewSphere1->SetRadius(12);
-	NewSphere1->SetPosition(15, 0, 80);
-	NewSphere1->SetColor(0, 200, 200);
+	NewSphere1->SetPosition(14, 0, 60);
+	NewSphere1->SetColor(120, 20, 20);
 
 	Sphere *NewSphere2=new Sphere();
-	NewSphere2->SetName("Sphere 2");
+	NewSphere2->SetName("Small sphere 2");
 	NewSphere2->SetRadius(12);
-	NewSphere2->SetPosition(-15, 0, 80);
-	NewSphere2->SetColor(200, 0, 200);
+	NewSphere2->SetPosition(-14, 0, 60);
+	NewSphere2->SetColor(20, 20, 120);
 
 	Sphere *NewSphere3=new Sphere();
 	NewSphere3->SetName("Big sphere");
-	NewSphere3->SetRadius(500);
-	NewSphere3->SetPosition(0, 512, 80);
-	NewSphere3->SetColor(150, 150, 150);
+	NewSphere3->SetRadius(700);
+	NewSphere3->SetPosition(0, 712, 60);
+	NewSphere3->SetColor(60, 60, 60);
 
 	Sphere *NewLightSource1=new Sphere();
-	NewLightSource1->SetName("Light source 1");
-	NewLightSource1->SetRadius(10);
-	NewLightSource1->SetPosition(100, -100, 50);
+	NewLightSource1->SetName("Spherical light source");
+	NewLightSource1->SetRadius(20);
+	NewLightSource1->SetPosition(100, -100, 60);
 	NewLightSource1->SetBrightness(100);
 	NewLightSource1->SetColor(255, 255, 255);
 
-	Sphere *NewLightSource2=new Sphere();
-	NewLightSource2->SetName("Light source 2");
-	NewLightSource2->SetRadius(10);
-	NewLightSource2->SetPosition(-100, -100, 50);
+	Cube *NewLightSource2=new Cube();
+	NewLightSource2->SetName("Cubical light source");
+	NewLightSource2->SetLength(13);
+	NewLightSource2->SetPosition(-100, -100, 60);
 	NewLightSource2->SetBrightness(100);
 	NewLightSource2->SetColor(255, 255, 255);
 

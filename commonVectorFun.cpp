@@ -8,14 +8,21 @@ Vec2d::Vec2d()
 	X=Y=0.0;
 }
 
-Vec2d::Vec2d(const Vec2d *vec)
+Vec2d::Vec2d(const Vec2d *other)
 {
-	X=vec->X, Y=vec->Y;
+	if(other)
+	{
+		X=other->X, Y=other->Y;
+	}
+	else
+	{
+		X=Y=0.0;
+	}
 }
 
-Vec2d::Vec2d(const Vec2d &vec)
+Vec2d::Vec2d(const Vec2d &other)
 {
-	X=vec.X, Y=vec.Y;
+	X=other.X, Y=other.Y;
 }
 
 Vec2d::Vec2d(double x, double y)
@@ -31,6 +38,13 @@ Vec2d Vec2d::Normal(double length)
 	res.X/=len;
 	res.Y/=len;
 	return(res);
+}
+
+void Vec2d::Normalize()
+{
+	double length=this->Length();
+	this->X/=length;
+	this->Y/=length;
 }
 
 Vec2d Vec2d::Abs()
@@ -110,14 +124,21 @@ Vec3d::Vec3d()
 	X=Y=Z=0.0;
 }
 
-Vec3d::Vec3d(const Vec3d *vec)
+Vec3d::Vec3d(const Vec3d *other)
 {
-	X=vec->X, Y=vec->Y, Z=vec->Z;
+	if(other)
+	{
+		X=other->X, Y=other->Y, Z=other->Z;
+	}
+	else
+	{
+		X=Y=Z=0.0;
+	}
 }
 
-Vec3d::Vec3d(const Vec3d &vec)
+Vec3d::Vec3d(const Vec3d &other)
 {
-	X=vec.X, Y=vec.Y, Z=vec.Z;
+	X=other.X, Y=other.Y, Z=other.Z;
 }
 
 Vec3d::Vec3d(double x, double y, double z)
@@ -134,6 +155,14 @@ Vec3d Vec3d::Normal(double length)
 	res.Y/=len;
 	res.Z/=len;
 	return(res);
+}
+
+void Vec3d::Normalize()
+{
+	double length=this->Length();
+	this->X/=length;
+	this->Y/=length;
+	this->Z/=length;
 }
 
 Vec3d Vec3d::Abs()
@@ -219,14 +248,21 @@ Vec3f::Vec3f()
 	X=Y=Z=0;
 }
 
-Vec3f::Vec3f(const Vec3f *vec)
+Vec3f::Vec3f(const Vec3f *other)
 {
-	X=vec->X, Y=vec->Y, Z=vec->Z;
+	if(other)
+	{
+		X=other->X, Y=other->Y, Z=other->Z;
+	}
+	else
+	{
+		X=Y=Z=0.0;
+	}
 }
 
-Vec3f::Vec3f(const Vec3f &vec)
+Vec3f::Vec3f(const Vec3f &other)
 {
-	X=vec.X, Y=vec.Y, Z=vec.Z;
+	X=other.X, Y=other.Y, Z=other.Z;
 }
 
 Vec3f::Vec3f(float x, float y, float z)
@@ -243,6 +279,14 @@ Vec3f Vec3f::Normal(float length)
 	res.Y/=len;
 	res.Z/=len;
 	return(res);
+}
+
+void Vec3f::Normalize()
+{
+	float length=this->Length();
+	this->X/=length;
+	this->Y/=length;
+	this->Z/=length;
 }
 
 Vec3f Vec3f::Abs()
@@ -312,6 +356,7 @@ Vec3f Vec3f::operator/(float m)
 	res.Z/=m;
 	return res;
 }
+
 
 //=== Vec3 uchar
 
