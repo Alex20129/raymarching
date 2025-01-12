@@ -9,7 +9,7 @@ Scene::Scene()
 	SceneObjects=new vector <Object *>;
 	SceneLights=new vector <Object *>;
 	SceneRays=new vector <Ray *>;
-	pRenderThreads=new vector <thread *>;
+	pRenderThreads=new queue<thread *>;
 
 	ImageData=new vector <uint8_t>;
 
@@ -81,16 +81,13 @@ void Scene::Render()
 	for(threadid=0; threadid<pRenderThreadsNum; threadid++)
 	{
 		newThread=new thread(RayRunningWrapperFun, SceneRays->data(), SceneRays->size()/pRenderThreadsNum, threadid);
-		pRenderThreads->push_back(newThread);
-	}
-	for(threadid=0; threadid<pRenderThreadsNum; threadid++)
-	{
-		pRenderThreads->at(threadid)->join();
+		pRenderThreads->push(newThread);
 	}
 	while(!pRenderThreads->empty())
 	{
-		delete pRenderThreads->back();
-		pRenderThreads->pop_back();
+		pRenderThreads->front()->join();
+		delete pRenderThreads->front();
+		pRenderThreads->pop();
 	}
 	end=chrono::high_resolution_clock::now();
 	FrameRenderTime=chrono::duration_cast <chrono::milliseconds>(end - start);

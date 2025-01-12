@@ -3,6 +3,7 @@
 
 #include "basicObjects.hpp"
 #include <thread>
+#include <queue>
 #include <chrono>
 
 #define DEFAULT_SCREEN_WIDTH		1024
@@ -30,7 +31,7 @@ public:
 	void SetScreenSize(unsigned int width, unsigned int height);
 	void SavePPMImage(const char *filename);
 private:
-	vector <thread *> *pRenderThreads;
+	queue<thread *> *pRenderThreads;
 	vector <Ray *> *SceneRays;
 	unsigned int pScreenWidth, pScreenHeight, pRenderThreadsNum;
 };
