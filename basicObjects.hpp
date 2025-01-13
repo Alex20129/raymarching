@@ -8,7 +8,7 @@
 #define RAY_STEPS_MAX			1024
 #define RAY_REFLECTIONS_MAX		4
 
-#define DEFAULT_OBJECT_COLOR	0x00,0x00,0x00
+#define DEFAULT_OBJECT_COLOR	0xFF,0xFF,0xFF
 #define DEFAULT_OBJECT_NAME		"Default object"
 
 using namespace std;
@@ -22,6 +22,9 @@ public:
 
 	uint Brightness() const;
 	void SetBrightness(uint brightness);
+
+	double Reflectivity();
+	void SetReflectivity(double reflectivity);
 
 	Vec3f Color() const;
 	void SetColor(Vec3f color);
@@ -43,6 +46,7 @@ protected:
 private:
 	bool pVisible;
 	uint pBrightness;
+	double pReflectivity;
 	string *pName;
 	Vec3uc *pColor;
 };

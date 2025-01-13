@@ -20,12 +20,14 @@ int main(int argc, char *argv[])
 	Sphere *NewSphere1=new Sphere();
 	NewSphere1->SetName("Small sphere 1");
 	NewSphere1->SetRadius(12);
+	NewSphere1->SetReflectivity(0.0);
 	NewSphere1->SetPosition(14, 0, 60);
 	NewSphere1->SetColor(120, 20, 20);
 
 	Sphere *NewSphere2=new Sphere();
 	NewSphere2->SetName("Small sphere 2");
 	NewSphere2->SetRadius(12);
+	NewSphere1->SetReflectivity(0.5);
 	NewSphere2->SetPosition(-14, 0, 60);
 	NewSphere2->SetColor(20, 20, 120);
 
@@ -33,7 +35,7 @@ int main(int argc, char *argv[])
 	NewSphere3->SetName("Big sphere");
 	NewSphere3->SetRadius(700);
 	NewSphere3->SetPosition(0, 712, 60);
-	NewSphere3->SetColor(60, 60, 60);
+	NewSphere3->SetColor(90, 90, 90);
 
 	Sphere *NewLightSource1=new Sphere();
 	NewLightSource1->SetName("Spherical light source");
@@ -75,19 +77,19 @@ int main(int argc, char *argv[])
 //	fprintf(stdout, "%8.1lf\n", newCube1->GetDistance(testObj->Position()));
 
 	NewScene->Render();
-	//fprintf(stdout, "RenderTime: %lims\n", FrameRenderTime.count());
-	//MainScene->SavePPMImage("009.ppm");
 	QImage img1(NewScene->ImageData->data(), NewScene->ScreenWidth(), NewScene->ScreenHeight(), QImage::Format_RGBA8888);
 	img1.save(QString("011.png"));
 
 	SceneW=new Widget;
 	ControlsW=new ControlWidget;
-
-	SceneW->showFullScreen();
-
-	QTimer::singleShot(0, SceneW, SLOT(show()));
-	QTimer::singleShot(0, ControlsW, SLOT(show()));
 //	ControlsW->setWindowModality(Qt::ApplicationModal);
+
+	SceneW->setImage(&img1);
+
+//	QTimer::singleShot(0, SceneW, SLOT(showNormal()));
+//	QTimer::singleShot(0, SceneW, SLOT(showFullScreen()));
+	QTimer::singleShot(0, SceneW, SLOT(showMaximized()));
+	QTimer::singleShot(0, ControlsW, SLOT(show()));
 
 	return app.exec();
 }

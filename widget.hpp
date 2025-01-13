@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QBrush>
+#include <QImage>
 
 #include "scene.hpp"
 
@@ -13,6 +14,8 @@ QT_END_NAMESPACE
 class Widget : public QWidget
 {
 	Q_OBJECT
+	QImage *pImage;
+	Ui::Widget *ui;
 signals:
 public:
 	Widget(QWidget *parent=nullptr);
@@ -20,10 +23,7 @@ public:
 	void keyPressEvent(QKeyEvent *event);
 	void closeEvent(QCloseEvent *event);
 	void paintEvent(QPaintEvent *event);
-	void resizeEvent(QResizeEvent *event);
 public slots:
-private:
-	Ui::Widget *ui;
-private slots:
+	void setImage(QImage *new_image);
 };
 #endif // WIDGET_HPP

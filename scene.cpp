@@ -130,20 +130,3 @@ void Scene::SetScreenSize(unsigned int width, unsigned int height)
 	pScreenHeight=height;
 	ImageData->resize(pScreenWidth*pScreenHeight*4, 255);
 }
-
-void Scene::SavePPMImage(const char *filename)
-{
-	unsigned int color, colornum=ImageData->size();
-	FILE *fd=fopen(filename, "w");
-	if(fd)
-	{
-		fprintf(fd, "P3 %i %i 255\n", pScreenWidth, pScreenHeight);
-		fprintf(fd, "%i", ImageData->data()[0]);
-		for(color=1; color<colornum; color++)
-		{
-			fprintf(fd, " %i", ImageData->data()[color]);
-		}
-		fprintf(fd, "\n");
-		fclose(fd);
-	}
-}

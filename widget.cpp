@@ -44,12 +44,21 @@ void Widget::closeEvent(QCloseEvent *event)
 
 void Widget::paintEvent(QPaintEvent *event)
 {
+	int X, Y;
+	QPainter myPainter(this);
 	event->accept();
-	QPainter(this).drawImage(QRectF(this->rect().width()/2-NewScene->ScreenWidth()/2, this->rect().height()/2-NewScene->ScreenHeight()/2, NewScene->ScreenWidth(), NewScene->ScreenHeight()),
-							 QImage(NewScene->ImageData->data(), NewScene->ScreenWidth(), NewScene->ScreenHeight(), QImage::Format_RGBA8888));
+	if(!pImage)
+	{
+		return;
+	}
+	X=this->width()/2-pImage->width()/2;
+	Y=this->height()/2-pImage->height()/2;
+	myPainter.drawImage(X, Y, *pImage);
 }
 
-void Widget::resizeEvent(QResizeEvent *event)
+void Widget::setImage(QImage *new_image)
 {
-
+	pImage=new_image;
+	// this->repaint(); // immediate repaint
+	this->update(); // deferred repaint
 }

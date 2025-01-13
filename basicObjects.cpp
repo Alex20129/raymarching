@@ -6,6 +6,7 @@ Object::Object()
 {
 	pVisible=1;
 	pBrightness=0;
+	pReflectivity=0.5;
 	Position=new Vec3d(0, 0, 0);
 	pColor=new Vec3uc(DEFAULT_OBJECT_COLOR);
 	pName=new string(DEFAULT_OBJECT_NAME);
@@ -29,6 +30,16 @@ uint Object::Brightness() const
 void Object::SetBrightness(uint brightness)
 {
 	pBrightness=brightness;
+}
+
+double Object::Reflectivity()
+{
+	return(pReflectivity);
+}
+
+void Object::SetReflectivity(double reflectivity)
+{
+	pReflectivity=reflectivity;
 }
 
 Vec3f Object::Color() const
@@ -149,9 +160,9 @@ void Ray::Reset()
 void Ray::Run()
 {
 	double illuninationLevel=1.0;
-	double diffused_lighting, color_acc_k=1.0;
+	double diffused_lighting;
 	Vec3d SurfaceNormal, Reflection;
-	Vec3d fromPointToLightSource;
+	Vec3d fromLightSourceToCollisionPoint;
 	Vec3d CollisionPoint, FirstCollisionPoint;
 	Vec3f NewColor(DEFAULT_OBJECT_COLOR);
 	Object *Obstacle=nullptr, *FirstCollisionObstacle=nullptr;
@@ -167,15 +178,11 @@ void Ray::Run()
 		CollisionPoint=*Position;
 		if(!FirstCollisionObstacle)
 		{
-			if(!Obstacle->ItsALightSource())
-			{
-				FirstCollisionObstacle=Obstacle;
-				FirstCollisionPoint=*Position;
-			}
+			FirstCollisionObstacle=Obstacle;
+			FirstCollisionPoint=*Position;
 		}
 
-		NewColor=NewColor*(1.0-color_acc_k) + Obstacle->Color()*color_acc_k;
-		color_acc_k/=2.0;
+		NewColor=NewColor*Obstacle->Reflectivity() + Obstacle->Color()*(1.0-Obstacle->Reflectivity());
 
 		if(Obstacle->ItsALightSource())
 		{
@@ -193,36 +200,28 @@ void Ray::Run()
 		pReflectionsHappened++;
 	}
 
-	if(FirstCollisionObstacle)
+	// if(FirstCollisionObstacle)
+	if(0)
 	{
 		illuninationLevel=0.0;
-		SurfaceNormal=(FirstCollisionPoint-*FirstCollisionObstacle->Position).Normal();
+		// SurfaceNormal=(FirstCollisionPoint-*FirstCollisionObstacle->Position).Normal();
 		for(Object *LightSource: *SceneLights)
 		{
-			fromPointToLightSource=(*LightSource->Position-FirstCollisionPoint).Normal();
+			fromLightSourceToCollisionPoint=(FirstCollisionPoint-*LightSource->Position).Normal();
 
-//			diffused_lighting=(SurfaceNormal*fromPointToLightSource);
-//			if(diffused_lighting<0.0)
-//			{
-//				diffused_lighting=0.0;
-//			}
+			// diffused_lighting=(SurfaceNormal*fromLightSource);
+			// if(diffused_lighting<0.0)
+			// {
+			// 	diffused_lighting=0.0;
+			// }
 
-			SetPosition(FirstCollisionPoint);
-			pObjectToSkipOnce=FirstCollisionObstacle;
+			SetPosition(*LightSource->Position);
+			pObjectToSkipOnce=LightSource;
 
-			Obstacle=RunTo(fromPointToLightSource);
-			if(Obstacle)
+			Obstacle=RunTo(fromLightSourceToCollisionPoint);
+			if(Obstacle==FirstCollisionObstacle)
 			{
-				if(Obstacle->ItsALightSource())
-				{
-//					illuninationLevel+=diffused_lighting*2.0;
-					illuninationLevel+=1.25;
-				}
-				else
-				{
-//					illuninationLevel+=diffused_lighting/2.0;
-					illuninationLevel+=0.75;
-				}
+				illuninationLevel+=1;
 			}
 		}
 		illuninationLevel/=SceneLights->size();

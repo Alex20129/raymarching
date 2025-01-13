@@ -29,7 +29,6 @@ public:
 	void SetScreenHeight(unsigned int height);
 	void SetRenderThreadsNum(unsigned int threads_num);
 	void SetScreenSize(unsigned int width, unsigned int height);
-	void SavePPMImage(const char *filename);
 private:
 	queue<thread *> *pRenderThreads;
 	vector <Ray *> *SceneRays;
