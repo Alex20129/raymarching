@@ -173,7 +173,7 @@ void Ray::Run()
 	double diffusedLighting, diffusedLightingHV;
 	Vec3d SurfaceNormal;
 	Vec3d fromCollisionPointToLightSource;
-	Vec3d CollisionPoint, FirstCollisionPoint;
+	Vec3d FirstCollisionPoint;
 	Vec3f NewColor;
 	Object *Obstacle=nullptr, *FirstCollisionObstacle=nullptr;
 
@@ -186,7 +186,6 @@ void Ray::Run()
 		}
 		pCollisionsHappened++;
 
-		CollisionPoint=*Position;
 		if(!FirstCollisionObstacle)
 		{
 			FirstCollisionObstacle=Obstacle;
