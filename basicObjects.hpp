@@ -6,7 +6,7 @@
 #include "commonVectorFun.hpp"
 
 #define RAY_STEPS_MAX			1024
-#define RAY_REFLECTIONS_MAX		4
+#define RAY_COLLISIONS_MAX		4
 
 #define DEFAULT_OBJECT_COLOR	0x00,0x00,0x00
 #define DEFAULT_OBJECT_NAME		"Default object"
@@ -59,14 +59,15 @@ public:
 	Ray();
 	Vec3d Direction() const;
 	void SetDirection(Vec3d direction);
+	void SetDirection(Vec3d *direction);
 	void SetDirection(double x, double y, double z);
 	void Reset();
 	void Run();
-	Object *RunTo(Vec3d *direction);
+	Object *RunOnce();
 private:
 	Object *pObjectToSkip;
 	Vec3d *pDirection;
-	unsigned int pStepsDone, pReflectionsHappened;
+	unsigned int pStepsDone, pCollisionsHappened;
 };
 
 // ========= SPHERE ===

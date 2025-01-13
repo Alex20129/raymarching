@@ -6,8 +6,8 @@
 #include <queue>
 #include <chrono>
 
-#define DEFAULT_SCREEN_WIDTH		1024
-#define DEFAULT_SCREEN_HEIGHT		1024
+#define DEFAULT_SCREEN_WIDTH		2048
+#define DEFAULT_SCREEN_HEIGHT		1536
 #define DEFAULT_RENDER_THREADS_NUM	4
 
 using namespace std;

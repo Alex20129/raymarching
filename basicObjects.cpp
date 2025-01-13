@@ -130,7 +130,7 @@ Ray::Ray()
 {
 	pDirection=new Vec3d(0, 0, 0);
 	pStepsDone=0;
-	pReflectionsHappened=0;
+	pCollisionsHappened=0;
 	SetName("Ray");
 }
 
@@ -141,18 +141,28 @@ Vec3d Ray::Direction() const
 
 void Ray::SetDirection(Vec3d direction)
 {
-	*pDirection=direction.Normal();
+	*pDirection=direction;
+	pDirection->Normalize();
+}
+
+void Ray::SetDirection(Vec3d *direction)
+{
+	*pDirection=*direction;
+	pDirection->Normalize();
 }
 
 void Ray::SetDirection(double x, double y, double z)
 {
-	*pDirection=Vec3d(x, y, z).Normal();
+	pDirection->X=x;
+	pDirection->Y=y;
+	pDirection->Z=z;
+	pDirection->Normalize();
 }
 
 void Ray::Reset()
 {
 	pStepsDone=0;
-	pReflectionsHappened=0;
+	pCollisionsHappened=0;
 	pObjectToSkip=nullptr;
 	SetPosition(0, 0, 0);
 }
@@ -167,13 +177,14 @@ void Ray::Run()
 	Vec3f NewColor;
 	Object *Obstacle=nullptr, *FirstCollisionObstacle=nullptr;
 
-	while(pReflectionsHappened<RAY_REFLECTIONS_MAX)
+	while(pCollisionsHappened<RAY_COLLISIONS_MAX)
 	{
-		Obstacle=RunTo(nullptr);
+		Obstacle=RunOnce();
 		if(Obstacle==nullptr) // finished in space
 		{
 			break;
 		}
+		pCollisionsHappened++;
 
 		CollisionPoint=*Position;
 		if(!FirstCollisionObstacle)
@@ -191,8 +202,6 @@ void Ray::Run()
 		{
 			break;
 		}
-
-		pReflectionsHappened++;
 	}
 
 	if(FirstCollisionObstacle)
@@ -200,7 +209,8 @@ void Ray::Run()
 		pObjectToSkip=FirstCollisionObstacle;
 		// WIP
 		//incorrect, it works only for spheres
-		SurfaceNormal=(FirstCollisionPoint-*FirstCollisionObstacle->Position).Normal();
+		SurfaceNormal=FirstCollisionPoint-*FirstCollisionObstacle->Position;
+		SurfaceNormal.Normalize();
 
 		diffusedLightingHV=0.0;
 		for(Object *LightSource: *SceneLights)
@@ -220,14 +230,15 @@ void Ray::Run()
 				diffusedLightingHV=diffusedLighting;
 			}
 
-			Obstacle=RunTo(&fromCollisionPointToLightSource);
+			SetDirection(&fromCollisionPointToLightSource);
+			Obstacle=RunOnce();
 			if(Obstacle==LightSource)
 			{
-				illuninationLevel=diffusedLightingHV;
+				// illuninationLevel=diffusedLightingHV;
 			}
 			else
 			{
-				illuninationLevel=diffusedLightingHV/2.0;
+				// illuninationLevel=diffusedLightingHV/2.0;
 			}
 			illuninationLevel=diffusedLightingHV;
 		}
@@ -236,15 +247,11 @@ void Ray::Run()
 	SetColor(NewColor*illuninationLevel);
 }
 
-Object *Ray::RunTo(Vec3d *direction)
+Object *Ray::RunOnce()
 {
 	double mindist=__INT_MAX__, dist=0;
 	Object *NearestObject=nullptr;
-	Vec3d SurfaceNormal, Reflection;
-	if(direction)
-	{
-		*pDirection=*direction;
-	}
+	Vec3d SurfaceNormalVec, ReflectionVec;
 	while(pStepsDone<RAY_STEPS_MAX)
 	{
 		for(Object *Obj: *SceneObjects)
@@ -273,9 +280,9 @@ Object *Ray::RunTo(Vec3d *direction)
 			pObjectToSkip=NearestObject;
 			// WIP
 			//incorrect, it works only for spheres
-			SurfaceNormal=(*this->Position-*NearestObject->Position).Normal();
-			Reflection=(*pDirection-SurfaceNormal*2.0*(*pDirection*SurfaceNormal)).Normal();
-			SetDirection(Reflection);
+			SurfaceNormalVec=(*this->Position-*NearestObject->Position).Normal();
+			ReflectionVec=*pDirection-SurfaceNormalVec*2.0*(*pDirection*SurfaceNormalVec);
+			SetDirection(ReflectionVec);
 			break;
 		}
 		SetPosition(*Position+*pDirection*mindist);
