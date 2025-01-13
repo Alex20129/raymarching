@@ -8,7 +8,7 @@
 #define RAY_STEPS_MAX			1024
 #define RAY_REFLECTIONS_MAX		4
 
-#define DEFAULT_OBJECT_COLOR	0xFF,0xFF,0xFF
+#define DEFAULT_OBJECT_COLOR	0x00,0x00,0x00
 #define DEFAULT_OBJECT_NAME		"Default object"
 
 using namespace std;
@@ -62,9 +62,9 @@ public:
 	void SetDirection(double x, double y, double z);
 	void Reset();
 	void Run();
-	Object *RunTo(Vec3d direction);
+	Object *RunTo(Vec3d *direction);
 private:
-	Object *pObjectToSkipOnce;
+	Object *pObjectToSkip;
 	Vec3d *pDirection;
 	unsigned int pStepsDone, pReflectionsHappened;
 };

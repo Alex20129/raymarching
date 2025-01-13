@@ -153,23 +153,23 @@ void Ray::Reset()
 {
 	pStepsDone=0;
 	pReflectionsHappened=0;
-	pObjectToSkipOnce=nullptr;
+	pObjectToSkip=nullptr;
 	SetPosition(0, 0, 0);
 }
 
 void Ray::Run()
 {
-	double illuninationLevel=1.0;
-	double diffused_lighting;
-	Vec3d SurfaceNormal, Reflection;
-	Vec3d fromLightSourceToCollisionPoint;
+	double illuninationLevel=0.125;
+	double diffusedLighting, diffusedLightingHV;
+	Vec3d SurfaceNormal;
+	Vec3d fromCollisionPointToLightSource;
 	Vec3d CollisionPoint, FirstCollisionPoint;
-	Vec3f NewColor(DEFAULT_OBJECT_COLOR);
+	Vec3f NewColor;
 	Object *Obstacle=nullptr, *FirstCollisionObstacle=nullptr;
 
 	while(pReflectionsHappened<RAY_REFLECTIONS_MAX)
 	{
-		Obstacle=RunTo(*pDirection);
+		Obstacle=RunTo(nullptr);
 		if(Obstacle==nullptr) // finished in space
 		{
 			break;
@@ -180,60 +180,71 @@ void Ray::Run()
 		{
 			FirstCollisionObstacle=Obstacle;
 			FirstCollisionPoint=*Position;
+			NewColor=Obstacle->Color();
 		}
-
-		NewColor=NewColor*Obstacle->Reflectivity() + Obstacle->Color()*(1.0-Obstacle->Reflectivity());
+		else
+		{
+			NewColor=NewColor*(1.0-Obstacle->Reflectivity()) + Obstacle->Color()*Obstacle->Reflectivity();
+		}
 
 		if(Obstacle->ItsALightSource())
 		{
 			break;
 		}
 
-		pObjectToSkipOnce=Obstacle;
-
-		// WIP
-		//incorrect, it works only for spheres
-		SurfaceNormal=(CollisionPoint-*Obstacle->Position).Normal();
-		Reflection=(*pDirection-SurfaceNormal*2.0*(*pDirection*SurfaceNormal)).Normal();
-
-		SetDirection(Reflection);
 		pReflectionsHappened++;
 	}
 
-	// if(FirstCollisionObstacle)
-	if(0)
+	if(FirstCollisionObstacle)
 	{
-		illuninationLevel=0.0;
-		// SurfaceNormal=(FirstCollisionPoint-*FirstCollisionObstacle->Position).Normal();
+		pObjectToSkip=FirstCollisionObstacle;
+		// WIP
+		//incorrect, it works only for spheres
+		SurfaceNormal=(FirstCollisionPoint-*FirstCollisionObstacle->Position).Normal();
+
+		diffusedLightingHV=0.0;
 		for(Object *LightSource: *SceneLights)
 		{
-			fromLightSourceToCollisionPoint=(FirstCollisionPoint-*LightSource->Position).Normal();
+			SetPosition(FirstCollisionPoint);
 
-			// diffused_lighting=(SurfaceNormal*fromLightSource);
-			// if(diffused_lighting<0.0)
-			// {
-			// 	diffused_lighting=0.0;
-			// }
+			fromCollisionPointToLightSource=*LightSource->Position-FirstCollisionPoint;
+			fromCollisionPointToLightSource.Normalize();
 
-			SetPosition(*LightSource->Position);
-			pObjectToSkipOnce=LightSource;
-
-			Obstacle=RunTo(fromLightSourceToCollisionPoint);
-			if(Obstacle==FirstCollisionObstacle)
+			diffusedLighting=SurfaceNormal*fromCollisionPointToLightSource;
+			if(diffusedLighting<0.0)
 			{
-				illuninationLevel+=1;
+				diffusedLighting=0.0;
 			}
+			if(diffusedLightingHV<diffusedLighting)
+			{
+				diffusedLightingHV=diffusedLighting;
+			}
+
+			Obstacle=RunTo(&fromCollisionPointToLightSource);
+			if(Obstacle==LightSource)
+			{
+				illuninationLevel=diffusedLightingHV;
+			}
+			else
+			{
+				illuninationLevel=diffusedLightingHV/2.0;
+			}
+			illuninationLevel=diffusedLightingHV;
 		}
-		illuninationLevel/=SceneLights->size();
 	}
 
 	SetColor(NewColor*illuninationLevel);
 }
 
-Object *Ray::RunTo(Vec3d direction)
+Object *Ray::RunTo(Vec3d *direction)
 {
 	double mindist=__INT_MAX__, dist=0;
 	Object *NearestObject=nullptr;
+	Vec3d SurfaceNormal, Reflection;
+	if(direction)
+	{
+		*pDirection=*direction;
+	}
 	while(pStepsDone<RAY_STEPS_MAX)
 	{
 		for(Object *Obj: *SceneObjects)
@@ -242,9 +253,8 @@ Object *Ray::RunTo(Vec3d direction)
 			{
 				continue;
 			}
-			if(Obj==pObjectToSkipOnce)
+			if(Obj==pObjectToSkip)
 			{
-				pObjectToSkipOnce=nullptr;
 				continue;
 			}
 			dist=Obj->GetDistance(*Position);
@@ -260,9 +270,15 @@ Object *Ray::RunTo(Vec3d direction)
 		}
 		if(NearestObject)
 		{
+			pObjectToSkip=NearestObject;
+			// WIP
+			//incorrect, it works only for spheres
+			SurfaceNormal=(*this->Position-*NearestObject->Position).Normal();
+			Reflection=(*pDirection-SurfaceNormal*2.0*(*pDirection*SurfaceNormal)).Normal();
+			SetDirection(Reflection);
 			break;
 		}
-		SetPosition(*Position+direction*mindist);
+		SetPosition(*Position+*pDirection*mindist);
 		pStepsDone++;
 	}
 	return(NearestObject);
