@@ -124,6 +124,80 @@ bool Object::ItsALightSource()
 	return(pBrightness>0);
 }
 
+// ========= CSG ===
+
+Difference::Difference(Object *object_a, Object *object_b)
+{
+	SetName("Difference");
+	ObjectA=object_a;
+	ObjectB=object_b;
+	if(ObjectA==nullptr)
+	{
+		return;
+	}
+	if(ObjectB==nullptr)
+	{
+		return;
+	}
+	Vec3f NewColor=(ObjectA->Color()+ObjectB->Color())/2.0;
+	SetColor(NewColor);
+}
+
+double Difference::GetDistance(Vec3d from)
+{
+	double DistA=ObjectA->GetDistance(from);
+	double DistB=0.0-ObjectB->GetDistance(from);
+	return std::max(DistA, DistB);
+}
+
+Union::Union(Object *object_a, Object *object_b)
+{
+	SetName("Union");
+	ObjectA=object_a;
+	ObjectB=object_b;
+	if(ObjectA==nullptr)
+	{
+		return;
+	}
+	if(ObjectB==nullptr)
+	{
+		return;
+	}
+	Vec3f NewColor=(ObjectA->Color()+ObjectB->Color())/2.0;
+	SetColor(NewColor);
+}
+
+double Union::GetDistance(Vec3d from)
+{
+	double DistA=ObjectA->GetDistance(from);
+	double DistB=ObjectB->GetDistance(from);
+	return std::min(DistA, DistB);
+}
+
+Intersection::Intersection(Object *object_a, Object *object_b)
+{
+	SetName("Intersection");
+	ObjectA=object_a;
+	ObjectB=object_b;
+	if(ObjectA==nullptr)
+	{
+		return;
+	}
+	if(ObjectB==nullptr)
+	{
+		return;
+	}
+	Vec3f NewColor=(ObjectA->Color()+ObjectB->Color())/2.0;
+	SetColor(NewColor);
+}
+
+double Intersection::GetDistance(Vec3d from)
+{
+	double DistA=ObjectA->GetDistance(from);
+	double DistB=ObjectB->GetDistance(from);
+	return std::max(DistA, DistB);
+}
+
 // ========= RAY ===
 
 Ray::Ray()

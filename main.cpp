@@ -46,20 +46,23 @@ int main(int argc, char *argv[])
 	NewLightSource1->SetBrightness(100);
 	NewLightSource1->SetColor(255, 255, 255);
 
-	Sphere *NewLightSource2=new Sphere();
-	NewLightSource2->SetName("Spherical light source");
-	NewLightSource2->SetRadius(20);
+	//Sphere *NewLightSource2=new Sphere();
+	//NewLightSource2->SetName("Spherical light source");
+	//NewLightSource2->SetRadius(20);
+	//NewLightSource2->SetPosition(100, -100, 60);
+	//NewLightSource2->SetBrightness(100);
+	//NewLightSource2->SetColor(255, 255, 255);
+
+	Cube *NewLightSource2=new Cube();
+	NewLightSource2->SetName("Cubical light source");
+	NewLightSource2->SetLength(13);
 	NewLightSource2->SetPosition(100, -100, 60);
 	NewLightSource2->SetBrightness(100);
 	NewLightSource2->SetColor(255, 255, 255);
 
-// Cube *NewLightSource3=new Cube();
-// NewLightSource3->SetName("Cubical light source");
-// NewLightSource3->SetLength(13);
-// NewLightSource3->SetPosition(100, -100, 60);
-// NewLightSource3->SetBrightness(100);
-// NewLightSource3->SetColor(255, 255, 255);
+	// Intersection *ShpereIntersection=new Intersection(NewSphere1, NewSphere2);
 
+	// NewScene->AddObject(ShpereIntersection);
 	NewScene->AddObject(NewSphere1);
 	NewScene->AddObject(NewSphere2);
 	NewScene->AddObject(NewSphere3);

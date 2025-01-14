@@ -15,6 +15,11 @@ using namespace std;
 
 class Object
 {
+	bool pVisible;
+	uint pBrightness;
+	double pReflectivity;
+	string *pName;
+	Vec3uc *pColor;
 public:
 	Object();
 	bool Visible() const;
@@ -42,19 +47,41 @@ public:
 
 	vector <Object *> *SceneObjects, *SceneLights;
 	Vec3d *Position;
-protected:
-private:
-	bool pVisible;
-	uint pBrightness;
-	double pReflectivity;
-	string *pName;
-	Vec3uc *pColor;
+};
+
+// ========= CSG ===
+
+class Difference : public Object
+{
+	Object *ObjectA, *ObjectB;
+public:
+	Difference(Object *object_a, Object *object_b);
+	double GetDistance(Vec3d from);
+};
+
+class Union : public Object
+{
+	Object *ObjectA, *ObjectB;
+public:
+	Union(Object *object_a, Object *object_b);
+	double GetDistance(Vec3d from);
+};
+
+class Intersection : public Object
+{
+	Object *ObjectA, *ObjectB;
+public:
+	Intersection(Object *object_a, Object *object_b);
+	double GetDistance(Vec3d from);
 };
 
 // ========= RAY ===
 
 class Ray : public Object
 {
+	Object *pObjectToSkip;
+	Vec3d *pDirection;
+	unsigned int pStepsDone, pCollisionsHappened;
 public:
 	Ray();
 	Vec3d Direction() const;
@@ -64,47 +91,40 @@ public:
 	void Reset();
 	void Run();
 	Object *RunOnce();
-private:
-	Object *pObjectToSkip;
-	Vec3d *pDirection;
-	unsigned int pStepsDone, pCollisionsHappened;
 };
 
 // ========= SPHERE ===
 
 class Sphere : public Object
 {
+	double pRadius;
 public:
 	Sphere();
 	void SetRadius(double radius);
 	double GetDistance(Vec3d from);
-private:
-	double pRadius;
 };
 
 // ========= CUBE ===
 
 class Cube : public Object
 {
+	double pLength;
 public:
 	Cube();
 	void SetLength(double length);
 	double GetDistance(Vec3d from);
-private:
-	double pLength;
 };
 
 // ========= TORUS ===
 
 class Torus : public Object
 {
+	double pRadius1, pRadius2;
 public:
 	Torus();
 	void SetRadius1(double radius);
 	void SetRadius2(double radius);
 	double GetDistance(Vec3d from);
-private:
-	double pRadius1, pRadius2;
 };
 
 #endif // BASICOBJECTS_HPP
