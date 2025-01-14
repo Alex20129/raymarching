@@ -119,6 +119,29 @@ double Object::GetDistance(Vec3d from)
 	return(from.Length());
 }
 
+/**
+ * Using the gradient of the SDF, estimate the normal vector on the surface at given point
+ */
+Vec3d Object::GetNormalVector(Vec3d point)
+{
+	Vec3d normalV(
+			GetDistance(Vec3d(point.X + RAY_COLLISION_THRESHOLD, point.Y, point.Z)) - GetDistance(Vec3d(point.X - RAY_COLLISION_THRESHOLD, point.Y, point.Z)),
+			GetDistance(Vec3d(point.X, point.Y + RAY_COLLISION_THRESHOLD, point.Z)) - GetDistance(Vec3d(point.X, point.Y - RAY_COLLISION_THRESHOLD, point.Z)),
+			GetDistance(Vec3d(point.X, point.Y, point.Z  + RAY_COLLISION_THRESHOLD)) - GetDistance(Vec3d(point.X, point.Y, point.Z - RAY_COLLISION_THRESHOLD)));
+	normalV.Normalize();
+	return(normalV);
+}
+
+Vec3d Object::GetNormalVector(Vec3d *point)
+{
+	Vec3d normalV(
+			GetDistance(Vec3d(point->X + RAY_COLLISION_THRESHOLD, point->Y, point->Z)) - GetDistance(Vec3d(point->X - RAY_COLLISION_THRESHOLD, point->Y, point->Z)),
+			GetDistance(Vec3d(point->X, point->Y + RAY_COLLISION_THRESHOLD, point->Z)) - GetDistance(Vec3d(point->X, point->Y - RAY_COLLISION_THRESHOLD, point->Z)),
+			GetDistance(Vec3d(point->X, point->Y, point->Z  + RAY_COLLISION_THRESHOLD)) - GetDistance(Vec3d(point->X, point->Y, point->Z - RAY_COLLISION_THRESHOLD)));
+	normalV.Normalize();
+	return(normalV);
+}
+
 bool Object::ItsALightSource()
 {
 	return(pBrightness>0);
@@ -245,7 +268,7 @@ void Ray::Run()
 {
 	double illuninationLevel=0.125;
 	double diffusedLighting, diffusedLightingHV;
-	Vec3d SurfaceNormal;
+	Vec3d SurfaceNormalVec;
 	Vec3d fromCollisionPointToLightSource;
 	Vec3d FirstCollisionPoint;
 	Vec3f NewColor;
@@ -280,10 +303,7 @@ void Ray::Run()
 	if(FirstCollisionObstacle)
 	{
 		pObjectToSkip=FirstCollisionObstacle;
-		// WIP
-		//incorrect, it works only for spheres
-		SurfaceNormal=FirstCollisionPoint-*FirstCollisionObstacle->Position;
-		SurfaceNormal.Normalize();
+		SurfaceNormalVec=FirstCollisionObstacle->GetNormalVector(FirstCollisionPoint);
 
 		diffusedLightingHV=0.0;
 		for(Object *LightSource: *SceneLights)
@@ -293,7 +313,7 @@ void Ray::Run()
 			fromCollisionPointToLightSource=*LightSource->Position-FirstCollisionPoint;
 			fromCollisionPointToLightSource.Normalize();
 
-			diffusedLighting=SurfaceNormal*fromCollisionPointToLightSource;
+			diffusedLighting=SurfaceNormalVec*fromCollisionPointToLightSource;
 			if(diffusedLighting<0.0)
 			{
 				diffusedLighting=0.0;
@@ -342,7 +362,7 @@ Object *Ray::RunOnce()
 			{
 				mindist=dist;
 			}
-			if(mindist<0.25)
+			if(mindist<RAY_COLLISION_THRESHOLD)
 			{
 				NearestObject=Obj;
 				break;
@@ -351,9 +371,7 @@ Object *Ray::RunOnce()
 		if(NearestObject)
 		{
 			pObjectToSkip=NearestObject;
-			// WIP
-			//incorrect, it works only for spheres
-			SurfaceNormalVec=(*this->Position-*NearestObject->Position).Normal();
+			SurfaceNormalVec=NearestObject->GetNormalVector(this->Position);
 			ReflectionVec=*pDirection-SurfaceNormalVec*2.0*(*pDirection*SurfaceNormalVec);
 			SetDirection(ReflectionVec);
 			break;

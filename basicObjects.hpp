@@ -7,9 +7,10 @@
 
 #define RAY_STEPS_MAX			1024
 #define RAY_COLLISIONS_MAX		4
+#define RAY_COLLISION_THRESHOLD	0.25
 
 #define DEFAULT_OBJECT_COLOR	0x00,0x00,0x00
-#define DEFAULT_OBJECT_NAME		"Default object"
+#define DEFAULT_OBJECT_NAME		"Object"
 
 using namespace std;
 
@@ -43,6 +44,8 @@ public:
 
 	void AttachExternalColorBuffer(Vec3uc *buffer);
 	virtual double GetDistance(Vec3d from);
+	Vec3d GetNormalVector(Vec3d point);
+	Vec3d GetNormalVector(Vec3d *point);
 	bool ItsALightSource();
 
 	vector <Object *> *SceneObjects, *SceneLights;
