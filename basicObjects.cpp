@@ -150,17 +150,19 @@ bool Object::ItsALightSource()
 Difference::Difference(Object *object_a, Object *object_b)
 {
 	SetName("Difference");
+	if(object_a==nullptr)
+	{
+		return;
+	}
 	ObjectA=object_a;
+	if(object_b==nullptr)
+	{
+		return;
+	}
 	ObjectB=object_b;
-	if(ObjectA==nullptr)
-	{
-		return;
-	}
-	if(ObjectB==nullptr)
-	{
-		return;
-	}
 	SetColor((ObjectA->Color()+ObjectB->Color())/2.0);
+	ObjectA->SetVisible(false);
+	ObjectB->SetVisible(false);
 }
 
 double Difference::GetDistance(Vec3d from) const
@@ -173,17 +175,19 @@ double Difference::GetDistance(Vec3d from) const
 Union::Union(Object *object_a, Object *object_b)
 {
 	SetName("Union");
+	if(object_a==nullptr)
+	{
+		return;
+	}
 	ObjectA=object_a;
+	if(object_b==nullptr)
+	{
+		return;
+	}
 	ObjectB=object_b;
-	if(ObjectA==nullptr)
-	{
-		return;
-	}
-	if(ObjectB==nullptr)
-	{
-		return;
-	}
 	SetColor((ObjectA->Color()+ObjectB->Color())/2.0);
+	ObjectA->SetVisible(false);
+	ObjectB->SetVisible(false);
 }
 
 double Union::GetDistance(Vec3d from) const
@@ -196,17 +200,19 @@ double Union::GetDistance(Vec3d from) const
 Intersection::Intersection(Object *object_a, Object *object_b)
 {
 	SetName("Intersection");
+	if(object_a==nullptr)
+	{
+		return;
+	}
 	ObjectA=object_a;
+	if(object_b==nullptr)
+	{
+		return;
+	}
 	ObjectB=object_b;
-	if(ObjectA==nullptr)
-	{
-		return;
-	}
-	if(ObjectB==nullptr)
-	{
-		return;
-	}
 	SetColor((ObjectA->Color()+ObjectB->Color())/2.0);
+	ObjectA->SetVisible(false);
+	ObjectB->SetVisible(false);
 }
 
 double Intersection::GetDistance(Vec3d from) const
@@ -261,7 +267,7 @@ void Ray::Reset()
 
 void Ray::Run()
 {
-	double illuninationLevel=0.125;
+	double illuninationLevel=0.0, ColorAccK=1.0;
 	double diffusedLighting, diffusedLightingHV;
 	Vec3d SurfaceNormalVec;
 	Vec3d fromCollisionPointToLightSource;
@@ -282,16 +288,18 @@ void Ray::Run()
 		{
 			FirstCollisionObstacle=Obstacle;
 			FirstCollisionPoint=*Position;
-			NewColor=Obstacle->Color();
+			// NewColor=Obstacle->Color();
 		}
-		else
+		// else
 		{
-			NewColor=NewColor*(1.0-Obstacle->Reflectivity()) + Obstacle->Color()*Obstacle->Reflectivity();
+			// NewColor=NewColor*(1.0-Obstacle->Reflectivity()) + Obstacle->Color()*Obstacle->Reflectivity();
+			NewColor=NewColor*(1.0-ColorAccK) + Obstacle->Color()*ColorAccK;
+			ColorAccK/=2.0;
 		}
 
 		if(Obstacle->ItsALightSource())
 		{
-			break;
+			pCollisionsHappened=RAY_COLLISIONS_MAX;
 		}
 	}
 
@@ -406,7 +414,7 @@ Cube::Cube()
 
 void Cube::SetLength(double length)
 {
-	pLength=length;
+	pLength=length/2;
 }
 
 double Cube::GetDistance(Vec3d from) const
@@ -441,6 +449,8 @@ double Torus::GetDistance(Vec3d from) const
 	Vec2d d=Vec2d(Vec2d(from.X, from.Z).Length()-pRadius1, from.Y);
 	return(d.Length()-pRadius2);
 }
+
+// ========= PLANE ===
 
 Plane::Plane()
 {

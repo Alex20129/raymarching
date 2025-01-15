@@ -6,7 +6,7 @@
 #include "commonVectorFun.hpp"
 
 #define RAY_STEPS_MAX			1024
-#define RAY_COLLISIONS_MAX		4
+#define RAY_COLLISIONS_MAX		3
 #define RAY_COLLISION_THRESHOLD	1.0F/16.0F
 
 #define DEFAULT_OBJECT_COLOR	0x00,0x00,0x00
