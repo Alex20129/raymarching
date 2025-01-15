@@ -20,68 +20,69 @@ int main(int argc, char *argv[])
 
 	Sphere *NewSphere1=new Sphere();
 	NewSphere1->SetName("Small sphere 1");
-	NewSphere1->SetRadius(10);
+	NewSphere1->SetRadius(25);
 	NewSphere1->SetReflectivity(0.5);
-	NewSphere1->SetPosition(12, 0, 50);
+	NewSphere1->SetPosition(0, 10, 160);
 	NewSphere1->SetColor(200, 0, 0);
 
-	// Sphere *NewSphere2=new Sphere();
-	// NewSphere2->SetName("Small sphere 2");
-	// NewSphere2->SetRadius(10);
-	// NewSphere2->SetReflectivity(0.5);
-	// NewSphere2->SetPosition(-12, 0, 50);
-	// NewSphere2->SetColor(0, 0, 200);
+	Sphere *NewSphere2=new Sphere();
+	NewSphere2->SetName("Small sphere 2");
+	NewSphere2->SetRadius(25);
+	NewSphere2->SetReflectivity(0.5);
+	NewSphere2->SetPosition(-55, 10, 180);
+	NewSphere2->SetColor(0, 0, 200);
 
-	Cube *NewCube=new Cube();
-	NewCube->SetName("Cube");
-	NewCube->SetLength(8);
-	NewCube->SetReflectivity(0.5);
-	NewCube->SetPosition(-12, 0, 50);
-	NewCube->SetColor(0, 200, 200);
+	Cube *NewCube1=new Cube();
+	NewCube1->SetName("Cube 1");
+	NewCube1->SetLength(20);
+	NewCube1->SetReflectivity(0.5);
+	NewCube1->SetPosition(0, 10, 160);
+	NewCube1->SetColor(0, 180, 180);
 
-	Sphere *NewSphere3=new Sphere();
-	NewSphere3->SetName("Big sphere");
-	NewSphere3->SetRadius(700);
-	NewSphere3->SetReflectivity(0.5);
-	NewSphere3->SetPosition(0, 712, 50);
-	NewSphere3->SetColor(180, 180, 180);
+	Cube *NewCube2=new Cube();
+	NewCube2->SetName("Cube 2");
+	NewCube2->SetLength(20);
+	NewCube2->SetReflectivity(0.5);
+	NewCube2->SetPosition(50, 10, 180);
+	NewCube2->SetColor(180, 0, 180);
+
+	// Torus *NewTorus1=new Torus();
+	// NewTorus1->SetName("Torus 1");
+	// NewTorus1->SetPosition(0, 20, 120);
+	// NewTorus1->SetRadius1(40);
+	// NewTorus1->SetRadius2(10);
+	// NewTorus1->SetColor(180, 200, 80);
 
 	Sphere *NewLightSource1=new Sphere();
 	NewLightSource1->SetName("Spherical light source");
 	NewLightSource1->SetRadius(20);
-	NewLightSource1->SetPosition(-100, -100, 50);
+	NewLightSource1->SetPosition(-100, -100, 40);
 	NewLightSource1->SetBrightness(100);
 	NewLightSource1->SetColor(255, 255, 255);
 
 	Cube *NewLightSource2=new Cube();
 	NewLightSource2->SetName("Cubical light source");
 	NewLightSource2->SetLength(13);
-	NewLightSource2->SetPosition(100, -100, 0);
+	NewLightSource2->SetPosition(100, -100, 120);
 	NewLightSource2->SetBrightness(100);
 	NewLightSource2->SetColor(255, 255, 255);
 
-	// Intersection *ShpereIntersection=new Intersection(NewSphere1, NewSphere2);
+	Intersection *ShpereCubeIntersection=new Intersection(NewSphere1, NewCube1);
+	ShpereCubeIntersection->SetColor(0, 180, 180);
 
-	// NewScene->AddObject(ShpereIntersection);
-	NewScene->AddObject(NewSphere1);
-	// NewScene->AddObject(NewSphere2);
-	NewScene->AddObject(NewCube);
-	NewScene->AddObject(NewSphere3);
+	Plane *NewPlane=new Plane();
+	NewPlane->SetPosition(0, 35, 0);
+	NewPlane->SetColor(50, 50, 50);
+
+	NewScene->AddObject(ShpereCubeIntersection);
+	// NewScene->AddObject(NewSphere1);
+	NewScene->AddObject(NewSphere2);
+	// NewScene->AddObject(NewCube1);
+	NewScene->AddObject(NewCube2);
+	// NewScene->AddObject(NewTorus1);
 	NewScene->AddObject(NewLightSource1);
 	NewScene->AddObject(NewLightSource2);
-
-//	Cube *newCube1=new Cube();
-//	newCube1->SetPosition(-30, 30, 120);
-//	newCube1->SetLength(15);
-//	newCube1->SetColor(100, 200, 100);
-//	MainScene->AddObject(newCube1);
-
-//	Torus *newTorus1=new Torus();
-//	newTorus1->SetPosition(0, 30, 140);
-//	newTorus1->SetRadius1(40);
-//	newTorus1->SetRadius2(10);
-//	newTorus1->SetColor(180, 200, 80);
-//	MainScene->AddObject(newTorus1);
+	NewScene->AddObject(NewPlane);
 
 //	Object *testObj=new Object;
 //	testObj->SetPosition(100, 0, 50);

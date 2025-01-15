@@ -7,7 +7,7 @@
 
 #define RAY_STEPS_MAX			1024
 #define RAY_COLLISIONS_MAX		4
-#define RAY_COLLISION_THRESHOLD	0.25
+#define RAY_COLLISION_THRESHOLD	1.0F/16.0F
 
 #define DEFAULT_OBJECT_COLOR	0x00,0x00,0x00
 #define DEFAULT_OBJECT_NAME		"Object"
@@ -43,23 +43,21 @@ public:
 	void SetName(string name);
 
 	void AttachExternalColorBuffer(Vec3uc *buffer);
-	virtual double GetDistance(Vec3d from);
-	Vec3d GetNormalVector(Vec3d point);
-	Vec3d GetNormalVector(Vec3d *point);
+	virtual double GetDistance(Vec3d from) const;
+	Vec3d GetNormalVector(Vec3d point) const;
+	Vec3d GetNormalVector(Vec3d *point) const;
 	bool ItsALightSource();
 
 	vector <Object *> *SceneObjects, *SceneLights;
 	Vec3d *Position;
 };
 
-// ========= CSG ===
-
 class Difference : public Object
 {
 	Object *ObjectA, *ObjectB;
 public:
 	Difference(Object *object_a, Object *object_b);
-	double GetDistance(Vec3d from);
+	double GetDistance(Vec3d from) const;
 };
 
 class Union : public Object
@@ -67,7 +65,7 @@ class Union : public Object
 	Object *ObjectA, *ObjectB;
 public:
 	Union(Object *object_a, Object *object_b);
-	double GetDistance(Vec3d from);
+	double GetDistance(Vec3d from) const;
 };
 
 class Intersection : public Object
@@ -75,10 +73,8 @@ class Intersection : public Object
 	Object *ObjectA, *ObjectB;
 public:
 	Intersection(Object *object_a, Object *object_b);
-	double GetDistance(Vec3d from);
+	double GetDistance(Vec3d from) const;
 };
-
-// ========= RAY ===
 
 class Ray : public Object
 {
@@ -96,18 +92,14 @@ public:
 	Object *RunOnce();
 };
 
-// ========= SPHERE ===
-
 class Sphere : public Object
 {
 	double pRadius;
 public:
 	Sphere();
 	void SetRadius(double radius);
-	double GetDistance(Vec3d from);
+	double GetDistance(Vec3d from) const;
 };
-
-// ========= CUBE ===
 
 class Cube : public Object
 {
@@ -115,10 +107,8 @@ class Cube : public Object
 public:
 	Cube();
 	void SetLength(double length);
-	double GetDistance(Vec3d from);
+	double GetDistance(Vec3d from) const;
 };
-
-// ========= TORUS ===
 
 class Torus : public Object
 {
@@ -127,7 +117,16 @@ public:
 	Torus();
 	void SetRadius1(double radius);
 	void SetRadius2(double radius);
-	double GetDistance(Vec3d from);
+	double GetDistance(Vec3d from) const;
+};
+
+class Plane : public Object
+{
+	Vec3d pOrientation;
+public:
+	Plane();
+	void SetOrientation(Vec3d orientation);
+	double GetDistance(Vec3d from) const;
 };
 
 #endif // BASICOBJECTS_HPP

@@ -357,7 +357,6 @@ Vec3f Vec3f::operator/(float m)
 	return res;
 }
 
-
 //=== Vec3 uchar
 
 Vec3uc::Vec3uc()

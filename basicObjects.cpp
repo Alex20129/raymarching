@@ -113,16 +113,14 @@ void Object::AttachExternalColorBuffer(Vec3uc *buffer)
 	pColor=buffer;
 }
 
-double Object::GetDistance(Vec3d from)
+double Object::GetDistance(Vec3d from) const
 {
 	from=from-*Position;
 	return(from.Length());
 }
 
-/**
- * Using the gradient of the SDF, estimate the normal vector on the surface at given point
- */
-Vec3d Object::GetNormalVector(Vec3d point)
+// Using the gradient of the SDF, estimate the normal vector on the surface at given point
+Vec3d Object::GetNormalVector(Vec3d point) const
 {
 	Vec3d normalV(
 			GetDistance(Vec3d(point.X + RAY_COLLISION_THRESHOLD, point.Y, point.Z)) - GetDistance(Vec3d(point.X - RAY_COLLISION_THRESHOLD, point.Y, point.Z)),
@@ -132,7 +130,7 @@ Vec3d Object::GetNormalVector(Vec3d point)
 	return(normalV);
 }
 
-Vec3d Object::GetNormalVector(Vec3d *point)
+Vec3d Object::GetNormalVector(Vec3d *point) const
 {
 	Vec3d normalV(
 			GetDistance(Vec3d(point->X + RAY_COLLISION_THRESHOLD, point->Y, point->Z)) - GetDistance(Vec3d(point->X - RAY_COLLISION_THRESHOLD, point->Y, point->Z)),
@@ -162,15 +160,14 @@ Difference::Difference(Object *object_a, Object *object_b)
 	{
 		return;
 	}
-	Vec3f NewColor=(ObjectA->Color()+ObjectB->Color())/2.0;
-	SetColor(NewColor);
+	SetColor((ObjectA->Color()+ObjectB->Color())/2.0);
 }
 
-double Difference::GetDistance(Vec3d from)
+double Difference::GetDistance(Vec3d from) const
 {
 	double DistA=ObjectA->GetDistance(from);
 	double DistB=0.0-ObjectB->GetDistance(from);
-	return std::max(DistA, DistB);
+	return max(DistA, DistB);
 }
 
 Union::Union(Object *object_a, Object *object_b)
@@ -186,15 +183,14 @@ Union::Union(Object *object_a, Object *object_b)
 	{
 		return;
 	}
-	Vec3f NewColor=(ObjectA->Color()+ObjectB->Color())/2.0;
-	SetColor(NewColor);
+	SetColor((ObjectA->Color()+ObjectB->Color())/2.0);
 }
 
-double Union::GetDistance(Vec3d from)
+double Union::GetDistance(Vec3d from) const
 {
 	double DistA=ObjectA->GetDistance(from);
 	double DistB=ObjectB->GetDistance(from);
-	return std::min(DistA, DistB);
+	return min(DistA, DistB);
 }
 
 Intersection::Intersection(Object *object_a, Object *object_b)
@@ -210,15 +206,14 @@ Intersection::Intersection(Object *object_a, Object *object_b)
 	{
 		return;
 	}
-	Vec3f NewColor=(ObjectA->Color()+ObjectB->Color())/2.0;
-	SetColor(NewColor);
+	SetColor((ObjectA->Color()+ObjectB->Color())/2.0);
 }
 
-double Intersection::GetDistance(Vec3d from)
+double Intersection::GetDistance(Vec3d from) const
 {
 	double DistA=ObjectA->GetDistance(from);
 	double DistB=ObjectB->GetDistance(from);
-	return std::max(DistA, DistB);
+	return max(DistA, DistB);
 }
 
 // ========= RAY ===
@@ -395,9 +390,9 @@ void Sphere::SetRadius(double radius)
 	pRadius=radius;
 }
 
-double Sphere::GetDistance(Vec3d from)
+double Sphere::GetDistance(Vec3d from) const
 {
-	from=from-Position;
+	from=from-*Position;
 	return(from.Length()-pRadius);
 }
 
@@ -414,9 +409,9 @@ void Cube::SetLength(double length)
 	pLength=length;
 }
 
-double Cube::GetDistance(Vec3d from)
+double Cube::GetDistance(Vec3d from) const
 {
-	from=from-Position;
+	from=from-*Position;
 	Vec3d d=from.Abs() - Vec3d(pLength, pLength, pLength);
 	return d.Max(Vec3d(0, 0, 0)).Length() + min(max(d.X, max(d.Y, d.Z)), 0.0);
 }
@@ -440,9 +435,27 @@ void Torus::SetRadius2(double radius)
 	pRadius2=radius;
 }
 
-double Torus::GetDistance(Vec3d from)
+double Torus::GetDistance(Vec3d from) const
 {
-	from=from-Position;
+	from=from-*Position;
 	Vec2d d=Vec2d(Vec2d(from.X, from.Z).Length()-pRadius1, from.Y);
 	return(d.Length()-pRadius2);
+}
+
+Plane::Plane()
+{
+	pOrientation=Vec3d(0, -1, 0);
+	SetName("Plane");
+}
+
+void Plane::SetOrientation(Vec3d orientation)
+{
+	pOrientation=orientation;
+	pOrientation.Normalize();
+}
+
+double Plane::GetDistance(Vec3d from) const
+{
+	from=from-*Position;
+	return(from*pOrientation);
 }
