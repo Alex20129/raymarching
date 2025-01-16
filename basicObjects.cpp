@@ -259,7 +259,7 @@ void Ray::Run()
 {
 	double illuninationLevel=0.0, ColorAccK=1.0;
 	double diffusedLighting, diffusedLightingHV;
-	Vec3d SurfaceNormalVec;
+	Vec3d SurfaceNormalVec, ReflectionVec;
 	Vec3d fromCollisionPointToLightSource;
 	Vec3d FirstCollisionPoint;
 	Vec3f NewColor;
@@ -268,7 +268,7 @@ void Ray::Run()
 	while(pCollisionsHappened<RAY_COLLISIONS_MAX)
 	{
 		Obstacle=RunOnce();
-		if(Obstacle==nullptr) // finished in space
+		if(Obstacle==nullptr)
 		{
 			break;
 		}
@@ -278,18 +278,19 @@ void Ray::Run()
 		{
 			FirstCollisionObstacle=Obstacle;
 			FirstCollisionPoint=*Position;
-			// NewColor=Obstacle->Color();
 		}
-		// else
-		{
-			// NewColor=NewColor*(1.0-Obstacle->Reflectivity()) + Obstacle->Color()*Obstacle->Reflectivity();
-			NewColor=NewColor*(1.0-ColorAccK) + Obstacle->Color()*ColorAccK;
-			ColorAccK/=2.0;
-		}
+		NewColor=NewColor*(1.0-ColorAccK) + Obstacle->Color()*ColorAccK;
+		ColorAccK/=2.0;
 
 		if(Obstacle->ItsALightSource())
 		{
 			pCollisionsHappened=RAY_COLLISIONS_MAX;
+		}
+		else
+		{
+			SurfaceNormalVec=Obstacle->GetNormalVector(*Position);
+			ReflectionVec=*pDirection - (2.0*SurfaceNormalVec) * (*pDirection*SurfaceNormalVec);
+			SetDirection(ReflectionVec);
 		}
 	}
 
@@ -337,7 +338,6 @@ Object *Ray::RunOnce()
 {
 	double mindist=__INT_MAX__, dist=0;
 	Object *NearestObject=nullptr;
-	Vec3d SurfaceNormalVec, ReflectionVec;
 	while(pStepsDone<RAY_STEPS_MAX)
 	{
 		for(Object *Obj: *SceneObjects)
@@ -364,9 +364,6 @@ Object *Ray::RunOnce()
 		if(NearestObject)
 		{
 			pObjectToSkip=NearestObject;
-			SurfaceNormalVec=NearestObject->GetNormalVector(*Position);
-			ReflectionVec=*pDirection-SurfaceNormalVec*2.0*(*pDirection*SurfaceNormalVec);
-			SetDirection(ReflectionVec);
 			break;
 		}
 		SetPosition(*Position+*pDirection*mindist);

@@ -20,10 +20,12 @@ public:
 	Vec2d operator+(const Vec2d &other);
 	Vec2d operator-(const Vec2d &other);
 	Vec2d operator-();
-	double operator*(const Vec2d &other);
-	Vec2d operator*(double m);
 	Vec2d operator/(double m);
 };
+
+double operator*(const Vec2d &vec_a, const Vec2d &vec_b);
+Vec2d operator*(const Vec2d &vec, const double m);
+Vec2d operator*(const double m, const Vec2d &vec);
 
 //=== Vec3 double
 
@@ -44,10 +46,12 @@ public:
 	Vec3d operator+(const Vec3d &other);
 	Vec3d operator-(const Vec3d &other);
 	Vec3d operator-();
-	double operator*(const Vec3d &other);
-	Vec3d operator*(double m);
 	Vec3d operator/(double m);
 };
+
+double operator*(const Vec3d &vec_a, const Vec3d &vec_b);
+Vec3d operator*(const Vec3d &vec, const double m);
+Vec3d operator*(const double m, const Vec3d &vec);
 
 //=== Vec3 float
 
@@ -67,10 +71,12 @@ public:
 	Vec3f operator+(const Vec3f &other);
 	Vec3f operator-(const Vec3f &other);
 	Vec3f operator-();
-	float operator*(const Vec3f &other);
-	Vec3f operator*(float m);
 	Vec3f operator/(float m);
 };
+
+float operator*(const Vec3f &vec_a, const Vec3f &vec_b);
+Vec3f operator*(const Vec3f &vec, const float m);
+Vec3f operator*(const float m, const Vec3f &vec);
 
 //=== Vec3 uchar
 

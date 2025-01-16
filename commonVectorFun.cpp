@@ -93,21 +93,6 @@ Vec2d Vec2d::operator-()
 	return Vec2d(-X, -Y);
 }
 
-double Vec2d::operator*(const Vec2d &other)
-{
-	double res;
-	res=other.X*X+other.Y*Y;
-	return res;
-}
-
-Vec2d Vec2d::operator*(double m)
-{
-	Vec2d res(this);
-	res.X*=m;
-	res.Y*=m;
-	return res;
-}
-
 Vec2d Vec2d::operator/(double m)
 {
 	Vec2d res(this);
@@ -115,6 +100,21 @@ Vec2d Vec2d::operator/(double m)
 	res.X/=m;
 	res.Y/=m;
 	return res;
+}
+
+double operator*(const Vec2d &vec_a, const Vec2d &vec_b)
+{
+	return(vec_a.X*vec_b.X+vec_a.Y*vec_b.Y);
+}
+
+Vec2d operator*(const Vec2d &vec, const double m)
+{
+	return(Vec2d(vec.X*m, vec.Y*m));
+}
+
+Vec2d operator*(const double m, const Vec2d &vec)
+{
+	return(Vec2d(vec.X*m, vec.Y*m));
 }
 
 //=== Vec3 double
@@ -215,22 +215,6 @@ Vec3d Vec3d::operator-()
 	return Vec3d(-X, -Y, -Z);
 }
 
-double Vec3d::operator*(const Vec3d &other)
-{
-	double res;
-	res=other.X*X+other.Y*Y+other.Z*Z;
-	return res;
-}
-
-Vec3d Vec3d::operator*(double m)
-{
-	Vec3d res(this);
-	res.X*=m;
-	res.Y*=m;
-	res.Z*=m;
-	return res;
-}
-
 Vec3d Vec3d::operator/(double m)
 {
 	Vec3d res(this);
@@ -239,6 +223,21 @@ Vec3d Vec3d::operator/(double m)
 	res.Y/=m;
 	res.Z/=m;
 	return res;
+}
+
+double operator*(const Vec3d &vec_a, const Vec3d &vec_b)
+{
+	return(vec_a.X*vec_b.X+vec_a.Y*vec_b.Y+vec_a.Z*vec_b.Z);
+}
+
+Vec3d operator*(const Vec3d &vec, const double m)
+{
+	return(Vec3d(vec.X*m, vec.Y*m, vec.Z*m));
+}
+
+Vec3d operator*(const double m, const Vec3d &vec)
+{
+	return(Vec3d(vec.X*m, vec.Y*m, vec.Z*m));
 }
 
 //=== Vec3 float
@@ -331,22 +330,6 @@ Vec3f Vec3f::operator-()
 	return Vec3f(-X, -Y, -Z);
 }
 
-float Vec3f::operator*(const Vec3f &other)
-{
-	float res;
-	res=other.X*X+other.Y*Y+other.Z*Z;
-	return res;
-}
-
-Vec3f Vec3f::operator*(float m)
-{
-	Vec3f res(this);
-	res.X*=m;
-	res.Y*=m;
-	res.Z*=m;
-	return res;
-}
-
 Vec3f Vec3f::operator/(float m)
 {
 	Vec3f res(this);
@@ -354,7 +337,22 @@ Vec3f Vec3f::operator/(float m)
 	res.X/=m;
 	res.Y/=m;
 	res.Z/=m;
-	return res;
+	return(res);
+}
+
+float operator*(const Vec3f &vec_a, const Vec3f &vec_b)
+{
+	return(vec_a.X*vec_b.X+vec_a.Y*vec_b.Y+vec_a.Z*vec_b.Z);
+}
+
+Vec3f operator*(const Vec3f &vec, const float m)
+{
+	return(Vec3f(vec.X*m, vec.Y*m, vec.Z*m));
+}
+
+Vec3f operator*(const float m, const Vec3f &vec)
+{
+	return(Vec3f(vec.X*m, vec.Y*m, vec.Z*m));
 }
 
 //=== Vec3 uchar
