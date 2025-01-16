@@ -122,22 +122,12 @@ double Object::GetDistance(Vec3d from) const
 // Using the gradient of the SDF, estimate the normal vector on the surface at given point
 Vec3d Object::GetNormalVector(Vec3d point) const
 {
+	double b=GetDistance(Vec3d(point.X - NORMAL_CALCULATION_D, point.Y - NORMAL_CALCULATION_D, point.Z - NORMAL_CALCULATION_D));
 	Vec3d normalV(
-			GetDistance(Vec3d(point.X + RAY_COLLISION_THRESHOLD, point.Y, point.Z)) - GetDistance(Vec3d(point.X - RAY_COLLISION_THRESHOLD, point.Y, point.Z)),
-			GetDistance(Vec3d(point.X, point.Y + RAY_COLLISION_THRESHOLD, point.Z)) - GetDistance(Vec3d(point.X, point.Y - RAY_COLLISION_THRESHOLD, point.Z)),
-			GetDistance(Vec3d(point.X, point.Y, point.Z  + RAY_COLLISION_THRESHOLD)) - GetDistance(Vec3d(point.X, point.Y, point.Z - RAY_COLLISION_THRESHOLD)));
-	normalV.Normalize();
-	return(normalV);
-}
-
-Vec3d Object::GetNormalVector(Vec3d *point) const
-{
-	Vec3d normalV(
-			GetDistance(Vec3d(point->X + RAY_COLLISION_THRESHOLD, point->Y, point->Z)) - GetDistance(Vec3d(point->X - RAY_COLLISION_THRESHOLD, point->Y, point->Z)),
-			GetDistance(Vec3d(point->X, point->Y + RAY_COLLISION_THRESHOLD, point->Z)) - GetDistance(Vec3d(point->X, point->Y - RAY_COLLISION_THRESHOLD, point->Z)),
-			GetDistance(Vec3d(point->X, point->Y, point->Z  + RAY_COLLISION_THRESHOLD)) - GetDistance(Vec3d(point->X, point->Y, point->Z - RAY_COLLISION_THRESHOLD)));
-	normalV.Normalize();
-	return(normalV);
+		GetDistance(Vec3d(point.X + NORMAL_CALCULATION_D, point.Y - NORMAL_CALCULATION_D, point.Z - NORMAL_CALCULATION_D)) - b,
+		GetDistance(Vec3d(point.X - NORMAL_CALCULATION_D, point.Y + NORMAL_CALCULATION_D, point.Z - NORMAL_CALCULATION_D)) - b,
+		GetDistance(Vec3d(point.X - NORMAL_CALCULATION_D, point.Y - NORMAL_CALCULATION_D, point.Z + NORMAL_CALCULATION_D)) - b);
+	return(normalV.Normal());
 }
 
 bool Object::ItsALightSource()
@@ -374,7 +364,7 @@ Object *Ray::RunOnce()
 		if(NearestObject)
 		{
 			pObjectToSkip=NearestObject;
-			SurfaceNormalVec=NearestObject->GetNormalVector(this->Position);
+			SurfaceNormalVec=NearestObject->GetNormalVector(*Position);
 			ReflectionVec=*pDirection-SurfaceNormalVec*2.0*(*pDirection*SurfaceNormalVec);
 			SetDirection(ReflectionVec);
 			break;
