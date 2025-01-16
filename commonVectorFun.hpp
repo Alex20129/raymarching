@@ -1,6 +1,8 @@
 #ifndef COMMONVECTORFUN_HPP
 #define COMMONVECTORFUN_HPP
 
+#include <cmath>
+
 //=== Vec2 double
 
 class Vec2d
@@ -11,13 +13,14 @@ public:
 	Vec2d(const Vec2d *other);
 	Vec2d(const Vec2d &other);
 	Vec2d(double x, double y);
+	void Normalize(double length=1.0);
 	Vec2d Normal(double length=1.0);
-	void Normalize();
 	Vec2d Abs();
 	double Length();
 	Vec2d Max(const Vec2d &other);
 	Vec2d operator=(const Vec2d &other);
 	Vec2d operator+(const Vec2d &other);
+	void operator+=(const Vec2d &other);
 	Vec2d operator-(const Vec2d &other);
 	Vec2d operator-();
 	Vec2d operator/(double m);
@@ -37,13 +40,14 @@ public:
 	Vec3d(const Vec3d *other);
 	Vec3d(const Vec3d &other);
 	Vec3d(double x, double y, double z);
+	void Normalize(double length=1.0);
 	Vec3d Normal(double length=1.0);
-	void Normalize();
 	Vec3d Abs();
 	double Length();
 	Vec3d Max(const Vec3d &other);
 	Vec3d operator=(const Vec3d &other);
 	Vec3d operator+(const Vec3d &other);
+	void operator+=(const Vec3d &other);
 	Vec3d operator-(const Vec3d &other);
 	Vec3d operator-();
 	Vec3d operator/(double m);
@@ -63,12 +67,13 @@ public:
 	Vec3f(const Vec3f *other);
 	Vec3f(const Vec3f &other);
 	Vec3f(float x, float y, float z);
+	void Normalize(float length=1.0);
 	Vec3f Normal(float length=1.0);
-	void Normalize();
 	Vec3f Abs();
 	float Length();
 	Vec3f operator=(const Vec3f &other);
 	Vec3f operator+(const Vec3f &other);
+	void operator+=(const Vec3f &other);
 	Vec3f operator-(const Vec3f &other);
 	Vec3f operator-();
 	Vec3f operator/(float m);
@@ -83,18 +88,21 @@ Vec3f operator*(const float m, const Vec3f &vec);
 class Vec3uc
 {
 public:
-	unsigned char X, Y, Z;
+	u_int8_t X, Y, Z;
 	Vec3uc();
 	Vec3uc(const Vec3uc *vec);
 	Vec3uc(const Vec3uc &vec);
-	Vec3uc(unsigned char x, unsigned char y, unsigned char z);
-	Vec3uc Normal(unsigned char length=1);
-	unsigned char Length();
+	Vec3uc(u_int8_t x, u_int8_t y, u_int8_t z);
+	void Normalize(u_int8_t length=1);
+	Vec3uc Normal(u_int8_t length=1);
+	u_int8_t Length();
+	Vec3uc Max(const Vec3uc &other);
 	Vec3uc operator=(const Vec3uc &other);
 	Vec3uc operator+(const Vec3uc &other);
+	void operator+=(const Vec3uc &other);
 	Vec3uc operator-(const Vec3uc &other);
 	Vec3uc operator-();
-	unsigned char operator*(const Vec3uc &other);
+	u_int8_t operator*(const Vec3uc &other);
 	Vec3uc operator*(char m);
 	Vec3uc operator*(float m);
 	Vec3uc operator*(double m);

@@ -59,16 +59,16 @@ int main(int argc, char *argv[])
 
 	Sphere *NewLightSource1=new Sphere();
 	NewLightSource1->SetName("Spherical light source");
-	NewLightSource1->SetRadius(20);
-	NewLightSource1->SetPosition(-100, -120, 120);
-	NewLightSource1->SetBrightness(100);
+	NewLightSource1->SetRadius(40);
+	NewLightSource1->SetPosition(-400, -400, 0);
+	NewLightSource1->SetBrightness(100000);
 	NewLightSource1->SetColor(255, 255, 255);
 
 	Cube *NewLightSource2=new Cube();
 	NewLightSource2->SetName("Cubical light source");
-	NewLightSource2->SetLength(40);
-	NewLightSource2->SetPosition(100, -120, 200);
-	NewLightSource2->SetBrightness(100);
+	NewLightSource2->SetLength(80);
+	NewLightSource2->SetPosition(400, -400, 180);
+	NewLightSource2->SetBrightness(100000);
 	NewLightSource2->SetColor(255, 255, 255);
 
 	Plane *NewPlane=new Plane();

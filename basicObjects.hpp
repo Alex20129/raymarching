@@ -6,7 +6,7 @@
 #include "commonVectorFun.hpp"
 
 #define RAY_STEPS_MAX			1024
-#define RAY_COLLISIONS_MAX		3
+#define RAY_COLLISIONS_MAX		4
 #define RAY_COLLISION_THRESHOLD	1.0F/8.0F
 #define NORMAL_CALCULATION_D	1.0F/64.0F
 
@@ -18,7 +18,7 @@ using namespace std;
 class Object
 {
 	bool pVisible;
-	uint pBrightness;
+	uint64_t pBrightness;
 	double pReflectivity;
 	string *pName;
 	Vec3uc *pColor;
@@ -27,8 +27,8 @@ public:
 	bool Visible() const;
 	void SetVisible(bool visible);
 
-	uint Brightness() const;
-	void SetBrightness(uint brightness);
+	uint64_t Brightness() const;
+	void SetBrightness(uint64_t brightness);
 
 	double Reflectivity();
 	void SetReflectivity(double reflectivity);
