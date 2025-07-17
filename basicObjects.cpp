@@ -7,8 +7,8 @@ Object::Object()
 	pVisible=1;
 	pBrightness=0;
 	pReflectivity=0.5;
-	Position=new Vec3d(0, 0, 0);
-	pColor=new Vec3uc(DEFAULT_OBJECT_COLOR);
+	Position=new Vec3d();
+	pColor=new Vec3uc();
 	pName=new string(DEFAULT_OBJECT_NAME);
 }
 
@@ -257,15 +257,12 @@ void Ray::Reset()
 
 void Ray::Run()
 {
-	double IlluminationAcc=0.0, ColorAccK=1.0;
 	Vec3d SurfaceNormalVec, ReflectionVec;
-	Vec3d fromLightSourceToCollisionPoint;
-	Vec3d FirstCollisionPoint;
-	Vec3f PixelColor;
-	Object *Obstacle=nullptr, *FirstCollisionObstacle=nullptr, *ShadowObstacle;
+	Vec3f ColorAcc(255, 255, 255);
+	Vec3f IlluminationAcc(0, 0, 0);
+	Object *Obstacle=nullptr;
 
-	// while(pCollisionsHappened<RAY_COLLISIONS_MAX)
-	while(pCollisionsHappened<1)
+	while(pCollisionsHappened<RAY_COLLISIONS_MAX)
 	{
 		Obstacle=RunOnce();
 		if(Obstacle==nullptr)
@@ -274,62 +271,25 @@ void Ray::Run()
 		}
 		pCollisionsHappened++;
 
-		if(!FirstCollisionObstacle)
-		{
-			FirstCollisionObstacle=Obstacle;
-			FirstCollisionPoint=*Position;
-			PixelColor=Obstacle->Color();
-		}
-		else
-		{
-			ColorAccK/=2.0;
-			PixelColor+=Obstacle->Color()*ColorAccK;
-		}
-
 		if(Obstacle->ItsALightSource())
 		{
-			pCollisionsHappened=RAY_COLLISIONS_MAX;
+			IlluminationAcc+=Obstacle->Color() * Obstacle->Brightness();
 		}
 		else
 		{
-			pObjectToSkip=Obstacle;
-			SurfaceNormalVec=Obstacle->GetNormalVector(*Position);
-			ReflectionVec=*pDirection - (2.0*SurfaceNormalVec) * (*pDirection*SurfaceNormalVec);
-			SetDirection(ReflectionVec);
-		}
-	}
-
-	// PixelColor.Normalize(255);
-
-	if(FirstCollisionObstacle)
-	{
-		for(Object *LightSource: *SceneLights)
-		{
-			pObjectToSkip = LightSource;
-			pStepsDone = 0;
-
-			fromLightSourceToCollisionPoint = FirstCollisionPoint - *LightSource->Position;
-			double distanceToLight = fromLightSourceToCollisionPoint.Length();
-
-			SetPosition(*LightSource->Position);
-			SetDirection(fromLightSourceToCollisionPoint);
-
-			ShadowObstacle = RunOnce();
-			double PointIllumination, miss=(FirstCollisionPoint - *this->Position).Length();
-
-			if(ShadowObstacle==FirstCollisionObstacle && miss<2.0)
-			{
-				PointIllumination = LightSource->Brightness();
-				PointIllumination /= distanceToLight*distanceToLight + 1.0F;
-				IlluminationAcc += PointIllumination;
-			}
+			ColorAcc = ColorAcc * Obstacle->Color();
+			ColorAcc = ColorAcc / 255.0;
+			// ColorAcc+=Obstacle->Color()*ColorAccK;
+			// ColorAccK*=Obstacle->Reflectivity();
 		}
 
-		IlluminationAcc = min(2.0, IlluminationAcc);
-		IlluminationAcc = max(0.1, IlluminationAcc);
+		pObjectToSkip=Obstacle;
+		SurfaceNormalVec=Obstacle->GetNormalVector(*Position);
+		ReflectionVec=*pDirection - (SurfaceNormalVec*2.0) * pDirection->Dot(SurfaceNormalVec);
+		SetDirection(ReflectionVec);
 	}
 
-	SetColor(PixelColor * IlluminationAcc);
+	SetColor(ColorAcc * IlluminationAcc);
 }
 
 Object *Ray::RunOnce()
@@ -451,5 +411,5 @@ void Plane::SetOrientation(Vec3d orientation)
 double Plane::GetDistance(Vec3d from) const
 {
 	from=from-*Position;
-	return(from*pOrientation);
+	return(from.Dot(pOrientation));
 }

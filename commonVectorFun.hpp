@@ -1,8 +1,8 @@
 #ifndef COMMONVECTORFUN_HPP
 #define COMMONVECTORFUN_HPP
 
-#include <cmath>
-#include <cstdint>
+#include <math.h>
+#include <stdint.h>
 
 //=== Vec2 double
 
@@ -18,18 +18,20 @@ public:
 	Vec2d Normal(double length=1.0);
 	Vec2d Abs();
 	double Length();
+	double Dot(const Vec2d &other);
 	Vec2d Max(const Vec2d &other);
 	Vec2d operator=(const Vec2d &other);
 	Vec2d operator+(const Vec2d &other);
 	void operator+=(const Vec2d &other);
 	Vec2d operator-(const Vec2d &other);
 	Vec2d operator-();
-	Vec2d operator/(double m);
+	Vec2d operator/(double d);
+	Vec2d operator*(const Vec2d &other);
 };
 
-double operator*(const Vec2d &vec_a, const Vec2d &vec_b);
 Vec2d operator*(const Vec2d &vec, const double m);
 Vec2d operator*(const double m, const Vec2d &vec);
+Vec2d operator/(const Vec2d &vec, const double d);
 
 //=== Vec3 double
 
@@ -45,16 +47,17 @@ public:
 	Vec3d Normal(double length=1.0);
 	Vec3d Abs();
 	double Length();
+	double Dot(const Vec3d &other);
 	Vec3d Max(const Vec3d &other);
 	Vec3d operator=(const Vec3d &other);
 	Vec3d operator+(const Vec3d &other);
 	void operator+=(const Vec3d &other);
 	Vec3d operator-(const Vec3d &other);
 	Vec3d operator-();
-	Vec3d operator/(double m);
+	Vec3d operator/(double d);
+	Vec3d operator*(const Vec3d &other);
 };
 
-double operator*(const Vec3d &vec_a, const Vec3d &vec_b);
 Vec3d operator*(const Vec3d &vec, const double m);
 Vec3d operator*(const double m, const Vec3d &vec);
 
@@ -72,15 +75,16 @@ public:
 	Vec3f Normal(float length=1.0);
 	Vec3f Abs();
 	float Length();
+	float Dot(const Vec3f &other);
 	Vec3f operator=(const Vec3f &other);
 	Vec3f operator+(const Vec3f &other);
 	void operator+=(const Vec3f &other);
 	Vec3f operator-(const Vec3f &other);
 	Vec3f operator-();
-	Vec3f operator/(float m);
+	Vec3f operator/(float d);
+	Vec3f operator*(const Vec3f &other);
 };
 
-float operator*(const Vec3f &vec_a, const Vec3f &vec_b);
 Vec3f operator*(const Vec3f &vec, const float m);
 Vec3f operator*(const float m, const Vec3f &vec);
 
@@ -97,6 +101,7 @@ public:
 	void Normalize(uint8_t length=1);
 	Vec3uc Normal(uint8_t length=1);
 	uint8_t Length();
+	uint8_t Dot(const Vec3uc &other);
 	Vec3uc Max(const Vec3uc &other);
 	Vec3uc operator=(const Vec3uc &other);
 	Vec3uc operator+(const Vec3uc &other);

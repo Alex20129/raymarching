@@ -26,6 +26,8 @@ ADD_EXECUTABLE(${CMAKE_PROJECT_NAME}
 	commonVectorFun.hpp
 	controlwidget.cpp
 	controlwidget.hpp
+	prng.cpp
+	prng.hpp
 	scene.cpp
 	scene.hpp
 	widget.ui

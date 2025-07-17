@@ -4,13 +4,13 @@
 #include <vector>
 #include <string>
 #include "commonVectorFun.hpp"
+#include "prng.hpp"
 
 #define RAY_STEPS_MAX			1024
-#define RAY_COLLISIONS_MAX		4
-#define RAY_COLLISION_THRESHOLD	1.0F/8.0F
-#define NORMAL_CALCULATION_D	1.0F/64.0F
+#define RAY_COLLISIONS_MAX		5
+#define RAY_COLLISION_THRESHOLD	1.0/8.0
+#define NORMAL_CALCULATION_D	1.0/32.0
 
-#define DEFAULT_OBJECT_COLOR	0x00,0x00,0x00
 #define DEFAULT_OBJECT_NAME		"Object"
 
 using namespace std;

@@ -21,18 +21,19 @@ int main(int argc, char *argv[])
 	Sphere *NewSphere1=new Sphere();
 	NewSphere1->SetName("Small sphere 1");
 	NewSphere1->SetRadius(22);
-	NewSphere1->SetReflectivity(0.5);
+	NewSphere1->SetReflectivity(0.4);
 	NewSphere1->SetPosition(0, 10, 160);
-	NewSphere1->SetColor(200, 0, 0);
+	NewSphere1->SetColor(200, 20, 20);
 
 	Cube *NewCube1=new Cube();
 	NewCube1->SetName("Cube 1");
-	NewCube1->SetLength(30);
-	NewCube1->SetReflectivity(0.5);
+	NewCube1->SetLength(32);
+	NewCube1->SetReflectivity(0.6);
 	NewCube1->SetPosition(0, 10, 160);
-	NewCube1->SetColor(0, 180, 180);
+	NewCube1->SetColor(20, 180, 180);
 
 	Intersection *ShpereCubeIntersection=new Intersection(NewSphere1, NewCube1);
+	ShpereCubeIntersection->SetReflectivity(0.25);
 	ShpereCubeIntersection->SetPosition(0, 10, 160);
 	ShpereCubeIntersection->SetColor(0, 180, 180);
 
@@ -41,14 +42,14 @@ int main(int argc, char *argv[])
 	NewSphere2->SetRadius(25);
 	NewSphere2->SetReflectivity(0.5);
 	NewSphere2->SetPosition(-55, 10, 180);
-	NewSphere2->SetColor(0, 0, 200);
+	NewSphere2->SetColor(20, 20, 200);
 
 	Cube *NewCube2=new Cube();
 	NewCube2->SetName("Cube 2");
 	NewCube2->SetLength(40);
 	NewCube2->SetReflectivity(0.5);
 	NewCube2->SetPosition(55, 10, 180);
-	NewCube2->SetColor(180, 0, 180);
+	NewCube2->SetColor(180, 20, 180);
 
 	// Torus *NewTorus1=new Torus();
 	// NewTorus1->SetName("Torus 1");
@@ -61,14 +62,14 @@ int main(int argc, char *argv[])
 	NewLightSource1->SetName("Spherical light source");
 	NewLightSource1->SetRadius(40);
 	NewLightSource1->SetPosition(-400, -400, 0);
-	NewLightSource1->SetBrightness(100000);
+	NewLightSource1->SetBrightness(2);
 	NewLightSource1->SetColor(255, 255, 255);
 
 	Cube *NewLightSource2=new Cube();
 	NewLightSource2->SetName("Cubical light source");
 	NewLightSource2->SetLength(80);
 	NewLightSource2->SetPosition(400, -400, 180);
-	NewLightSource2->SetBrightness(100000);
+	NewLightSource2->SetBrightness(2);
 	NewLightSource2->SetColor(255, 255, 255);
 
 	Plane *NewPlane=new Plane();
@@ -93,7 +94,7 @@ int main(int argc, char *argv[])
 
 	NewScene->Render();
 	QImage img1(NewScene->ImageData->data(), NewScene->ScreenWidth(), NewScene->ScreenHeight(), QImage::Format_RGBA8888);
-	img1.save(QString("011.png"));
+	img1.save(QString("012.png"));
 
 	SceneW=new Widget;
 	ControlsW=new ControlWidget;
