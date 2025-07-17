@@ -380,29 +380,29 @@ Vec3uc::Vec3uc(const Vec3uc &vec)
 	X=vec.X, Y=vec.Y, Z=vec.Z;
 }
 
-Vec3uc::Vec3uc(u_int8_t x, u_int8_t y, u_int8_t z)
+Vec3uc::Vec3uc(uint8_t x, uint8_t y, uint8_t z)
 {
 	X=x, Y=y, Z=z;
 }
 
-void Vec3uc::Normalize(u_int8_t length)
+void Vec3uc::Normalize(uint8_t length)
 {
-	u_int8_t len=this->Length()/length;
+	uint8_t len=this->Length()/length;
 	this->X/=len;
 	this->Y/=len;
 	this->Z/=len;
 }
 
-Vec3uc Vec3uc::Normal(u_int8_t length)
+Vec3uc Vec3uc::Normal(uint8_t length)
 {
 	Vec3uc res(this);
 	res.Normalize(length);
 	return(res);
 }
 
-u_int8_t Vec3uc::Length()
+uint8_t Vec3uc::Length()
 {
-	u_int8_t res=std::sqrt(X*X+Y*Y+Z*Z);
+	uint8_t res=std::sqrt(X*X+Y*Y+Z*Z);
 	return(res);
 }
 
@@ -452,9 +452,9 @@ Vec3uc Vec3uc::operator-()
 	return Vec3uc(-X, -Y, -Z);
 }
 
-u_int8_t Vec3uc::operator*(const Vec3uc &other)
+uint8_t Vec3uc::operator*(const Vec3uc &other)
 {
-	u_int8_t res;
+	uint8_t res;
 	res=other.X*X+other.Y*Y+other.Z*Z;
 	return res;
 }

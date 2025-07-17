@@ -89,21 +89,21 @@ Vec3f operator*(const float m, const Vec3f &vec);
 class Vec3uc
 {
 public:
-	u_int8_t X, Y, Z;
+	uint8_t X, Y, Z;
 	Vec3uc();
 	Vec3uc(const Vec3uc *vec);
 	Vec3uc(const Vec3uc &vec);
-	Vec3uc(u_int8_t x, u_int8_t y, u_int8_t z);
-	void Normalize(u_int8_t length=1);
-	Vec3uc Normal(u_int8_t length=1);
-	u_int8_t Length();
+	Vec3uc(uint8_t x, uint8_t y, uint8_t z);
+	void Normalize(uint8_t length=1);
+	Vec3uc Normal(uint8_t length=1);
+	uint8_t Length();
 	Vec3uc Max(const Vec3uc &other);
 	Vec3uc operator=(const Vec3uc &other);
 	Vec3uc operator+(const Vec3uc &other);
 	void operator+=(const Vec3uc &other);
 	Vec3uc operator-(const Vec3uc &other);
 	Vec3uc operator-();
-	u_int8_t operator*(const Vec3uc &other);
+	uint8_t operator*(const Vec3uc &other);
 	Vec3uc operator*(char m);
 	Vec3uc operator*(float m);
 	Vec3uc operator*(double m);
