@@ -2,6 +2,7 @@
 #define COMMONVECTORFUN_HPP
 
 #include <cmath>
+#include <cstdint>
 
 //=== Vec2 double
 
