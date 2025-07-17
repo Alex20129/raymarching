@@ -27,7 +27,7 @@ uint64_t mms_prng_64()
 	return(mms_result);
 }
 
-uint32_t fnv1a_prng_32(const uint8_t *inbuf)
+uint32_t fnv1a_prng_32()
 {
 	uint32_t fnv_result=SEED_VALUE_32;
 	fnv_result^=fnv_result & UINT32_SPARSE_MASK;
@@ -36,7 +36,7 @@ uint32_t fnv1a_prng_32(const uint8_t *inbuf)
 	return(fnv_result);
 }
 
-uint64_t fnv1a_prng_64(const uint8_t *inbuf)
+uint64_t fnv1a_prng_64()
 {
 	uint64_t fnv_result=SEED_VALUE_64;
 	fnv_result^=fnv_result & UINT64_SPARSE_MASK;

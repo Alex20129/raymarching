@@ -12,7 +12,7 @@
 uint32_t mms_prng_32();
 uint64_t mms_prng_64();
 
-uint32_t fnv1a_prng_32(const uint8_t *inbuf);
-uint64_t fnv1a_prng_64(const uint8_t *inbuf);
+uint32_t fnv1a_prng_32();
+uint64_t fnv1a_prng_64();
 
 #endif // PRNG_H
