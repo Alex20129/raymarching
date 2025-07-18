@@ -29,10 +29,8 @@ Scene::Scene()
 		for(X=0; X<pScreenWidth; ++X)
 		{
 			newRay=new Ray();
-			newRay->SetDirection(X-pScreenWidth/2.0, Y-pScreenHeight/2.0, pScreenWidth);
-			newRay->AttachExternalColorBuffer((Vec3uc *)&ImageData->data()[SceneRays->size()*4]);
+			newRay->SetDefaultDirection(X-pScreenWidth/2.0, Y-pScreenHeight/2.0, pScreenWidth);
 			newRay->SceneObjects=this->SceneObjects;
-			newRay->SceneLights=this->SceneLights;
 			SceneRays->push_back(newRay);
 		}
 	}
@@ -55,12 +53,11 @@ Scene::~Scene()
 void Scene::AddObject(Object *object)
 {
 	this->SceneObjects->push_back(object);
-	if(object->ItsALightSource())
+	if(object->Brightness()>0.0)
 	{
 		this->SceneLights->push_back(object);
 	}
 	object->SceneObjects=this->SceneObjects;
-	object->SceneLights=this->SceneLights;
 }
 
 static void RayRunningWrapperFun(Ray **rays, unsigned int rays_per_thread, unsigned int thread_id)
@@ -73,21 +70,35 @@ static void RayRunningWrapperFun(Ray **rays, unsigned int rays_per_thread, unsig
 	}
 }
 
-void Scene::Render()
+void Scene::Render(unsigned int rays_per_pixel)
 {
 	thread *newThread;
 	unsigned int threadid;
+	float colorDiv=rays_per_pixel;
 	chrono::time_point <chrono::high_resolution_clock> start=chrono::high_resolution_clock::now(), end;
-	for(threadid=0; threadid<pRenderThreadsNum; threadid++)
+	while(rays_per_pixel)
 	{
-		newThread=new thread(RayRunningWrapperFun, SceneRays->data(), SceneRays->size()/pRenderThreadsNum, threadid);
-		pRenderThreads->push(newThread);
+		rays_per_pixel--;
+		for(threadid=0; threadid<pRenderThreadsNum; threadid++)
+		{
+			newThread=new thread(RayRunningWrapperFun, SceneRays->data(), SceneRays->size()/pRenderThreadsNum, threadid);
+			pRenderThreads->push(newThread);
+		}
+		while(!pRenderThreads->empty())
+		{
+			pRenderThreads->front()->join();
+			delete pRenderThreads->front();
+			pRenderThreads->pop();
+		}
 	}
-	while(!pRenderThreads->empty())
+	size_t ray_id;
+	for(ray_id=0; ray_id<SceneRays->size(); ray_id++)
 	{
-		pRenderThreads->front()->join();
-		delete pRenderThreads->front();
-		pRenderThreads->pop();
+		Vec3f color=SceneRays->at(ray_id)->Color();
+		color=color/colorDiv;
+		ImageData->data()[ray_id*4]=(uint8_t)color.X;
+		ImageData->data()[ray_id*4+1]=(uint8_t)color.Y;
+		ImageData->data()[ray_id*4+2]=(uint8_t)color.Z;
 	}
 	end=chrono::high_resolution_clock::now();
 	FrameRenderTime=chrono::duration_cast <chrono::milliseconds>(end - start);
@@ -128,5 +139,5 @@ void Scene::SetScreenSize(unsigned int width, unsigned int height)
 {
 	pScreenWidth=width;
 	pScreenHeight=height;
-	ImageData->resize(pScreenWidth*pScreenHeight*4, 255);
+	ImageData->resize(width*height*4, 255);
 }

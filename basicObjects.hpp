@@ -9,26 +9,27 @@
 #define RAY_STEPS_MAX			1024
 #define RAY_COLLISIONS_MAX		5
 #define RAY_COLLISION_THRESHOLD	1.0/8.0
-#define NORMAL_CALCULATION_D	1.0/32.0
-
-#define DEFAULT_OBJECT_NAME		"Object"
+#define RAY_COLLISION_STEPOUT	1.0/4.0
+#define NORMAL_CALCULATION_D	1.0/16.0
 
 using namespace std;
 
 class Object
 {
 	bool pVisible;
-	uint64_t pBrightness;
+	double pBrightness;
 	double pReflectivity;
 	string *pName;
-	Vec3uc *pColor;
+protected:
+	Vec3f pColor;
+	Vec3d pPosition;
 public:
 	Object();
 	bool Visible() const;
 	void SetVisible(bool visible);
 
-	uint64_t Brightness() const;
-	void SetBrightness(uint64_t brightness);
+	double Brightness() const;
+	void SetBrightness(double brightness);
 
 	double Reflectivity();
 	void SetReflectivity(double reflectivity);
@@ -37,19 +38,17 @@ public:
 	void SetColor(Vec3f color);
 	void SetColor(float r, float g, float b);
 
+	Vec3d Position() const;
 	void SetPosition(Vec3d position);
 	void SetPosition(double x, double y, double z);
 
 	string Name();
 	void SetName(string name);
 
-	void AttachExternalColorBuffer(Vec3uc *buffer);
 	virtual double GetDistance(Vec3d from) const;
 	Vec3d GetNormalVector(Vec3d point) const;
-	bool ItsALightSource();
 
-	vector <Object *> *SceneObjects, *SceneLights;
-	Vec3d *Position;
+	vector <Object *> *SceneObjects;
 };
 
 class Difference : public Object
@@ -78,12 +77,12 @@ public:
 
 class Ray : public Object
 {
-	Object *pObjectToSkip;
-	Vec3d *pDirection;
+	Vec3d pDefaultDirection;
+	Vec3d pDirection;
 	unsigned int pStepsDone, pCollisionsHappened;
 public:
 	Ray();
-	Vec3d Direction() const;
+	void SetDefaultDirection(double x, double y, double z);
 	void SetDirection(Vec3d direction);
 	void SetDirection(Vec3d *direction);
 	void SetDirection(double x, double y, double z);

@@ -28,51 +28,51 @@ ControlWidget::~ControlWidget()
 
 void ControlWidget::on_Zdial_valueChanged(int value)
 {
-	objpos=NewScene->SceneObjects->at(obID)->Position;
+	objpos=NewScene->SceneObjects->at(obID)->Position();
 	ui->lineEditZ->setText(QString::number(value));
-	objpos->Z=value;
+	objpos.Z=value;
 }
 
 void ControlWidget::on_YScrollBar_valueChanged(int value)
 {
-	objpos=NewScene->SceneObjects->at(obID)->Position;
+	objpos=NewScene->SceneObjects->at(obID)->Position();
 	ui->lineEditY->setText(QString::number(value));
-	objpos->Y=value;
+	objpos.Y=value;
 }
 
 void ControlWidget::on_XScrollBar_valueChanged(int value)
 {
-	objpos=NewScene->SceneObjects->at(obID)->Position;
+	objpos=NewScene->SceneObjects->at(obID)->Position();
 	ui->lineEditX->setText(QString::number(value));
-	objpos->X=value;
+	objpos.X=value;
 }
 
 void ControlWidget::on_comboBox_currentIndexChanged(int index)
 {
 	obID=index;
-	objpos=NewScene->SceneObjects->at(obID)->Position;
-	ui->lineEditX->setText(QString::number(objpos->X));
-	ui->XScrollBar->setValue(objpos->X);
-	ui->lineEditY->setText(QString::number(objpos->Y));
-	ui->YScrollBar->setValue(objpos->Y);
-	ui->lineEditZ->setText(QString::number(objpos->Z));
-	ui->Zdial->setValue(objpos->Z);
+	objpos=NewScene->SceneObjects->at(obID)->Position();
+	ui->lineEditX->setText(QString::number(objpos.X));
+	ui->XScrollBar->setValue(objpos.X);
+	ui->lineEditY->setText(QString::number(objpos.Y));
+	ui->YScrollBar->setValue(objpos.Y);
+	ui->lineEditZ->setText(QString::number(objpos.Z));
+	ui->Zdial->setValue(objpos.Z);
 }
 
 void ControlWidget::on_renderButton_clicked()
 {
 	obID=ui->comboBox->currentIndex();
-	objpos=NewScene->SceneObjects->at(obID)->Position;
+	objpos=NewScene->SceneObjects->at(obID)->Position();
 
-	objpos->X=ui->lineEditX->text().toDouble();
-	objpos->Y=ui->lineEditY->text().toDouble();
-	objpos->Z=ui->lineEditZ->text().toDouble();
+	objpos.X=ui->lineEditX->text().toDouble();
+	objpos.Y=ui->lineEditY->text().toDouble();
+	objpos.Z=ui->lineEditZ->text().toDouble();
 
-	ui->XScrollBar->setValue(objpos->X);
-	ui->YScrollBar->setValue(objpos->Y);
-	ui->Zdial->setValue(objpos->Z);
+	ui->XScrollBar->setValue(objpos.X);
+	ui->YScrollBar->setValue(objpos.Y);
+	ui->Zdial->setValue(objpos.Z);
 
-	NewScene->Render();
+	NewScene->Render(1);
 	ui->rendertime->setText(QString::number(NewScene->FrameRenderTime.count()));
 	SceneW->update();
 }

@@ -26,7 +26,7 @@ private slots:
 	void on_renderButton_clicked();
 
 private:
-	Vec3d *objpos;
+	Vec3d objpos;
 	uint obID;
 	Ui::ControlWidget *ui;
 };

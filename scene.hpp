@@ -21,7 +21,7 @@ public:
 	vector <unsigned char> *ImageData;
 	chrono::milliseconds FrameRenderTime;
 	void AddObject(Object *object);
-	void Render();
+	void Render(unsigned int rays_per_pixel);
 	unsigned int ScreenWidth();
 	unsigned int ScreenHeight();
 	unsigned int RenderThreadsNum();
