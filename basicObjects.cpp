@@ -2,24 +2,6 @@
 #include <cstdio>
 #include <cmath>
 
-Vec3d RandomDirection()
-{
-	double prnX, prnY, prnZ;
-	prnX=mms_prng_32();
-	// prnX=fnv_prng_32();
-	prnX/=UINT32_MAX/2.0;
-	prnX-=1.0;
-	prnY=mms_prng_32();
-	// prnY=fnv_prng_32();
-	prnY/=UINT32_MAX/2.0;
-	prnY-=1.0;
-	prnZ=mms_prng_32();
-	// prnZ=fnv_prng_32();
-	prnZ/=UINT32_MAX/2.0;
-	prnZ-=1.0;
-	return(Vec3d(prnX, prnY, prnZ));
-}
-
 Object::Object()
 {
 	SceneObjects=nullptr;
@@ -150,7 +132,7 @@ Vec3d Object::GetNormalVector(Vec3d point) const
 		GetDistance(Vec3d(point.X + NORMAL_CALCULATION_D, point.Y - NORMAL_CALCULATION_D, point.Z - NORMAL_CALCULATION_D)) - b,
 		GetDistance(Vec3d(point.X - NORMAL_CALCULATION_D, point.Y + NORMAL_CALCULATION_D, point.Z - NORMAL_CALCULATION_D)) - b,
 		GetDistance(Vec3d(point.X - NORMAL_CALCULATION_D, point.Y - NORMAL_CALCULATION_D, point.Z + NORMAL_CALCULATION_D)) - b);
-	return(normalV.Normal());
+	return(normalV);
 }
 
 // ========= CSG ===
@@ -282,6 +264,7 @@ void Ray::Reset()
 void Ray::Run()
 {
 	Vec3d SurfaceNormalVec;
+	Vec3d RandomDirectionVec;
 	// Vec3d ReflectionVec;
 	Vec3f ColorAcc(255, 255, 255);
 	Vec3f IlluminationAcc(0, 0, 0);
@@ -303,11 +286,16 @@ void Ray::Run()
 		// ColorAccK*=Obstacle->Reflectivity();
 
 		SurfaceNormalVec=Obstacle->GetNormalVector(pPosition);
+		SurfaceNormalVec.Normalize();
+
+		RandomDirectionVec.Randomize();
+		RandomDirectionVec.Normalize();
+
 		// ===
 		// ReflectionVec=pDirection - (SurfaceNormalVec*2.0) * pDirection.Dot(SurfaceNormalVec);
 		// SetDirection(ReflectionVec);
 		// ===
-		SetDirection(SurfaceNormalVec + RandomDirection());
+		SetDirection(SurfaceNormalVec + RandomDirectionVec);
 		// ===
 		pPosition=pPosition+SurfaceNormalVec*RAY_COLLISION_STEPOUT;
 	}

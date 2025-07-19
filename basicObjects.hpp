@@ -4,7 +4,6 @@
 #include <vector>
 #include <string>
 #include "commonVectorFun.hpp"
-#include "prng.hpp"
 
 #define RAY_STEPS_MAX			1024
 #define RAY_COLLISIONS_MAX		5

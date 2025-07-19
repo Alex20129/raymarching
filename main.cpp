@@ -16,8 +16,6 @@ int main(int argc, char *argv[])
 	QApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
 	QApplication RayMarchingApp(argc, argv);
 
-	double test_brightness=0.0;
-
 	NewScene=new Scene;
 
 	Sphere *NewSphere1=new Sphere();
@@ -25,7 +23,6 @@ int main(int argc, char *argv[])
 	NewSphere1->SetRadius(22);
 	NewSphere1->SetReflectivity(0.4);
 	NewSphere1->SetPosition(0, 10, 160);
-	NewSphere1->SetBrightness(test_brightness);
 	NewSphere1->SetColor(200, 20, 20);
 
 	Cube *NewCube1=new Cube();
@@ -33,8 +30,9 @@ int main(int argc, char *argv[])
 	NewCube1->SetLength(34);
 	NewCube1->SetReflectivity(0.6);
 	NewCube1->SetPosition(0, 10, 160);
-	NewCube1->SetBrightness(test_brightness);
 	NewCube1->SetColor(20, 180, 180);
+
+	double test_brightness=0.0;
 
 	Intersection *ShpereCubeIntersection=new Intersection(NewSphere1, NewCube1);
 	ShpereCubeIntersection->SetReflectivity(0.25);
@@ -44,7 +42,7 @@ int main(int argc, char *argv[])
 
 	Sphere *NewSphere2=new Sphere();
 	NewSphere2->SetName("Small sphere 2");
-	NewSphere2->SetRadius(25);
+	NewSphere2->SetRadius(24);
 	NewSphere2->SetReflectivity(0.25);
 	NewSphere2->SetPosition(-55, 10, 180);
 	NewSphere2->SetBrightness(test_brightness);
@@ -99,9 +97,9 @@ int main(int argc, char *argv[])
 	NewScene->AddObject(NewPlane1);
 	NewScene->AddObject(NewPlane2);
 
-	NewScene->Render(16);
+	NewScene->Render(4);
 	QImage img1(NewScene->ImageData->data(), NewScene->ScreenWidth(), NewScene->ScreenHeight(), QImage::Format_RGBA8888);
-	img1.save(QString("016.png"));
+	img1.save(QString("004-64.png"));
 
 	SceneW=new Widget;
 //	ControlsW=new ControlWidget;

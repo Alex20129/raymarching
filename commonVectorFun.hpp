@@ -44,6 +44,7 @@ public:
 	Vec3d(const Vec3d &other);
 	Vec3d(double x, double y, double z);
 	void Normalize(double length=1.0);
+	void Randomize();
 	Vec3d Normal(double length=1.0);
 	Vec3d Abs();
 	double Length();
@@ -72,6 +73,7 @@ public:
 	Vec3f(const Vec3f &other);
 	Vec3f(float x, float y, float z);
 	void Normalize(float length=1.0);
+	void Randomize();
 	Vec3f Normal(float length=1.0);
 	Vec3f Abs();
 	float Length();
