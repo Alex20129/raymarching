@@ -168,8 +168,9 @@ Difference::Difference(Object *object_a, Object *object_b)
 	}
 	ObjectB=object_b;
 	SetName("Difference");
-	SetColor((ObjectA->Color()+ObjectB->Color())/2.0);
-	SetBrightness((ObjectA->Brightness()+ObjectB->Brightness())/2.0);
+	pColor=(ObjectA->Color()+ObjectB->Color())/2.0;
+	pBrightness=(ObjectA->Brightness()+ObjectB->Brightness())/2.0;
+	pReflectivity=(ObjectA->Reflectivity()+ObjectB->Reflectivity())/2.0;
 	ObjectA->SetVisible(false);
 	ObjectB->SetVisible(false);
 }
@@ -194,8 +195,9 @@ Union::Union(Object *object_a, Object *object_b)
 	}
 	ObjectB=object_b;
 	SetName("Union");
-	SetColor((ObjectA->Color()+ObjectB->Color())/2.0);
-	SetBrightness((ObjectA->Brightness()+ObjectB->Brightness())/2.0);
+	pColor=(ObjectA->Color()+ObjectB->Color())/2.0;
+	pBrightness=(ObjectA->Brightness()+ObjectB->Brightness())/2.0;
+	pReflectivity=(ObjectA->Reflectivity()+ObjectB->Reflectivity())/2.0;
 	ObjectA->SetVisible(false);
 	ObjectB->SetVisible(false);
 }
@@ -220,8 +222,9 @@ Intersection::Intersection(Object *object_a, Object *object_b)
 	}
 	ObjectB=object_b;
 	SetName("Intersection");
-	SetColor((ObjectA->Color()+ObjectB->Color())/2.0);
-	SetBrightness((ObjectA->Brightness()+ObjectB->Brightness())/2.0);
+	pColor=(ObjectA->Color()+ObjectB->Color())/2.0;
+	pBrightness=(ObjectA->Brightness()+ObjectB->Brightness())/2.0;
+	pReflectivity=(ObjectA->Reflectivity()+ObjectB->Reflectivity())/2.0;
 	ObjectA->SetVisible(false);
 	ObjectB->SetVisible(false);
 }
@@ -279,7 +282,7 @@ void Ray::Reset()
 void Ray::Run()
 {
 	Vec3d SurfaceNormalVec;
-	Vec3d ReflectionVec;
+	// Vec3d ReflectionVec;
 	Vec3f ColorAcc(255, 255, 255);
 	Vec3f IlluminationAcc(0, 0, 0);
 	Object *Obstacle=nullptr;
@@ -308,7 +311,7 @@ void Ray::Run()
 		// ===
 		pPosition=pPosition+SurfaceNormalVec*RAY_COLLISION_STEPOUT;
 	}
-	pColor=pColor + (ColorAcc*IlluminationAcc);
+	pColor=pColor + (ColorAcc+IlluminationAcc);
 }
 
 Object *Ray::RunOnce()
@@ -327,19 +330,15 @@ Object *Ray::RunOnce()
 			if(mindist>dist)
 			{
 				mindist=dist;
-			}
-			if(mindist<RAY_COLLISION_THRESHOLD)
-			{
 				NearestObject=Obj;
-				break;
 			}
-		}
-		if(NearestObject)
-		{
-			break;
 		}
 		pPosition=pPosition+pDirection*mindist;
 		pStepsDone++;
+		if(mindist<RAY_COLLISION_THRESHOLD)
+		{
+			break;
+		}
 	}
 	return(NearestObject);
 }
@@ -411,13 +410,21 @@ double Torus::GetDistance(Vec3d from) const
 
 Plane::Plane()
 {
-	pOrientation=Vec3d(0, -1, 0);
+	pOrientation=Vec3d(0, 0, 1);
 	SetName("Plane");
 }
 
 void Plane::SetOrientation(Vec3d orientation)
 {
 	pOrientation=orientation.Normal();
+}
+
+void Plane::SetOrientation(double x, double y, double z)
+{
+	pOrientation.X=x;
+	pOrientation.Y=y;
+	pOrientation.Z=z;
+	pOrientation.Normalize();
 }
 
 double Plane::GetDistance(Vec3d from) const

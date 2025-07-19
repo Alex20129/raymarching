@@ -91,14 +91,12 @@ void Scene::Render(unsigned int rays_per_pixel)
 			pRenderThreads->pop();
 		}
 	}
-	size_t ray_id;
-	for(ray_id=0; ray_id<SceneRays->size(); ray_id++)
+	for(size_t ray_id=0; ray_id<SceneRays->size(); ray_id++)
 	{
 		Vec3f color=SceneRays->at(ray_id)->Color();
-		color=color/colorDiv;
-		ImageData->data()[ray_id*4]=(uint8_t)color.X;
-		ImageData->data()[ray_id*4+1]=(uint8_t)color.Y;
-		ImageData->data()[ray_id*4+2]=(uint8_t)color.Z;
+		ImageData->data()[ray_id*4]=(uint8_t)(color.X/colorDiv);
+		ImageData->data()[ray_id*4+1]=(uint8_t)(color.Y/colorDiv);
+		ImageData->data()[ray_id*4+2]=(uint8_t)(color.Z/colorDiv);
 	}
 	end=chrono::high_resolution_clock::now();
 	FrameRenderTime=chrono::duration_cast <chrono::milliseconds>(end - start);
