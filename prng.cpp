@@ -3,52 +3,69 @@
 static const uint32_t MMS_ALPHA_32=0xAC948B27;
 static const uint64_t MMS_ALPHA_64=0xE58B6F35AC948B27;
 
-static const uint32_t FNV32_PRIME =0x01000193;
-static const uint64_t FNV64_PRIME =0x00000100000001B3;
+static const uint32_t FNV_PRIME_32=0x01000193;
+static const uint64_t FNV_PRIME_64=0x00000100000001B3;
 
-static uint32_t SEED_VALUE_32=0xDEADBEEF;
-static uint64_t SEED_VALUE_64=0xDEADBEEFDEADBEEF;
-
-void prng_set_seed_32(uint32_t seed)
+// == prng-32 ====
+prng_u32::prng_u32()
 {
-	SEED_VALUE_32=seed;
+	pSeed=0xDEADBEEF;
 }
 
-void prng_set_seed_64(uint64_t seed)
+void prng_u32::set_seed_value(uint32_t new_seed)
 {
-	SEED_VALUE_64=seed;
+	pSeed=new_seed;
 }
 
-uint32_t mms_prng_32()
+uint32_t prng_u32::generate_mms()
 {
-	uint32_t result=SEED_VALUE_32;
-	result=(result & UINT16_MAX) * MMS_ALPHA_32 + (result >> 16);
-	SEED_VALUE_32=result;
-	return(result);
+	pSeed=(pSeed & UINT16_MAX) * MMS_ALPHA_32 + (pSeed >> 16);
+	return(pSeed);
 }
 
-uint64_t mms_prng_64()
+uint32_t prng_u32::generate_fnv()
 {
-	uint64_t result=SEED_VALUE_64;
-	result=(result & UINT32_MAX) * MMS_ALPHA_64 + (result >> 32);
-	SEED_VALUE_64=result;
-	return(result);
+	pSeed^=pSeed & UINT16_MAX;
+	pSeed*=FNV_PRIME_32;
+	return(pSeed);
 }
 
-uint32_t fnv_prng_32()
+uint32_t prng_u32::generate_xs()
 {
-	uint32_t result=SEED_VALUE_32;
-	result^=result & UINT16_MAX;
-	result*=FNV32_PRIME;
-	SEED_VALUE_32=result;
-	return(result);
+	pSeed^=pSeed<<13;
+	pSeed^=pSeed>>17;
+	pSeed^=pSeed<<5;
+	return(pSeed);
 }
 
-uint64_t fnv_prng_64()
+// == prng-64 ====
+prng_u64::prng_u64()
 {
-	uint64_t result=SEED_VALUE_64;
-	result^=result & UINT32_MAX;
-	result*=FNV64_PRIME;
-	SEED_VALUE_32=result;
-	return(result);
+	pSeed=0xDEADBEEFDEADBEEF;
+}
+
+void prng_u64::set_seed_value(uint64_t new_seed)
+{
+	pSeed=new_seed;
+}
+
+uint64_t prng_u64::generate_mms()
+{
+	pSeed=(pSeed & UINT32_MAX) * MMS_ALPHA_64 + (pSeed >> 32);
+	return(pSeed);
+}
+
+uint64_t prng_u64::generate_fnv()
+{
+	pSeed^=pSeed & UINT32_MAX;
+	pSeed*=FNV_PRIME_64;
+	return(pSeed);
+}
+
+uint64_t prng_u64::generate_xs()
+{
+	pSeed^=pSeed<<13;
+	pSeed^=pSeed>>7;
+	pSeed^=pSeed<<17;
+	return(pSeed);
 }

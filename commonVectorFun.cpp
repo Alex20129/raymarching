@@ -1,5 +1,4 @@
 #include "commonVectorFun.hpp"
-#include "prng.hpp"
 
 //=== Vec2 double
 
@@ -171,26 +170,6 @@ void Vec3d::Normalize(double length)
 	this->Z/=len;
 }
 
-void Vec3d::Randomize()
-{
-	double prX, prY, prZ, div=(double)(UINT64_MAX/2);
-	// prX=fnv_prng_64();
-	// prY=fnv_prng_64();
-	// prZ=fnv_prng_64();
-	prX=mms_prng_64();
-	prY=mms_prng_64();
-	prZ=mms_prng_64();
-	prX/=div;
-	prX-=1.0;
-	prY/=div;
-	prY-=1.0;
-	prZ/=div;
-	prZ-=1.0;
-	this->X=prX;
-	this->Y=prY;
-	this->Z=prZ;
-}
-
 Vec3d Vec3d::Normal(double length)
 {
 	Vec3d res(this);
@@ -259,7 +238,7 @@ Vec3d Vec3d::operator-(const Vec3d &other)
 
 Vec3d Vec3d::operator-()
 {
-	return Vec3d(-X, -Y, -Z);
+	return(Vec3d(-X, -Y, -Z));
 }
 
 Vec3d Vec3d::operator/(double d)
@@ -277,7 +256,7 @@ Vec3d Vec3d::operator*(const Vec3d &other)
 	res.X*=other.X;
 	res.Y*=other.Y;
 	res.Z*=other.Z;
-	return res;
+	return(res);
 }
 
 Vec3d operator*(const Vec3d &vec, const double m)
@@ -325,26 +304,6 @@ void Vec3f::Normalize(float length)
 	this->X/=len;
 	this->Y/=len;
 	this->Z/=len;
-}
-
-void Vec3f::Randomize()
-{
-	float prX, prY, prZ, div=(float)(UINT32_MAX/2);
-	// prX=fnv_prng_32();
-	// prY=fnv_prng_32();
-	// prZ=fnv_prng_32();
-	prX=mms_prng_32();
-	prY=mms_prng_32();
-	prZ=mms_prng_32();
-	prX/=div;
-	prX-=1.0;
-	prY/=div;
-	prY-=1.0;
-	prZ/=div;
-	prZ-=1.0;
-	this->X=prX;
-	this->Y=prY;
-	this->Z=prZ;
 }
 
 Vec3f Vec3f::Normal(float length)

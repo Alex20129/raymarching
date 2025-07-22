@@ -1,5 +1,5 @@
-#include "scene.hpp"
 #include <cstdio>
+#include "scene.hpp"
 
 Scene::Scene()
 {
@@ -29,6 +29,7 @@ Scene::Scene()
 		for(X=0; X<pScreenWidth; ++X)
 		{
 			newRay=new Ray();
+			newRay->SetID(SceneRays->size());
 			newRay->SetDefaultDirection(X-pScreenWidth/2.0, Y-pScreenHeight/2.0, pScreenWidth);
 			newRay->SceneObjects=this->SceneObjects;
 			SceneRays->push_back(newRay);
@@ -60,13 +61,22 @@ void Scene::AddObject(Object *object)
 	object->SceneObjects=this->SceneObjects;
 }
 
-static void RayRunningWrapperFun(Ray **rays, unsigned int rays_per_thread, unsigned int thread_id)
+static void RayRunningWrapperFun(vector <Ray *> *rays, unsigned int rays_per_thread, unsigned int thread_id)
 {
+	prng_u64 threadLocalPRNG;
+	uint64_t seed=thread_id;
 	unsigned int rayid;
-	for(rayid=0; rayid<rays_per_thread; rayid++)
+	vector <Ray *> threadLocalRays=*rays;
+	for(rayid=thread_id*rays_per_thread; rayid<(thread_id+1)*rays_per_thread; rayid++)
 	{
-		rays[thread_id*rays_per_thread+rayid]->Reset();
-		rays[thread_id*rays_per_thread+rayid]->Run();
+		Ray *rayPtr=threadLocalRays.at(rayid);
+		seed+=threadLocalPRNG.generate_fnv();
+		threadLocalPRNG.set_seed_value(seed);
+		seed+=threadLocalPRNG.generate_xs();
+		threadLocalPRNG.set_seed_value(seed);
+		rayPtr->SetPRNG(threadLocalPRNG);
+		rayPtr->Reset();
+		rayPtr->Run();
 	}
 }
 
@@ -81,7 +91,7 @@ void Scene::Render(unsigned int rays_per_pixel)
 		rays_per_pixel--;
 		for(threadid=0; threadid<pRenderThreadsNum; threadid++)
 		{
-			newThread=new thread(RayRunningWrapperFun, SceneRays->data(), SceneRays->size()/pRenderThreadsNum, threadid);
+			newThread=new thread(RayRunningWrapperFun, SceneRays, SceneRays->size()/pRenderThreadsNum, threadid);
 			pRenderThreads->push(newThread);
 		}
 		while(!pRenderThreads->empty())

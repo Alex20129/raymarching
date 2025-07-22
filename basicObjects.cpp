@@ -1,11 +1,15 @@
-#include "basicObjects.hpp"
 #include <cstdio>
 #include <cmath>
+#include "basicObjects.hpp"
+
+static const double UINT64_DIV2_D=(double)(UINT64_MAX/2);
+static const float UINT32_DIV2_F=(float)(UINT32_MAX/2);
 
 Object::Object()
 {
 	SceneObjects=nullptr;
 	pVisible=1;
+	pID=0;
 	pBrightness=0.0;
 	pReflectivity=0.25;
 	pName=new string("Object");
@@ -19,6 +23,16 @@ bool Object::Visible() const
 void Object::SetVisible(bool visible)
 {
 	pVisible=visible;
+}
+
+uint64_t Object::ID() const
+{
+	return(pID);
+}
+
+void Object::SetID(uint64_t id)
+{
+	pID=id;
 }
 
 double Object::Brightness() const
@@ -220,11 +234,34 @@ double Intersection::GetDistance(Vec3d from) const
 
 // ========= RAY ===
 
+void Ray::RandomizeVector3D(Vec3d &vector)
+{
+	vector.X=pPRNG.generate_mms();
+	vector.X/=UINT64_DIV2_D;
+	vector.X-=1.0;
+	vector.Y=pPRNG.generate_mms();
+	vector.Y/=UINT64_DIV2_D;
+	vector.Y-=1.0;
+	vector.Z=pPRNG.generate_mms();
+	vector.Z/=UINT64_DIV2_D;
+	vector.Z-=1.0;
+}
+
 Ray::Ray()
 {
 	pStepsDone=0;
 	pCollisionsHappened=0;
 	SetName("Ray");
+}
+
+prng_u64 Ray::PRNG()
+{
+	return(pPRNG);
+}
+
+void Ray::SetPRNG(prng_u64 &prng)
+{
+	pPRNG=prng;
 }
 
 void Ray::SetDefaultDirection(double x, double y, double z)
@@ -265,9 +302,10 @@ void Ray::Run()
 {
 	Vec3d SurfaceNormalVec;
 	Vec3d RandomDirectionVec;
-	// Vec3d ReflectionVec;
+	Vec3d ReflectionVec;
 	Vec3f ColorAcc(255, 255, 255);
-	Vec3f IlluminationAcc(0, 0, 0);
+	Vec3f IlluminationAcc(0.01, 0.01, 0.01);
+	// double IlluminationAcc=0;
 	Object *Obstacle=nullptr;
 
 	while(pCollisionsHappened<RAY_COLLISIONS_MAX)
@@ -280,15 +318,16 @@ void Ray::Run()
 		pCollisionsHappened++;
 
 		IlluminationAcc += Obstacle->Color() * Obstacle->Brightness();
+		// IlluminationAcc += Obstacle->Brightness();
 
-		ColorAcc = ColorAcc * Obstacle->Color();
-		ColorAcc = ColorAcc / 255.0;
+		ColorAcc=ColorAcc * Obstacle->Color();
+		ColorAcc=ColorAcc / 255.0;
 		// ColorAccK*=Obstacle->Reflectivity();
 
 		SurfaceNormalVec=Obstacle->GetNormalVector(pPosition);
 		SurfaceNormalVec.Normalize();
 
-		RandomDirectionVec.Randomize();
+		RandomizeVector3D(RandomDirectionVec);
 		RandomDirectionVec.Normalize();
 
 		// ===
@@ -297,38 +336,38 @@ void Ray::Run()
 		// ===
 		SetDirection(SurfaceNormalVec + RandomDirectionVec);
 		// ===
-		pPosition=pPosition+SurfaceNormalVec*RAY_COLLISION_STEPOUT;
+		pPosition=pPosition+(SurfaceNormalVec*RAY_COLLISION_STEPOUT);
 	}
-	pColor=pColor + (ColorAcc+IlluminationAcc);
+	// ColorAcc=ColorAcc * IlluminationAcc;
+	// ColorAcc=ColorAcc / 255.0;
+	pColor=pColor + ColorAcc;
 }
 
 Object *Ray::RunOnce()
 {
-	double mindist=UINT32_MAX, dist=0;
-	Object *NearestObject=nullptr;
+	double mindist=UINT32_MAX, dist;
 	while(pStepsDone<RAY_STEPS_MAX)
 	{
-		for(Object *Obj: *SceneObjects)
+		for(Object *Object: *SceneObjects)
 		{
-			if(!Obj->Visible())
+			if(!Object->Visible())
 			{
 				continue;
 			}
-			dist=Obj->GetDistance(pPosition);
+			dist=Object->GetDistance(pPosition);
 			if(mindist>dist)
 			{
 				mindist=dist;
-				NearestObject=Obj;
+				if(mindist<RAY_COLLISION_THRESHOLD)
+				{
+					return(Object);
+				}
 			}
 		}
 		pPosition=pPosition+pDirection*mindist;
 		pStepsDone++;
-		if(mindist<RAY_COLLISION_THRESHOLD)
-		{
-			break;
-		}
 	}
-	return(NearestObject);
+	return(nullptr);
 }
 
 // ========= SPHERE ===
