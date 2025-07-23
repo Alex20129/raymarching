@@ -9,17 +9,13 @@ Scene::Scene()
 	SceneObjects=new vector <Object *>;
 	SceneLights=new vector <Object *>;
 	SceneRays=new vector <Ray *>;
-	pRenderThreads=new queue<thread *>;
-
 	ImageData=new vector <uint8_t>;
+	pRayRunsPerPixel=1;
 
-	if(thread::hardware_concurrency()>1)
+	pRenderThreads=thread::hardware_concurrency();
+	if(pRenderThreads<1)
 	{
-		pRenderThreadsNum=thread::hardware_concurrency();
-	}
-	else
-	{
-		pRenderThreadsNum=DEFAULT_RENDER_THREADS_NUM;
+		pRenderThreads=1;
 	}
 
 	SetScreenSize(DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT);
@@ -61,89 +57,107 @@ void Scene::AddObject(Object *object)
 	object->SceneObjects=this->SceneObjects;
 }
 
-static void RayRunningWrapperFun(vector <Ray *> *rays, unsigned int rays_per_thread, unsigned int thread_id)
+static void RayRunningWrapperFun(vector <Ray *> *rays, uint64_t thread_id, uint64_t rays_per_thread, uint64_t ray_runs_per_pixel)
 {
 	prng_u64 threadLocalPRNG;
 	uint64_t seed=thread_id;
-	unsigned int rayid;
+	uint64_t rayid, run;
 	vector <Ray *> threadLocalRays=*rays;
+	Ray *rayPtr;
+
+	seed+=threadLocalPRNG.generate_fnv();
+	threadLocalPRNG.set_seed_value(seed);
+	seed+=threadLocalPRNG.generate_xs();
+	threadLocalPRNG.set_seed_value(seed);
+
 	for(rayid=thread_id*rays_per_thread; rayid<(thread_id+1)*rays_per_thread; rayid++)
 	{
-		Ray *rayPtr=threadLocalRays.at(rayid);
-		seed+=threadLocalPRNG.generate_fnv();
-		threadLocalPRNG.set_seed_value(seed);
-		seed+=threadLocalPRNG.generate_xs();
-		threadLocalPRNG.set_seed_value(seed);
+		rayPtr=threadLocalRays.at(rayid);
 		rayPtr->SetPRNG(threadLocalPRNG);
-		rayPtr->Reset();
-		rayPtr->Run();
+		rayPtr->SetColor(0, 0, 0);
+		for(run=0; run<ray_runs_per_pixel; run++)
+		{
+			rayPtr->Reset();
+			rayPtr->Run();
+		}
+		threadLocalPRNG=rayPtr->PRNG();
 	}
 }
 
-void Scene::Render(unsigned int rays_per_pixel)
+void Scene::Render()
 {
-	thread *newThread;
-	unsigned int threadid;
-	float colorDiv=rays_per_pixel;
+	uint64_t threadid;
+	thread *renderThread;
+	float colorDiv=pRayRunsPerPixel;
+	queue<thread *> renderThreads;
+
 	chrono::time_point <chrono::high_resolution_clock> start=chrono::high_resolution_clock::now(), end;
-	while(rays_per_pixel)
+	for(threadid=0; threadid<pRenderThreads; threadid++)
 	{
-		rays_per_pixel--;
-		for(threadid=0; threadid<pRenderThreadsNum; threadid++)
-		{
-			newThread=new thread(RayRunningWrapperFun, SceneRays, SceneRays->size()/pRenderThreadsNum, threadid);
-			pRenderThreads->push(newThread);
-		}
-		while(!pRenderThreads->empty())
-		{
-			pRenderThreads->front()->join();
-			delete pRenderThreads->front();
-			pRenderThreads->pop();
-		}
+		renderThread=new thread(RayRunningWrapperFun, SceneRays, threadid, SceneRays->size()/pRenderThreads, pRayRunsPerPixel);
+		renderThreads.push(renderThread);
+	}
+	while(!renderThreads.empty())
+	{
+		renderThreads.front()->join();
+		delete renderThreads.front();
+		renderThreads.pop();
 	}
 	for(size_t ray_id=0; ray_id<SceneRays->size(); ray_id++)
 	{
+		uint32_t c;
 		Vec3f color=SceneRays->at(ray_id)->Color();
-		ImageData->data()[ray_id*4]=(uint8_t)(color.X/colorDiv);
-		ImageData->data()[ray_id*4+1]=(uint8_t)(color.Y/colorDiv);
-		ImageData->data()[ray_id*4+2]=(uint8_t)(color.Z/colorDiv);
+
+		c=color.X/colorDiv;
+		ImageData->data()[ray_id*4]=c&0xFF;
+
+		c=color.Y/colorDiv;
+		ImageData->data()[ray_id*4+1]=c&0xFF;
+
+		c=color.Z/colorDiv;
+		ImageData->data()[ray_id*4+2]=c&0xFF;
 	}
 	end=chrono::high_resolution_clock::now();
 	FrameRenderTime=chrono::duration_cast <chrono::milliseconds>(end - start);
 	fprintf(stdout, "FrameRenderTime: %li ms\n", FrameRenderTime.count());
 }
 
-unsigned int Scene::ScreenWidth()
+uint64_t Scene::ScreenWidth()
 {
 	return(pScreenWidth);
 }
 
-unsigned int Scene::ScreenHeight()
+uint64_t Scene::ScreenHeight()
 {
 	return(pScreenHeight);
 }
 
-unsigned int Scene::RenderThreadsNum()
+uint64_t Scene::RenderThreadsNum()
 {
-	return(pRenderThreadsNum);
+	return(pRenderThreads);
 }
 
-void Scene::SetScreenWidth(unsigned int width)
+void Scene::SetScreenWidth(uint64_t width)
 {
 	SetScreenSize(width, pScreenHeight);
 }
 
-void Scene::SetScreenHeight(unsigned int height)
+void Scene::SetScreenHeight(uint64_t height)
 {
 	SetScreenSize(pScreenWidth, height);
 }
 
-void Scene::SetRenderThreadsNum(unsigned int threads_num)
+void Scene::SetNumOfRenderThreads(uint64_t render_threads)
 {
-	pRenderThreadsNum=threads_num;
+	pRenderThreads=render_threads;
 }
 
-void Scene::SetScreenSize(unsigned int width, unsigned int height)
+void Scene::SetNumOfRayRunsPerPixel(uint64_t ray_runs_per_pixel)
+{
+	pRayRunsPerPixel=ray_runs_per_pixel;
+}
+
+void Scene::SetScreenSize(uint64_t width, uint64_t height)
 {
 	pScreenWidth=width;
 	pScreenHeight=height;

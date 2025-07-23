@@ -72,7 +72,7 @@ void ControlWidget::on_renderButton_clicked()
 	ui->YScrollBar->setValue(objpos.Y);
 	ui->Zdial->setValue(objpos.Z);
 
-	NewScene->Render(1);
+	NewScene->Render();
 	ui->rendertime->setText(QString::number(NewScene->FrameRenderTime.count()));
 	SceneW->update();
 }

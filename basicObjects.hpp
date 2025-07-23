@@ -7,7 +7,7 @@
 #include "prng.hpp"
 
 #define RAY_STEPS_MAX			1024
-#define RAY_COLLISIONS_MAX		5
+#define RAY_COLLISIONS_MAX		2
 #define RAY_COLLISION_THRESHOLD	1.0/8.0
 #define RAY_COLLISION_STEPOUT	1.0/4.0
 #define NORMAL_CALCULATION_D	1.0/16.0
@@ -83,7 +83,7 @@ class Ray : public Object
 {
 	Vec3d pDefaultDirection;
 	Vec3d pDirection;
-	unsigned int pStepsDone, pCollisionsHappened;
+	uint64_t pStepsDone, pCollisionsHappened;
 	prng_u64 pPRNG;
 	void RandomizeVector3D(Vec3d &vector);
 public:

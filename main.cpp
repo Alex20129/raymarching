@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
 	NewSphere2->SetName("Sphere 2");
 	NewSphere2->SetRadius(46);
 	NewSphere2->SetReflectivity(0.25);
-	NewSphere2->SetPosition(-50, 40, 300);
+	NewSphere2->SetPosition(-50, 44, 300);
 	NewSphere2->SetBrightness(test_brightness);
 	NewSphere2->SetColor(20, 20, 200);
 
@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
 	NewCube2->SetName("Cube 2");
 	NewCube2->SetLength(80);
 	NewCube2->SetReflectivity(0.25);
-	NewCube2->SetPosition(50, 40, 300);
+	NewCube2->SetPosition(50, 44, 300);
 	NewCube2->SetBrightness(test_brightness);
 	NewCube2->SetColor(150, 10, 150);
 
@@ -108,10 +108,11 @@ int main(int argc, char *argv[])
 	NewScene->AddObject(NewPlane3);
 	NewScene->AddObject(NewPlane4);
 
-	uint32_t rays_per_pixel=1;
+	uint32_t rays_per_pixel=4;
 	while(rays_per_pixel)
 	{
-		NewScene->Render(rays_per_pixel);
+		NewScene->SetNumOfRayRunsPerPixel(rays_per_pixel);
+		NewScene->Render();
 		QImage img1(NewScene->ImageData->data(), NewScene->ScreenWidth(), NewScene->ScreenHeight(), QImage::Format_RGBA8888);
 		img1.save(QString::number(rays_per_pixel)+QString(".png"));
 		rays_per_pixel=rays_per_pixel>>1;
