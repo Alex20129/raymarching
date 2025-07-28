@@ -28,7 +28,7 @@ uint32_t prng_u32::generate_mwc()
 
 uint32_t prng_u32::generate_fnv1a()
 {
-	pSeed^=pSeed & UINT8_MAX;
+	pSeed^=pSeed & UINT16_MAX;
 	pSeed*=FNV32_PRIME;
 	return(pSeed);
 }
@@ -60,7 +60,7 @@ uint64_t prng_u64::generate_mwc()
 
 uint64_t prng_u64::generate_fnv1a()
 {
-	pSeed^=pSeed & UINT8_MAX;
+	pSeed^=pSeed & UINT32_MAX;
 	pSeed*=FNV64_PRIME;
 	return(pSeed);
 }
