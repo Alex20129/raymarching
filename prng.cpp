@@ -1,7 +1,7 @@
 #include "prng.hpp"
 
-static const uint32_t MMS32_ALPHA=0x7F545415;
-static const uint64_t MMS64_ALPHA=0x000007F22254544B;
+static const uint32_t MWC32_ALPHA=0x7F545415;
+static const uint64_t MWC64_ALPHA=0x000007F22254544B;
 
 static const uint32_t FNV32_INITIAL_OFFSET=0x811C9DC5;
 static const uint64_t FNV64_INITIAL_OFFSET=0xCBF29CE484222325;
@@ -22,7 +22,7 @@ void prng_u32::set_seed_value(uint32_t new_seed)
 
 uint32_t prng_u32::generate_mwc()
 {
-	pSeed=(pSeed & UINT16_MAX) * MMS32_ALPHA + (pSeed >> 16);
+	pSeed=(pSeed & UINT16_MAX) * MWC32_ALPHA + (pSeed >> 16);
 	return(pSeed);
 }
 
@@ -54,7 +54,7 @@ void prng_u64::set_seed_value(uint64_t new_seed)
 
 uint64_t prng_u64::generate_mwc()
 {
-	pSeed=(pSeed & UINT32_MAX) * MMS64_ALPHA + (pSeed >> 32);
+	pSeed=(pSeed & UINT32_MAX) * MWC64_ALPHA + (pSeed >> 32);
 	return(pSeed);
 }
 
