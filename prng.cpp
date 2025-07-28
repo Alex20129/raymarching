@@ -36,7 +36,6 @@ uint32_t prng_u32::generate_fnv1a()
 
 uint32_t prng_u32::generate_xorshift()
 {
-	pSeed+=pSeed & UINT8_MAX;
 	pSeed^=pSeed<<13;
 	pSeed^=pSeed>>17;
 	pSeed^=pSeed<<5;
@@ -70,7 +69,6 @@ uint64_t prng_u64::generate_fnv1a()
 
 uint64_t prng_u64::generate_xorshift()
 {
-	pSeed+=pSeed & UINT8_MAX;
 	pSeed^=pSeed<<13;
 	pSeed^=pSeed>>7;
 	pSeed^=pSeed<<17;
