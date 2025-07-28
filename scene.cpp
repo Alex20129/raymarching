@@ -69,7 +69,7 @@ static void RayRunningWrapperFun(vector <Ray *> *rays, uint64_t thread_id, uint6
 	threadLocalPRNG.set_seed_value(seed);
 
 	seed+=thread_id;
-	seed+=threadLocalPRNG.generate_mms();
+	seed+=threadLocalPRNG.generate_mwc();
 	threadLocalPRNG.set_seed_value(seed);
 
 	seed+=thread_id;

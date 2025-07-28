@@ -236,13 +236,13 @@ double Intersection::GetDistance(Vec3d from) const
 
 void Ray::RandomizeVector3D(Vec3d &vector)
 {
-	vector.X=pPRNG.generate_mms();
+	vector.X=pPRNG.generate_mwc();
 	vector.X/=UINT64_DIV2_D;
 	vector.X-=1.0;
-	vector.Y=pPRNG.generate_mms();
+	vector.Y=pPRNG.generate_mwc();
 	vector.Y/=UINT64_DIV2_D;
 	vector.Y-=1.0;
-	vector.Z=pPRNG.generate_mms();
+	vector.Z=pPRNG.generate_mwc();
 	vector.Z/=UINT64_DIV2_D;
 	vector.Z-=1.0;
 }
