@@ -249,8 +249,7 @@ void Ray::RandomizeVector3D(Vec3d &vector)
 
 Ray::Ray()
 {
-	pStepsDone=0;
-	pCollisionsHappened=0;
+	pObjectToIgnore=nullptr;
 	SetName("Ray");
 }
 
@@ -274,12 +273,14 @@ void Ray::SetDefaultDirection(double x, double y, double z)
 
 void Ray::SetDirection(Vec3d direction)
 {
-	pDirection=direction.Normal();
+	pDirection=direction;
+	pDirection.Normalize();
 }
 
 void Ray::SetDirection(Vec3d *direction)
 {
-	pDirection=direction->Normal();
+	pDirection=*direction;
+	pDirection.Normalize();
 }
 
 void Ray::SetDirection(double x, double y, double z)
@@ -292,8 +293,7 @@ void Ray::SetDirection(double x, double y, double z)
 
 void Ray::Reset()
 {
-	pStepsDone=0;
-	pCollisionsHappened=0;
+
 	pDirection=pDefaultDirection;
 	SetPosition(0, 0, 0);
 }
@@ -304,26 +304,26 @@ void Ray::Run()
 	Vec3d RandomDirectionVec;
 	Vec3d ReflectionVec;
 	Vec3f ColorAcc(255, 255, 255);
-	Vec3f IlluminationAcc(0.01, 0.01, 0.01);
-	// double IlluminationAcc=0;
+	Vec3f IlluminationAcc(0, 0, 0);
 	Object *Obstacle=nullptr;
+	uint64_t CollisionsHappened=0;
 
-	while(pCollisionsHappened<RAY_COLLISIONS_MAX)
+	while(CollisionsHappened<RAY_COLLISIONS_MAX)
 	{
 		Obstacle=RunOnce();
 		if(Obstacle==nullptr)
 		{
 			break;
 		}
-		pCollisionsHappened++;
+		pObjectToIgnore=Obstacle;
+		CollisionsHappened++;
 
 		IlluminationAcc += Obstacle->Color() * Obstacle->Brightness();
-		// IlluminationAcc += Obstacle->Brightness();
+		// IlluminationAcc += Obstacle->Color();
 
-		ColorAcc=ColorAcc * Obstacle->Color();
-		ColorAcc=ColorAcc / 255.0;
-		// ColorAccK*=Obstacle->Reflectivity();
+		ColorAcc=ColorAcc * Obstacle->Color() / 255.0;
 
+		// Obstacle->Reflectivity();
 		SurfaceNormalVec=Obstacle->GetNormalVector(pPosition);
 		SurfaceNormalVec.Normalize();
 
@@ -335,23 +335,26 @@ void Ray::Run()
 		// SetDirection(ReflectionVec);
 		// ===
 		SetDirection(SurfaceNormalVec + RandomDirectionVec);
-		// ===
-		pPosition=pPosition+(SurfaceNormalVec*RAY_COLLISION_STEPOUT);
+		// SetDirection(SurfaceNormalVec);
 	}
-	// ColorAcc=ColorAcc * IlluminationAcc;
-	// ColorAcc=ColorAcc / 255.0;
-	pColor=pColor + ColorAcc;
+	pColor=pColor + (ColorAcc * IlluminationAcc);
 }
 
 Object *Ray::RunOnce()
 {
 	double mindist=UINT32_MAX, dist;
-	while(pStepsDone<RAY_STEPS_MAX)
+	uint64_t stepsDone=0;
+	while(stepsDone<RAY_STEPS_PER_RUN_MAX)
 	{
 		for(Object *Object: *SceneObjects)
 		{
 			if(!Object->Visible())
 			{
+				continue;
+			}
+			if(Object==pObjectToIgnore)
+			{
+				pObjectToIgnore=nullptr;
 				continue;
 			}
 			dist=Object->GetDistance(pPosition);
@@ -365,7 +368,7 @@ Object *Ray::RunOnce()
 			}
 		}
 		pPosition=pPosition+pDirection*mindist;
-		pStepsDone++;
+		stepsDone++;
 	}
 	return(nullptr);
 }

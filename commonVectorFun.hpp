@@ -108,13 +108,13 @@ public:
 	void operator+=(const Vec3uc &other);
 	Vec3uc operator-(const Vec3uc &other);
 	Vec3uc operator-();
-	uint8_t operator*(const Vec3uc &other);
-	Vec3uc operator*(char m);
-	Vec3uc operator*(float m);
-	Vec3uc operator*(double m);
 	Vec3uc operator/(char m);
 	Vec3uc operator/(float m);
 	Vec3uc operator/(double m);
+	Vec3uc operator*(const Vec3uc &other);
+	Vec3uc operator*(char m);
+	Vec3uc operator*(float m);
+	Vec3uc operator*(double m);
 };
 
 #endif // COMMONVECTORFUN_HPP

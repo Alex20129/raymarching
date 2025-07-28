@@ -60,14 +60,20 @@ void Scene::AddObject(Object *object)
 static void RayRunningWrapperFun(vector <Ray *> *rays, uint64_t thread_id, uint64_t rays_per_thread, uint64_t ray_runs_per_pixel)
 {
 	prng_u64 threadLocalPRNG;
-	uint64_t seed=thread_id;
-	uint64_t rayid, run;
+	uint64_t seed=0, rayid, run;
 	vector <Ray *> threadLocalRays=*rays;
 	Ray *rayPtr;
 
-	seed+=threadLocalPRNG.generate_fnv();
+	seed+=thread_id;
+	seed+=threadLocalPRNG.generate_fnv1a();
 	threadLocalPRNG.set_seed_value(seed);
-	seed+=threadLocalPRNG.generate_xs();
+
+	seed+=thread_id;
+	seed+=threadLocalPRNG.generate_mms();
+	threadLocalPRNG.set_seed_value(seed);
+
+	seed+=thread_id;
+	seed+=threadLocalPRNG.generate_xorshift();
 	threadLocalPRNG.set_seed_value(seed);
 
 	for(rayid=thread_id*rays_per_thread; rayid<(thread_id+1)*rays_per_thread; rayid++)

@@ -11,8 +11,8 @@ public:
 	prng_u32();
 	void set_seed_value(uint32_t new_seed);
 	uint32_t generate_mms();
-	uint32_t generate_fnv();
-	uint32_t generate_xs();
+	uint32_t generate_fnv1a();
+	uint32_t generate_xorshift();
 };
 
 struct prng_u64
@@ -23,8 +23,8 @@ public:
 	prng_u64();
 	void set_seed_value(uint64_t new_seed);
 	uint64_t generate_mms();
-	uint64_t generate_fnv();
-	uint64_t generate_xs();
+	uint64_t generate_fnv1a();
+	uint64_t generate_xorshift();
 };
 
 #endif // PRNG_H

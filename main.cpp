@@ -13,54 +13,53 @@ ControlWidget *ControlsW;
 
 int main(int argc, char *argv[])
 {
-	QApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
-	QApplication RayMarchingApp(argc, argv);
+	// QApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
+	// QApplication RayMarchingApp(argc, argv);
 
 	NewScene=new Scene;
 
 	Sphere *NewSphere1=new Sphere();
 	NewSphere1->SetName("Sphere 1");
 	NewSphere1->SetRadius(44);
-	NewSphere1->SetReflectivity(0.4);
 	NewSphere1->SetPosition(0, -40, 300);
+	NewSphere1->SetReflectivity(0.4);
 	NewSphere1->SetColor(200, 20, 20);
 
 	Cube *NewCube1=new Cube();
 	NewCube1->SetName("Cube 1");
 	NewCube1->SetLength(68);
-	NewCube1->SetReflectivity(0.6);
 	NewCube1->SetPosition(0, -40, 300);
+	NewCube1->SetReflectivity(0.6);
 	NewCube1->SetColor(20, 180, 180);
-
-	double test_brightness=0.0;
 
 	Intersection *ShpereCubeIntersection=new Intersection(NewSphere1, NewCube1);
 	ShpereCubeIntersection->SetReflectivity(0.25);
-	ShpereCubeIntersection->SetBrightness(test_brightness);
+	ShpereCubeIntersection->SetBrightness(0.0);
 	ShpereCubeIntersection->SetColor(0, 180, 180);
 
 	Sphere *NewSphere2=new Sphere();
 	NewSphere2->SetName("Sphere 2");
 	NewSphere2->SetRadius(46);
-	NewSphere2->SetReflectivity(0.25);
 	NewSphere2->SetPosition(-50, 44, 300);
-	NewSphere2->SetBrightness(test_brightness);
+	NewSphere2->SetReflectivity(0.25);
+	NewSphere2->SetBrightness(0.0);
 	NewSphere2->SetColor(20, 20, 200);
 
 	Cube *NewCube2=new Cube();
 	NewCube2->SetName("Cube 2");
 	NewCube2->SetLength(80);
-	NewCube2->SetReflectivity(0.25);
 	NewCube2->SetPosition(50, 44, 300);
-	NewCube2->SetBrightness(test_brightness);
+	NewCube2->SetReflectivity(0.25);
+	NewCube2->SetBrightness(0.0);
 	NewCube2->SetColor(150, 10, 150);
 
 	// Torus *NewTorus2=new Torus();
 	// NewTorus2->SetName("Torus 2");
-	// NewTorus2->SetPosition(0, 20, 120);
 	// NewTorus2->SetRadius1(40);
 	// NewTorus2->SetRadius2(10);
-	// NewTorus2->SetBrightness(test_brightness);
+	// NewTorus2->SetPosition(0, 20, 120);
+	// NewTorus2->SetReflectivity(0.25);
+	// NewTorus2->SetBrightness(0.0);
 	// NewTorus2->SetColor(200, 200, 80);
 
 	Plane *NewPlane1=new Plane();
@@ -108,7 +107,7 @@ int main(int argc, char *argv[])
 	NewScene->AddObject(NewPlane3);
 	NewScene->AddObject(NewPlane4);
 
-	uint32_t rays_per_pixel=4;
+	uint32_t rays_per_pixel=16;
 	while(rays_per_pixel)
 	{
 		NewScene->SetNumOfRayRunsPerPixel(rays_per_pixel);

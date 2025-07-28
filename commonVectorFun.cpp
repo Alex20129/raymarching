@@ -492,10 +492,39 @@ Vec3uc Vec3uc::operator-()
 	return Vec3uc(-X, -Y, -Z);
 }
 
-uint8_t Vec3uc::operator*(const Vec3uc &other)
+Vec3uc Vec3uc::operator/(char m)
 {
-	uint8_t res;
-	res=other.X*X+other.Y*Y+other.Z*Z;
+	Vec3uc res(this);
+	res.X/=m;
+	res.Y/=m;
+	res.Z/=m;
+	return res;
+}
+
+Vec3uc Vec3uc::operator/(float m)
+{
+	Vec3uc res(this);
+	res.X/=m;
+	res.Y/=m;
+	res.Z/=m;
+	return res;
+}
+
+Vec3uc Vec3uc::operator/(double m)
+{
+	Vec3uc res(this);
+	res.X/=m;
+	res.Y/=m;
+	res.Z/=m;
+	return res;
+}
+
+Vec3uc Vec3uc::operator*(const Vec3uc &other)
+{
+	Vec3uc res(this);
+	res.X*=other.X;
+	res.Y*=other.Y;
+	res.Z*=other.Z;
 	return res;
 }
 
@@ -523,32 +552,5 @@ Vec3uc Vec3uc::operator*(double m)
 	res.X*=m;
 	res.Y*=m;
 	res.Z*=m;
-	return res;
-}
-
-Vec3uc Vec3uc::operator/(char m)
-{
-	Vec3uc res(this);
-	res.X/=m;
-	res.Y/=m;
-	res.Z/=m;
-	return res;
-}
-
-Vec3uc Vec3uc::operator/(float m)
-{
-	Vec3uc res(this);
-	res.X/=m;
-	res.Y/=m;
-	res.Z/=m;
-	return res;
-}
-
-Vec3uc Vec3uc::operator/(double m)
-{
-	Vec3uc res(this);
-	res.X/=m;
-	res.Y/=m;
-	res.Z/=m;
 	return res;
 }
