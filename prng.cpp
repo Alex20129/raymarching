@@ -1,7 +1,7 @@
 #include "prng.hpp"
 
-static const uint32_t MWC32_ALPHA=0x7F545415;
-static const uint64_t MWC64_ALPHA=0x000007F25454540D;
+static const uint32_t MWC32_ALPHA=0x7F545431;
+static const uint64_t MWC64_ALPHA=0x00007F5454545437;
 
 static const uint32_t FNV32_INITIAL_OFFSET=0x811C9DC5;
 static const uint64_t FNV64_INITIAL_OFFSET=0xCBF29CE484222325;
