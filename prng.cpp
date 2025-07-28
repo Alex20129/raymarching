@@ -22,7 +22,6 @@ void prng_u32::set_seed_value(uint32_t new_seed)
 
 uint32_t prng_u32::generate_mwc()
 {
-	pSeed+=pSeed & UINT8_MAX;
 	pSeed=(pSeed & UINT16_MAX) * MMS32_ALPHA + (pSeed >> 16);
 	return(pSeed);
 }
@@ -55,7 +54,6 @@ void prng_u64::set_seed_value(uint64_t new_seed)
 
 uint64_t prng_u64::generate_mwc()
 {
-	pSeed+=pSeed & UINT8_MAX;
 	pSeed=(pSeed & UINT32_MAX) * MMS64_ALPHA + (pSeed >> 32);
 	return(pSeed);
 }
