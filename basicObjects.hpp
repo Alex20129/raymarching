@@ -126,6 +126,9 @@ public:
 	Cylinder();
 	void SetLength(double length);
 	void SetRadius(double radius);
+	void SetOrientation(const Vec3d *orientation);
+	void SetOrientation(const Vec3d &orientation);
+	void SetOrientation(double x, double y, double z);
 	double GetDistance(Vec3d from) const;
 };
 

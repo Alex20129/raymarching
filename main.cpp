@@ -41,14 +41,14 @@ int main(int argc, char *argv[])
 	Plane4->SetPosition(-140, 0, 0);
 	Plane4->SetOrientation(1, 0, 0);
 	Plane4->SetSpecularity(0);
-	Plane4->SetColor(200, 80, 80);
+	Plane4->SetColor(255, 80, 80);
 
 	Plane *Plane5=new Plane();
 	Plane4->SetName("Green wall");
 	Plane5->SetPosition(140, 0, 0);
 	Plane5->SetOrientation(-1, 0, 0);
 	Plane5->SetSpecularity(0);
-	Plane5->SetColor(80, 200, 80);
+	Plane5->SetColor(80, 255, 80);
 
 	Sphere *NewSphere1=new Sphere();
 	NewSphere1->SetName("Sphere 1");
