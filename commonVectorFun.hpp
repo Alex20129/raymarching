@@ -15,9 +15,9 @@ public:
 	Vec2d(const Vec2d &other);
 	Vec2d(double x, double y);
 	void Normalize(double length=1.0);
-	Vec2d Normal(double length=1.0);
 	Vec2d Abs();
 	double Length();
+	double LengthSquared();
 	double Dot(const Vec2d &other);
 	Vec2d Max(const Vec2d &other);
 	Vec2d operator=(const Vec2d &other);
@@ -44,9 +44,9 @@ public:
 	Vec3d(const Vec3d &other);
 	Vec3d(double x, double y, double z);
 	void Normalize(double length=1.0);
-	Vec3d Normal(double length=1.0);
 	Vec3d Abs();
 	double Length();
+	double LengthSquared();
 	double Dot(const Vec3d &other);
 	Vec3d Max(const Vec3d &other);
 	Vec3d operator=(const Vec3d &other);
@@ -72,9 +72,9 @@ public:
 	Vec3f(const Vec3f &other);
 	Vec3f(float x, float y, float z);
 	void Normalize(float length=1.0);
-	Vec3f Normal(float length=1.0);
 	Vec3f Abs();
 	float Length();
+	float LengthSquared();
 	float Dot(const Vec3f &other);
 	Vec3f operator=(const Vec3f &other);
 	Vec3f operator+(const Vec3f &other);
@@ -99,7 +99,6 @@ public:
 	Vec3uc(const Vec3uc &vec);
 	Vec3uc(uint8_t x, uint8_t y, uint8_t z);
 	void Normalize(uint8_t length=1);
-	Vec3uc Normal(uint8_t length=1);
 	uint8_t Length();
 	uint8_t Dot(const Vec3uc &other);
 	Vec3uc Max(const Vec3uc &other);

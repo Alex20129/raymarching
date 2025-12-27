@@ -6,11 +6,6 @@
 #include "commonVectorFun.hpp"
 #include "prng.hpp"
 
-#define RAY_STEPS_PER_RUN_MAX	512
-#define RAY_COLLISIONS_MAX		4
-#define RAY_COLLISION_THRESHOLD	1.0/8.0
-#define NORMAL_CALCULATION_D	1.0/16.0
-
 using namespace std;
 
 class Object
@@ -21,9 +16,11 @@ class Object
 protected:
 	double pBrightness;
 	double pReflectivity;
+	double pSpecularity;
 	Vec3f pColor;
 	Vec3d pPosition;
 public:
+	static constexpr double NORMAL_CALCULATION_DIST = 1.0/16.0;
 	Object();
 	bool Visible() const;
 	void SetVisible(bool visible);
@@ -36,6 +33,9 @@ public:
 
 	double Reflectivity();
 	void SetReflectivity(double reflectivity);
+
+	double Specularity();
+	void SetSpecularity(double specularity);
 
 	Vec3f Color() const;
 	void SetColor(Vec3f color);
@@ -84,14 +84,16 @@ class Ray : public Object
 	Vec3d pDirection;
 	Object *pObjectToIgnore;
 	prng_u64 pPRNG;
-	void RandomizeVector3D(Vec3d &vector);
+	Vec3d createRandomVector3d();
 public:
+	static constexpr uint64_t RAY_STEPS_PER_RUN_MAX = 512;
+	static constexpr uint64_t RAY_COLLISIONS_MAX = 5;
+	static constexpr double RAY_COLLISION_THRESHOLD = 1.0/8.0;
+	static constexpr double RAY_COLLISION_THRESHOLD2 = 1.0/4.0;
 	Ray();
-	prng_u64 PRNG();
-	void SetPRNG(prng_u64 &prng);
 	void SetDefaultDirection(double x, double y, double z);
-	void SetDirection(Vec3d direction);
-	void SetDirection(Vec3d *direction);
+	void SetDirection(const Vec3d *direction);
+	void SetDirection(const Vec3d &direction);
 	void SetDirection(double x, double y, double z);
 	void Reset();
 	void Run();
@@ -116,6 +118,17 @@ public:
 	double GetDistance(Vec3d from) const;
 };
 
+class Cylinder : public Object
+{
+	double pLength;
+	double pRadius;
+public:
+	Cylinder();
+	void SetLength(double length);
+	void SetRadius(double radius);
+	double GetDistance(Vec3d from) const;
+};
+
 class Torus : public Object
 {
 	double pRadius1, pRadius2;
@@ -131,7 +144,8 @@ class Plane : public Object
 	Vec3d pOrientation;
 public:
 	Plane();
-	void SetOrientation(Vec3d orientation);
+	void SetOrientation(const Vec3d *orientation);
+	void SetOrientation(const Vec3d &orientation);
 	void SetOrientation(double x, double y, double z);
 	double GetDistance(Vec3d from) const;
 };

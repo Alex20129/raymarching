@@ -36,13 +36,6 @@ void Vec2d::Normalize(double length)
 	this->Y/=len;
 }
 
-Vec2d Vec2d::Normal(double length)
-{
-	Vec2d res(this);
-	res.Normalize(length);
-	return(res);
-}
-
 Vec2d Vec2d::Abs()
 {
 	Vec2d res(std::abs(X), std::abs(Y));
@@ -52,6 +45,12 @@ Vec2d Vec2d::Abs()
 double Vec2d::Length()
 {
 	double res=std::sqrt(X*X+Y*Y);
+	return(res);
+}
+
+double Vec2d::LengthSquared()
+{
+	double res=X*X+Y*Y;
 	return(res);
 }
 
@@ -170,13 +169,6 @@ void Vec3d::Normalize(double length)
 	this->Z/=len;
 }
 
-Vec3d Vec3d::Normal(double length)
-{
-	Vec3d res(this);
-	res.Normalize(length);
-	return(res);
-}
-
 Vec3d Vec3d::Abs()
 {
 	Vec3d res(std::abs(X), std::abs(Y), std::abs(Z));
@@ -186,6 +178,12 @@ Vec3d Vec3d::Abs()
 double Vec3d::Length()
 {
 	double res=std::sqrt(X*X+Y*Y+Z*Z);
+	return(res);
+}
+
+double Vec3d::LengthSquared()
+{
+	double res=X*X+Y*Y+Z*Z;
 	return(res);
 }
 
@@ -306,13 +304,6 @@ void Vec3f::Normalize(float length)
 	this->Z/=len;
 }
 
-Vec3f Vec3f::Normal(float length)
-{
-	Vec3f res(this);
-	res.Normalize(length);
-	return(res);
-}
-
 Vec3f Vec3f::Abs()
 {
 	Vec3f res(std::abs(X), std::abs(Y), std::abs(Z));
@@ -322,6 +313,12 @@ Vec3f Vec3f::Abs()
 float Vec3f::Length()
 {
 	float res=std::sqrt(X*X+Y*Y+Z*Z);
+	return(res);
+}
+
+float Vec3f::LengthSquared()
+{
+	float res=X*X+Y*Y+Z*Z;
 	return(res);
 }
 
@@ -425,13 +422,6 @@ void Vec3uc::Normalize(uint8_t length)
 	this->X/=len;
 	this->Y/=len;
 	this->Z/=len;
-}
-
-Vec3uc Vec3uc::Normal(uint8_t length)
-{
-	Vec3uc res(this);
-	res.Normalize(length);
-	return(res);
 }
 
 uint8_t Vec3uc::Length()

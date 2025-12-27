@@ -59,34 +59,18 @@ void Scene::AddObject(Object *object)
 
 static void RayRunningWrapperFun(vector <Ray *> *rays, uint64_t thread_id, uint64_t rays_per_thread, uint64_t ray_runs_per_pixel)
 {
-	prng_u64 threadLocalPRNG;
-	uint64_t seed=0, rayid, run;
+	uint64_t rayid, run;
 	vector <Ray *> threadLocalRays=*rays;
 	Ray *rayPtr;
-
-	seed+=thread_id;
-	seed+=threadLocalPRNG.generate_fnv1a();
-	threadLocalPRNG.set_seed_value(seed);
-
-	seed+=thread_id;
-	seed+=threadLocalPRNG.generate_mwc();
-	threadLocalPRNG.set_seed_value(seed);
-
-	seed+=thread_id;
-	seed+=threadLocalPRNG.generate_xorshift();
-	threadLocalPRNG.set_seed_value(seed);
-
 	for(rayid=thread_id*rays_per_thread; rayid<(thread_id+1)*rays_per_thread; rayid++)
 	{
 		rayPtr=threadLocalRays.at(rayid);
-		rayPtr->SetPRNG(threadLocalPRNG);
 		rayPtr->SetColor(0, 0, 0);
 		for(run=0; run<ray_runs_per_pixel; run++)
 		{
 			rayPtr->Reset();
 			rayPtr->Run();
 		}
-		threadLocalPRNG=rayPtr->PRNG();
 	}
 }
 
@@ -111,20 +95,25 @@ void Scene::Render()
 	}
 	for(size_t ray_id=0; ray_id<SceneRays->size(); ray_id++)
 	{
-		uint32_t c;
+		int32_t c;
 		Vec3f color=SceneRays->at(ray_id)->Color();
 
 		c=color.X/colorDiv;
-		ImageData->data()[ray_id*4]=c&0xFF;
+		c=std::min(c, 255);
+		ImageData->data()[ray_id*4]=c;
 
 		c=color.Y/colorDiv;
-		ImageData->data()[ray_id*4+1]=c&0xFF;
+		c=std::min(c, 255);
+		ImageData->data()[ray_id*4+1]=c;
 
 		c=color.Z/colorDiv;
-		ImageData->data()[ray_id*4+2]=c&0xFF;
+		c=std::min(c, 255);
+		ImageData->data()[ray_id*4+2]=c;
 	}
 	end=chrono::high_resolution_clock::now();
 	FrameRenderTime=chrono::duration_cast <chrono::milliseconds>(end - start);
+
+	fprintf(stdout, "RayRunsPerPixel: %lu\n", pRayRunsPerPixel);
 	fprintf(stdout, "FrameRenderTime: %li ms\n", FrameRenderTime.count());
 }
 

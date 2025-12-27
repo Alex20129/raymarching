@@ -2,17 +2,15 @@
 #include <cmath>
 #include "basicObjects.hpp"
 
-static const double UINT64_DIV2_D=(double)(UINT64_MAX/2);
-static const float UINT32_DIV2_F=(float)(UINT32_MAX/2);
-
 Object::Object()
 {
+	pName=new string("Object");
 	SceneObjects=nullptr;
 	pVisible=1;
 	pID=0;
 	pBrightness=0.0;
-	pReflectivity=0.25;
-	pName=new string("Object");
+	pReflectivity=0.5;
+	pSpecularity=0.5;
 }
 
 bool Object::Visible() const
@@ -60,7 +58,29 @@ void Object::SetReflectivity(double reflectivity)
 	{
 		reflectivity=0.0;
 	}
+	if(reflectivity>1.0)
+	{
+		reflectivity=1.0;
+	}
 	pReflectivity=reflectivity;
+}
+
+double Object::Specularity()
+{
+	return(pSpecularity);
+}
+
+void Object::SetSpecularity(double specularity)
+{
+	if(specularity<0.0)
+	{
+		specularity=0.0;
+	}
+	if(specularity>1.0)
+	{
+		specularity=1.0;
+	}
+	pSpecularity=specularity;
 }
 
 Vec3f Object::Color() const
@@ -135,17 +155,18 @@ void Object::SetName(string name)
 
 double Object::GetDistance(Vec3d from) const
 {
-	return((from-pPosition).Length());
+	from=from-pPosition;
+	return(from.Length());
 }
 
 // Using the gradient of the SDF, estimate the normal vector on the surface at given point
 Vec3d Object::GetNormalVector(Vec3d point) const
 {
-	double b=GetDistance(Vec3d(point.X - NORMAL_CALCULATION_D, point.Y - NORMAL_CALCULATION_D, point.Z - NORMAL_CALCULATION_D));
+	double b=GetDistance(Vec3d(point.X - NORMAL_CALCULATION_DIST, point.Y - NORMAL_CALCULATION_DIST, point.Z - NORMAL_CALCULATION_DIST));
 	Vec3d normalV(
-		GetDistance(Vec3d(point.X + NORMAL_CALCULATION_D, point.Y - NORMAL_CALCULATION_D, point.Z - NORMAL_CALCULATION_D)) - b,
-		GetDistance(Vec3d(point.X - NORMAL_CALCULATION_D, point.Y + NORMAL_CALCULATION_D, point.Z - NORMAL_CALCULATION_D)) - b,
-		GetDistance(Vec3d(point.X - NORMAL_CALCULATION_D, point.Y - NORMAL_CALCULATION_D, point.Z + NORMAL_CALCULATION_D)) - b);
+		GetDistance(Vec3d(point.X + NORMAL_CALCULATION_DIST, point.Y - NORMAL_CALCULATION_DIST, point.Z - NORMAL_CALCULATION_DIST)) - b,
+		GetDistance(Vec3d(point.X - NORMAL_CALCULATION_DIST, point.Y + NORMAL_CALCULATION_DIST, point.Z - NORMAL_CALCULATION_DIST)) - b,
+		GetDistance(Vec3d(point.X - NORMAL_CALCULATION_DIST, point.Y - NORMAL_CALCULATION_DIST, point.Z + NORMAL_CALCULATION_DIST)) - b);
 	return(normalV);
 }
 
@@ -153,6 +174,7 @@ Vec3d Object::GetNormalVector(Vec3d point) const
 
 Difference::Difference(Object *object_a, Object *object_b)
 {
+	SetName("Difference");
 	if(object_a==nullptr)
 	{
 		return;
@@ -163,10 +185,10 @@ Difference::Difference(Object *object_a, Object *object_b)
 		return;
 	}
 	ObjectB=object_b;
-	SetName("Difference");
 	pColor=(ObjectA->Color()+ObjectB->Color())/2.0;
 	pBrightness=(ObjectA->Brightness()+ObjectB->Brightness())/2.0;
 	pReflectivity=(ObjectA->Reflectivity()+ObjectB->Reflectivity())/2.0;
+	pSpecularity=(ObjectA->Specularity()+ObjectB->Specularity())/2.0;
 	ObjectA->SetVisible(false);
 	ObjectB->SetVisible(false);
 }
@@ -180,6 +202,7 @@ double Difference::GetDistance(Vec3d from) const
 
 Union::Union(Object *object_a, Object *object_b)
 {
+	SetName("Union");
 	if(object_a==nullptr)
 	{
 		return;
@@ -190,10 +213,10 @@ Union::Union(Object *object_a, Object *object_b)
 		return;
 	}
 	ObjectB=object_b;
-	SetName("Union");
 	pColor=(ObjectA->Color()+ObjectB->Color())/2.0;
 	pBrightness=(ObjectA->Brightness()+ObjectB->Brightness())/2.0;
 	pReflectivity=(ObjectA->Reflectivity()+ObjectB->Reflectivity())/2.0;
+	pSpecularity=(ObjectA->Specularity()+ObjectB->Specularity())/2.0;
 	ObjectA->SetVisible(false);
 	ObjectB->SetVisible(false);
 }
@@ -207,6 +230,7 @@ double Union::GetDistance(Vec3d from) const
 
 Intersection::Intersection(Object *object_a, Object *object_b)
 {
+	SetName("Intersection");
 	if(object_a==nullptr)
 	{
 		return;
@@ -217,10 +241,10 @@ Intersection::Intersection(Object *object_a, Object *object_b)
 		return;
 	}
 	ObjectB=object_b;
-	SetName("Intersection");
 	pColor=(ObjectA->Color()+ObjectB->Color())/2.0;
 	pBrightness=(ObjectA->Brightness()+ObjectB->Brightness())/2.0;
 	pReflectivity=(ObjectA->Reflectivity()+ObjectB->Reflectivity())/2.0;
+	pSpecularity=(ObjectA->Specularity()+ObjectB->Specularity())/2.0;
 	ObjectA->SetVisible(false);
 	ObjectB->SetVisible(false);
 }
@@ -234,66 +258,64 @@ double Intersection::GetDistance(Vec3d from) const
 
 // ========= RAY ===
 
-void Ray::RandomizeVector3D(Vec3d &vector)
+Vec3d Ray::createRandomVector3d()
 {
-	vector.X=pPRNG.generate_mwc();
-	vector.X/=UINT64_DIV2_D;
-	vector.X-=1.0;
-	vector.Y=pPRNG.generate_mwc();
-	vector.Y/=UINT64_DIV2_D;
-	vector.Y-=1.0;
-	vector.Z=pPRNG.generate_mwc();
-	vector.Z/=UINT64_DIV2_D;
-	vector.Z-=1.0;
+	constexpr double div=(double)(UINT64_MAX)/(double)(2.0);
+	Vec3d randomVector;
+	do
+	{
+		randomVector.X=pPRNG.generate_xorshift();
+		randomVector.X/=div;
+		randomVector.X-=1.0;
+		randomVector.Y=pPRNG.generate_xorshift();
+		randomVector.Y/=div;
+		randomVector.Y-=1.0;
+		randomVector.Z=pPRNG.generate_xorshift();
+		randomVector.Z/=div;
+		randomVector.Z-=1.0;
+	} while (randomVector.LengthSquared() > 1.0);
+	return(randomVector);
 }
 
 Ray::Ray()
 {
-	pObjectToIgnore=nullptr;
 	SetName("Ray");
-}
-
-prng_u64 Ray::PRNG()
-{
-	return(pPRNG);
-}
-
-void Ray::SetPRNG(prng_u64 &prng)
-{
-	pPRNG=prng;
+	uint64_t prngSeed=(uint64_t)(this);
+	prngSeed+=pPRNG.generate_xorshift();
+	pPRNG.set_seed_value(prngSeed);
+	pObjectToIgnore=nullptr;
 }
 
 void Ray::SetDefaultDirection(double x, double y, double z)
 {
-	pDefaultDirection.X=x;
-	pDefaultDirection.Y=y;
-	pDefaultDirection.Z=z;
-	pDefaultDirection.Normalize();
+	Vec3d newDefaultDirection(x, y, z);
+	newDefaultDirection.Normalize();
+	pDefaultDirection=newDefaultDirection;
 }
 
-void Ray::SetDirection(Vec3d direction)
+void Ray::SetDirection(const Vec3d *direction)
 {
-	pDirection=direction;
-	pDirection.Normalize();
+	Vec3d newDirection(direction);
+	newDirection.Normalize();
+	pDirection=newDirection;
 }
 
-void Ray::SetDirection(Vec3d *direction)
+void Ray::SetDirection(const Vec3d &direction)
 {
-	pDirection=*direction;
-	pDirection.Normalize();
+	Vec3d newDirection(direction);
+	newDirection.Normalize();
+	pDirection=newDirection;
 }
 
 void Ray::SetDirection(double x, double y, double z)
 {
-	pDirection.X=x;
-	pDirection.Y=y;
-	pDirection.Z=z;
-	pDirection.Normalize();
+	Vec3d newDirection(x, y, z);
+	newDirection.Normalize();
+	pDirection=newDirection;
 }
 
 void Ray::Reset()
 {
-
 	pDirection=pDefaultDirection;
 	SetPosition(0, 0, 0);
 }
@@ -301,10 +323,9 @@ void Ray::Reset()
 void Ray::Run()
 {
 	Vec3d SurfaceNormalVec;
-	Vec3d RandomDirectionVec;
-	Vec3d ReflectionVec;
-	Vec3f ColorAcc(255, 255, 255);
-	Vec3f IlluminationAcc(0, 0, 0);
+	Vec3d reflectionVec;
+	Vec3f colorAcc(255, 255, 255);
+	Vec3f illuminationAcc(0, 0, 0);
 	Object *Obstacle=nullptr;
 	uint64_t CollisionsHappened=0;
 
@@ -313,64 +334,73 @@ void Ray::Run()
 		Obstacle=RunOnce();
 		if(Obstacle==nullptr)
 		{
+			colorAcc=Vec3f(0, 0, 0);
 			break;
 		}
 		pObjectToIgnore=Obstacle;
 		CollisionsHappened++;
 
-		IlluminationAcc += Obstacle->Color() * Obstacle->Brightness();
-		// IlluminationAcc += Obstacle->Color();
+		illuminationAcc = illuminationAcc + Obstacle->Color() * Obstacle->Brightness();
 
-		ColorAcc=ColorAcc * Obstacle->Color() / 255.0;
+		colorAcc=colorAcc * Obstacle->Color() / 255.0;
 
+		// TODO:
 		// Obstacle->Reflectivity();
+
 		SurfaceNormalVec=Obstacle->GetNormalVector(pPosition);
 		SurfaceNormalVec.Normalize();
 
-		RandomizeVector3D(RandomDirectionVec);
-		RandomDirectionVec.Normalize();
+		double specularity=Obstacle->Specularity();
 
-		// ===
-		// ReflectionVec=pDirection - (SurfaceNormalVec*2.0) * pDirection.Dot(SurfaceNormalVec);
-		// SetDirection(ReflectionVec);
-		// ===
-		SetDirection(SurfaceNormalVec + RandomDirectionVec);
-		// SetDirection(SurfaceNormalVec);
+		reflectionVec=pDirection - (SurfaceNormalVec*2.0) * pDirection.Dot(SurfaceNormalVec);
+		reflectionVec.Normalize(specularity);
+
+		Vec3d diffusionVec=createRandomVector3d();
+		diffusionVec=diffusionVec+SurfaceNormalVec;
+		diffusionVec.Normalize(1.0-specularity);
+
+		SetDirection(reflectionVec + diffusionVec);
 	}
-	pColor=pColor + (ColorAcc * IlluminationAcc);
+	pColor=pColor + (colorAcc + illuminationAcc);
+	// pColor=pColor + ColorAcc;
 }
 
 Object *Ray::RunOnce()
 {
 	double mindist=UINT32_MAX, dist;
 	uint64_t stepsDone=0;
+	Object *prettyCloseObject=nullptr;
 	while(stepsDone<RAY_STEPS_PER_RUN_MAX)
 	{
-		for(Object *Object: *SceneObjects)
+		for(Object *sceneObject: *SceneObjects)
 		{
-			if(!Object->Visible())
+			if(!sceneObject->Visible())
 			{
 				continue;
 			}
-			if(Object==pObjectToIgnore)
+			if(sceneObject==pObjectToIgnore)
 			{
 				pObjectToIgnore=nullptr;
 				continue;
 			}
-			dist=Object->GetDistance(pPosition);
-			if(mindist>dist)
+			dist=sceneObject->GetDistance(pPosition);
+			if(dist<mindist)
 			{
 				mindist=dist;
-				if(mindist<RAY_COLLISION_THRESHOLD)
+				if(dist<RAY_COLLISION_THRESHOLD)
 				{
-					return(Object);
+					return(sceneObject);
+				}
+				else if(dist<RAY_COLLISION_THRESHOLD2)
+				{
+					prettyCloseObject=sceneObject;
 				}
 			}
 		}
 		pPosition=pPosition+pDirection*mindist;
 		stepsDone++;
 	}
-	return(nullptr);
+	return(prettyCloseObject);
 }
 
 // ========= SPHERE ===
@@ -388,15 +418,16 @@ void Sphere::SetRadius(double radius)
 
 double Sphere::GetDistance(Vec3d from) const
 {
-	return((from-pPosition).Length()-pRadius);
+	from=from-pPosition;
+	return(from.Length()-pRadius);
 }
 
 // ========= CUBE ===
 
 Cube::Cube()
 {
-	pLength=1.0;
 	SetName("Cube");
+	pLength=1.0;
 }
 
 void Cube::SetLength(double length)
@@ -406,8 +437,37 @@ void Cube::SetLength(double length)
 
 double Cube::GetDistance(Vec3d from) const
 {
-	Vec3d d=(from-pPosition).Abs() - Vec3d(pLength, pLength, pLength);
+	from=from-pPosition;
+	Vec3d d=from.Abs()-Vec3d(pLength, pLength, pLength);
 	return d.Max(Vec3d(0, 0, 0)).Length() + min(max(d.X, max(d.Y, d.Z)), 0.0);
+}
+
+// ========= CYLINDER ===
+
+Cylinder::Cylinder()
+{
+	SetName("Cylinder");
+	pLength=1.0;
+	pRadius=1.0;
+}
+
+void Cylinder::SetLength(double length)
+{
+	pLength=length;
+}
+
+void Cylinder::SetRadius(double radius)
+{
+	pRadius=radius;
+}
+
+double Cylinder::GetDistance(Vec3d from) const
+{
+	from=from-pPosition;
+	double dXZ = Vec2d(from.X, from.Z).Length() - pRadius;
+	double dY = abs(from.Y) - pLength / 2.0;
+	Vec2d d(max(dXZ, dY), max(dXZ, -dY));
+	return min(d.Length(), max(dXZ, dY));
 }
 
 // ========= TORUS ===
@@ -431,8 +491,8 @@ void Torus::SetRadius2(double radius)
 
 double Torus::GetDistance(Vec3d from) const
 {
-	Vec3d s=from-pPosition;
-	Vec2d d=Vec2d(Vec2d(s.X, s.Z).Length()-pRadius1, s.Y);
+	from=from-pPosition;
+	Vec2d d=Vec2d(Vec2d(from.X, from.Z).Length()-pRadius1, from.Y);
 	return(d.Length()-pRadius2);
 }
 
@@ -444,20 +504,29 @@ Plane::Plane()
 	SetName("Plane");
 }
 
-void Plane::SetOrientation(Vec3d orientation)
+void Plane::SetOrientation(const Vec3d *orientation)
 {
-	pOrientation=orientation.Normal();
+	Vec3d newOrientation(orientation);
+	newOrientation.Normalize();
+	pOrientation=newOrientation;
+}
+
+void Plane::SetOrientation(const Vec3d &orientation)
+{
+	Vec3d newOrientation(orientation);
+	newOrientation.Normalize();
+	pOrientation=newOrientation;
 }
 
 void Plane::SetOrientation(double x, double y, double z)
 {
-	pOrientation.X=x;
-	pOrientation.Y=y;
-	pOrientation.Z=z;
-	pOrientation.Normalize();
+	Vec3d newOrientation(x, y, z);
+	newOrientation.Normalize();
+	pOrientation=newOrientation;
 }
 
 double Plane::GetDistance(Vec3d from) const
 {
-	return((from-pPosition).Dot(pOrientation));
+	from=from-pPosition;
+	return(from.Dot(pOrientation));
 }
