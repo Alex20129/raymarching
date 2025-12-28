@@ -19,6 +19,7 @@ protected:
 	double pSpecularity;
 	Vec3f pColor;
 	Vec3d pPosition;
+	Vec3d pOrientation;
 public:
 	static constexpr double NORMAL_CALCULATION_DIST = 1.0/16.0;
 	Object();
@@ -44,6 +45,11 @@ public:
 	Vec3d Position() const;
 	void SetPosition(Vec3d position);
 	void SetPosition(double x, double y, double z);
+
+	Vec3d Orientation() const;
+	void SetOrientation(const Vec3d *orientation);
+	void SetOrientation(const Vec3d &orientation);
+	void SetOrientation(double x, double y, double z);
 
 	string Name();
 	void SetName(string name);
@@ -126,9 +132,6 @@ public:
 	Cylinder();
 	void SetLength(double length);
 	void SetRadius(double radius);
-	void SetOrientation(const Vec3d *orientation);
-	void SetOrientation(const Vec3d &orientation);
-	void SetOrientation(double x, double y, double z);
 	double GetDistance(Vec3d from) const;
 };
 
@@ -144,12 +147,8 @@ public:
 
 class Plane : public Object
 {
-	Vec3d pOrientation;
 public:
 	Plane();
-	void SetOrientation(const Vec3d *orientation);
-	void SetOrientation(const Vec3d &orientation);
-	void SetOrientation(double x, double y, double z);
 	double GetDistance(Vec3d from) const;
 };
 

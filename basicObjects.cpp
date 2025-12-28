@@ -11,6 +11,7 @@ Object::Object()
 	pBrightness=0.0;
 	pReflectivity=0.5;
 	pSpecularity=0.5;
+	pOrientation=Vec3d(0, 0, 1);
 }
 
 bool Object::Visible() const
@@ -141,6 +142,32 @@ void Object::SetPosition(double x, double y, double z)
 	pPosition.X=x;
 	pPosition.Y=y;
 	pPosition.Z=z;
+}
+
+Vec3d Object::Orientation() const
+{
+	return(pOrientation);
+}
+
+void Object::SetOrientation(const Vec3d *orientation)
+{
+	Vec3d newOrientation(orientation);
+	newOrientation.Normalize();
+	pOrientation=newOrientation;
+}
+
+void Object::SetOrientation(const Vec3d &orientation)
+{
+	Vec3d newOrientation(orientation);
+	newOrientation.Normalize();
+	pOrientation=newOrientation;
+}
+
+void Object::SetOrientation(double x, double y, double z)
+{
+	Vec3d newOrientation(x, y, z);
+	newOrientation.Normalize();
+	pOrientation=newOrientation;
 }
 
 string Object::Name()
@@ -502,27 +529,6 @@ Plane::Plane()
 {
 	pOrientation=Vec3d(0, 0, 1);
 	SetName("Plane");
-}
-
-void Plane::SetOrientation(const Vec3d *orientation)
-{
-	Vec3d newOrientation(orientation);
-	newOrientation.Normalize();
-	pOrientation=newOrientation;
-}
-
-void Plane::SetOrientation(const Vec3d &orientation)
-{
-	Vec3d newOrientation(orientation);
-	newOrientation.Normalize();
-	pOrientation=newOrientation;
-}
-
-void Plane::SetOrientation(double x, double y, double z)
-{
-	Vec3d newOrientation(x, y, z);
-	newOrientation.Normalize();
-	pOrientation=newOrientation;
 }
 
 double Plane::GetDistance(Vec3d from) const
