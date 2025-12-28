@@ -20,6 +20,7 @@ protected:
 	Vec3f pColor;
 	Vec3d pPosition;
 	Vec3d pOrientation;
+	Vec3d WorldToLocal(const Vec3d &point) const;
 public:
 	static constexpr double NORMAL_CALCULATION_DIST = 1.0/16.0;
 	Object();

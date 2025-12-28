@@ -2,6 +2,31 @@
 #include <cmath>
 #include "basicObjects.hpp"
 
+Vec3d Object::WorldToLocal(const Vec3d &point) const
+{
+	Vec3d dir = point - pPosition;
+	Vec3d right, up, forward = pOrientation;
+
+	if (abs(forward.X) < 1.0)
+	{
+		right = Vec3d(1, 0, 0).Cross(forward);
+	}
+	else
+	{
+		right = Vec3d(0, 1, 0).Cross(forward);
+	}
+	right.Normalize();
+
+	up = forward.Cross(right);
+	up.Normalize();
+
+	return Vec3d(
+		dir.Dot(right),
+		dir.Dot(up),
+		dir.Dot(forward)
+		);
+}
+
 Object::Object()
 {
 	pName=new string("Object");
