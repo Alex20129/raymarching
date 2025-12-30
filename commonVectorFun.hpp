@@ -27,12 +27,11 @@ public:
 	Vec2d operator-(const Vec2d &other) const;
 	Vec2d operator-() const;
 	Vec2d operator/(double d) const;
-	Vec2d operator*(const Vec2d &other);
+	Vec2d operator*(const Vec2d &other) const;
 };
 
 Vec2d operator*(const Vec2d &vec, const double m);
 Vec2d operator*(const double m, const Vec2d &vec);
-Vec2d operator/(const Vec2d &vec, const double d);
 
 //=== Vec3 double
 
@@ -57,7 +56,7 @@ public:
 	Vec3d operator-(const Vec3d &other) const;
 	Vec3d operator-() const;
 	Vec3d operator/(double d) const;
-	Vec3d operator*(const Vec3d &other);
+	Vec3d operator*(const Vec3d &other) const;
 };
 
 Vec3d operator*(const Vec3d &vec, const double m);
@@ -86,40 +85,10 @@ public:
 	Vec3f operator-(const Vec3f &other) const;
 	Vec3f operator-() const;
 	Vec3f operator/(float d) const;
-	Vec3f operator*(const Vec3f &other);
+	Vec3f operator*(const Vec3f &other) const;
 };
 
 Vec3f operator*(const Vec3f &vec, const float m);
 Vec3f operator*(const float m, const Vec3f &vec);
-
-//=== Vec3 uchar
-
-class Vec3uc
-{
-public:
-	uint8_t X, Y, Z;
-	Vec3uc();
-	Vec3uc(const Vec3uc *vec);
-	Vec3uc(const Vec3uc &vec);
-	Vec3uc(uint8_t x, uint8_t y, uint8_t z);
-	void Normalize(uint8_t length=1);
-	uint8_t Length();
-	uint8_t Dot(const Vec3uc &other) const;
-	Vec3uc Cross(const Vec3uc &other) const;
-	Vec3uc Max(const Vec3uc &other);
-	Vec3uc operator=(const Vec3uc &other);
-	Vec3uc operator+(const Vec3uc &other);
-	void operator+=(const Vec3uc &other);
-	Vec3uc operator-(const Vec3uc &other) const;
-	Vec3uc operator-() const;
-	Vec3uc operator/(char d) const;
-	Vec3uc operator/(int d) const;
-	Vec3uc operator/(float d) const;
-	Vec3uc operator/(double d) const;
-	Vec3uc operator*(const Vec3uc &other);
-	Vec3uc operator*(char m);
-	Vec3uc operator*(float m);
-	Vec3uc operator*(double m);
-};
 
 #endif // COMMONVECTORFUN_HPP

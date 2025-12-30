@@ -95,8 +95,8 @@ class Ray : public Object
 public:
 	static constexpr uint64_t RAY_STEPS_PER_RUN_MAX = 512;
 	static constexpr uint64_t RAY_COLLISIONS_MAX = 5;
-	static constexpr double RAY_COLLISION_THRESHOLD = 1.0/8.0;
-	static constexpr double RAY_COLLISION_THRESHOLD2 = 1.0/4.0;
+	static constexpr double RAY_PROXIMITY_DISTANCE = 1.0/8.0;
+	static constexpr double RAY_COLLISION_DISTANCE = 1.0/16.0;
 	Ray();
 	void SetDefaultDirection(double x, double y, double z);
 	void SetDirection(const Vec3d *direction);

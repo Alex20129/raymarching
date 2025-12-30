@@ -6,8 +6,7 @@ Vec3d Object::WorldToLocal(const Vec3d &point) const
 {
 	Vec3d dir = point - pPosition;
 	Vec3d right, up, forward = pOrientation;
-
-	if (abs(forward.X) < 1.0)
+	if(abs(forward.X) < 1.0)
 	{
 		right = Vec3d(1, 0, 0).Cross(forward);
 	}
@@ -16,10 +15,8 @@ Vec3d Object::WorldToLocal(const Vec3d &point) const
 		right = Vec3d(0, 1, 0).Cross(forward);
 	}
 	right.Normalize();
-
 	up = forward.Cross(right);
 	up.Normalize();
-
 	return Vec3d(
 		dir.Dot(right),
 		dir.Dot(up),
@@ -419,7 +416,7 @@ void Ray::Run()
 
 Object *Ray::RunOnce()
 {
-	double mindist=UINT32_MAX, dist;
+	double mindist=UINT32_MAX, distance;
 	uint64_t stepsDone=0;
 	Object *prettyCloseObject=nullptr;
 	while(stepsDone<RAY_STEPS_PER_RUN_MAX)
@@ -435,17 +432,17 @@ Object *Ray::RunOnce()
 				pObjectToIgnore=nullptr;
 				continue;
 			}
-			dist=sceneObject->GetDistance(pPosition);
-			if(dist<mindist)
+			distance=sceneObject->GetDistance(pPosition);
+			if(distance<mindist)
 			{
-				mindist=dist;
-				if(dist<RAY_COLLISION_THRESHOLD)
-				{
-					return(sceneObject);
-				}
-				else if(dist<RAY_COLLISION_THRESHOLD2)
+				mindist=distance;
+				if(distance<RAY_PROXIMITY_DISTANCE)
 				{
 					prettyCloseObject=sceneObject;
+					if(distance<RAY_COLLISION_DISTANCE)
+					{
+						return(prettyCloseObject);
+					}
 				}
 			}
 		}
@@ -489,7 +486,7 @@ void Cube::SetLength(double length)
 
 double Cube::GetDistance(Vec3d from) const
 {
-	from=from-pPosition;
+	from=WorldToLocal(from);
 	Vec3d d=from.Abs()-Vec3d(pLength, pLength, pLength);
 	return d.Max(Vec3d(0, 0, 0)).Length() + min(max(d.X, max(d.Y, d.Z)), 0.0);
 }
@@ -515,11 +512,11 @@ void Cylinder::SetRadius(double radius)
 
 double Cylinder::GetDistance(Vec3d from) const
 {
-	from=from-pPosition;
-	double dXZ = Vec2d(from.X, from.Z).Length() - pRadius;
-	double dY = abs(from.Y) - pLength / 2.0;
-	Vec2d d(max(dXZ, dY), max(dXZ, -dY));
-	return min(d.Length(), max(dXZ, dY));
+	from=WorldToLocal(from);
+	double dXY = Vec2d(from.X, from.Y).Length() - pRadius;
+	double dZ = abs(from.Z) - pLength / 2.0;
+	Vec2d d(max(dXY, dZ), max(dXY, -dZ));
+	return min(d.Length(), max(dXY, dZ));
 }
 
 // ========= TORUS ===
@@ -543,8 +540,8 @@ void Torus::SetRadius2(double radius)
 
 double Torus::GetDistance(Vec3d from) const
 {
-	from=from-pPosition;
-	Vec2d d=Vec2d(Vec2d(from.X, from.Z).Length()-pRadius1, from.Y);
+	from=WorldToLocal(from);
+	Vec2d d=Vec2d(Vec2d(from.X, from.Y).Length()-pRadius1, from.Z);
 	return(d.Length()-pRadius2);
 }
 
@@ -552,7 +549,6 @@ double Torus::GetDistance(Vec3d from) const
 
 Plane::Plane()
 {
-	pOrientation=Vec3d(0, 0, 1);
 	SetName("Plane");
 }
 
