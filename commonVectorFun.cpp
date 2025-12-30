@@ -81,11 +81,9 @@ Vec2d Vec2d::operator=(const Vec2d &other)
 	return(*this);
 }
 
-Vec2d Vec2d::operator+(const Vec2d &other)
+Vec2d Vec2d::operator+(const Vec2d &other) const
 {
-	Vec2d res(this);
-	res.X+=other.X;
-	res.Y+=other.Y;
+	Vec2d res(this->X+other.X, this->Y+other.Y);
 	return(res);
 }
 
@@ -218,12 +216,9 @@ Vec3d Vec3d::operator=(const Vec3d &other)
 	return(*this);
 }
 
-Vec3d Vec3d::operator+(const Vec3d &other)
+Vec3d Vec3d::operator+(const Vec3d &other) const
 {
-	Vec3d res(this);
-	res.X+=other.X;
-	res.Y+=other.Y;
-	res.Z+=other.Z;
+	Vec3d res(this->X+other.X, this->Y+other.Y, this->Z+other.Z);
 	return(res);
 }
 
@@ -358,12 +353,9 @@ Vec3f Vec3f::operator=(const Vec3f &other)
 	return(*this);
 }
 
-Vec3f Vec3f::operator+(const Vec3f &other)
+Vec3f Vec3f::operator+(const Vec3f &other) const
 {
-	Vec3f res(this);
-	res.X+=other.X;
-	res.Y+=other.Y;
-	res.Z+=other.Z;
+	Vec3f res(this->X+other.X, this->Y+other.Y, this->Z+other.Z);
 	return(res);
 }
 

@@ -158,9 +158,9 @@ int main(int argc, char *argv[])
 		Sphere2->SetSpecularity(spec);
 		Sphere3->SetSpecularity(spec);
 		Cylinder1->SetSpecularity(spec);
-		//Cylinder1->SetOrientation(0, std::sin(i*0.07853975), std::cos(i*0.07853975));
+		Cylinder1->SetOrientation(0, std::sin(i*0.07853975), std::cos(i*0.07853975));
 		// Cube2->SetOrientation(std::sin(i*0.07853975), 0, std::cos(i*0.07853975));
-		//Torus1->SetOrientation(0, std::sin(i*0.07853975), std::cos(i*0.07853975));
+		// Torus1->SetOrientation(0, std::sin(i*0.07853975), std::cos(i*0.07853975));
 
 		NewScene->SetNumOfRayRunsPerPixel(rays_per_pixel);
 		NewScene->Render();

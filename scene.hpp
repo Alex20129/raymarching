@@ -14,7 +14,7 @@ using namespace std;
 class Scene
 {
 	vector <Ray *> *SceneRays;
-	uint64_t pScreenWidth, pScreenHeight;
+	int64_t pScreenWidth, pScreenHeight;
 	uint64_t pRenderThreads;
 	uint64_t pRayRunsPerPixel;
 public:
@@ -25,14 +25,14 @@ public:
 	chrono::milliseconds FrameRenderTime;
 	void AddObject(Object *object);
 	void Render();
-	uint64_t ScreenWidth();
-	uint64_t ScreenHeight();
+	int64_t ScreenWidth();
+	int64_t ScreenHeight();
 	uint64_t RenderThreadsNum();
-	void SetScreenWidth(uint64_t width);
-	void SetScreenHeight(uint64_t height);
+	void SetScreenWidth(int64_t width);
+	void SetScreenHeight(int64_t height);
 	void SetNumOfRenderThreads(uint64_t render_threads);
 	void SetNumOfRayRunsPerPixel(uint64_t ray_runs_per_pixel);
-	void SetScreenSize(uint64_t width, uint64_t height);
+	void SetScreenSize(int64_t width, int64_t height);
 };
 
 #endif // SCENE_HPP

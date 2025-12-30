@@ -106,7 +106,7 @@ void Object::SetSpecularity(double specularity)
 	pSpecularity=specularity;
 }
 
-Vec3f Object::Color() const
+const Vec3f &Object::Color() const
 {
 	return(pColor);
 }
@@ -149,7 +149,7 @@ void Object::SetColor(float r, float g, float b)
 	pColor.Z=b;
 }
 
-Vec3d Object::Position() const
+const Vec3d &Object::Position() const
 {
 	return(pPosition);
 }
@@ -166,7 +166,7 @@ void Object::SetPosition(double x, double y, double z)
 	pPosition.Z=z;
 }
 
-Vec3d Object::Orientation() const
+const Vec3d &Object::Orientation() const
 {
 	return(pOrientation);
 }
@@ -330,42 +330,21 @@ Ray::Ray()
 {
 	SetName("Ray");
 	uint64_t prngSeed=(uint64_t)(this);
-	prngSeed+=pPRNG.generate_xorshift();
+	prngSeed+=pPRNG.generate_xorshift_star();
 	pPRNG.set_seed_value(prngSeed);
 	pObjectToIgnore=nullptr;
 }
 
-void Ray::SetDefaultDirection(double x, double y, double z)
+void Ray::SetDefaultOrientation(double x, double y, double z)
 {
-	Vec3d newDefaultDirection(x, y, z);
-	newDefaultDirection.Normalize();
-	pDefaultDirection=newDefaultDirection;
-}
-
-void Ray::SetDirection(const Vec3d *direction)
-{
-	Vec3d newDirection(direction);
-	newDirection.Normalize();
-	pDirection=newDirection;
-}
-
-void Ray::SetDirection(const Vec3d &direction)
-{
-	Vec3d newDirection(direction);
-	newDirection.Normalize();
-	pDirection=newDirection;
-}
-
-void Ray::SetDirection(double x, double y, double z)
-{
-	Vec3d newDirection(x, y, z);
-	newDirection.Normalize();
-	pDirection=newDirection;
+	Vec3d newDefaultOrientation(x, y, z);
+	newDefaultOrientation.Normalize();
+	pDefaultOrientation=newDefaultOrientation;
 }
 
 void Ray::Reset()
 {
-	pDirection=pDefaultDirection;
+	SetOrientation(pDefaultOrientation);
 	SetPosition(0, 0, 0);
 }
 
@@ -401,14 +380,14 @@ void Ray::Run()
 
 		double specularity=Obstacle->Specularity();
 
-		reflectionVec=pDirection - (SurfaceNormalVec*2.0) * pDirection.Dot(SurfaceNormalVec);
+		reflectionVec=pOrientation - (SurfaceNormalVec*2.0) * pOrientation.Dot(SurfaceNormalVec);
 		reflectionVec.Normalize(specularity);
 
 		Vec3d diffusionVec=createRandomVector3d();
 		diffusionVec=diffusionVec+SurfaceNormalVec;
 		diffusionVec.Normalize(1.0-specularity);
 
-		SetDirection(reflectionVec + diffusionVec);
+		SetOrientation(reflectionVec + diffusionVec);
 	}
 	pColor=pColor + (colorAcc + illuminationAcc);
 	// pColor=pColor + ColorAcc;
@@ -446,7 +425,7 @@ Object *Ray::RunOnce()
 				}
 			}
 		}
-		pPosition=pPosition+pDirection*mindist;
+		pPosition=pPosition+pOrientation*mindist;
 		stepsDone++;
 	}
 	return(prettyCloseObject);

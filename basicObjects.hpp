@@ -39,15 +39,15 @@ public:
 	double Specularity();
 	void SetSpecularity(double specularity);
 
-	Vec3f Color() const;
+	const Vec3f &Color() const;
 	void SetColor(Vec3f color);
 	void SetColor(float r, float g, float b);
 
-	Vec3d Position() const;
+	const Vec3d &Position() const;
 	void SetPosition(Vec3d position);
 	void SetPosition(double x, double y, double z);
 
-	Vec3d Orientation() const;
+	const Vec3d &Orientation() const;
 	void SetOrientation(const Vec3d *orientation);
 	void SetOrientation(const Vec3d &orientation);
 	void SetOrientation(double x, double y, double z);
@@ -87,8 +87,7 @@ public:
 
 class Ray : public Object
 {
-	Vec3d pDefaultDirection;
-	Vec3d pDirection;
+	Vec3d pDefaultOrientation;
 	Object *pObjectToIgnore;
 	prng_u64 pPRNG;
 	Vec3d createRandomVector3d();
@@ -98,10 +97,7 @@ public:
 	static constexpr double RAY_PROXIMITY_DISTANCE = 1.0/8.0;
 	static constexpr double RAY_COLLISION_DISTANCE = 1.0/16.0;
 	Ray();
-	void SetDefaultDirection(double x, double y, double z);
-	void SetDirection(const Vec3d *direction);
-	void SetDirection(const Vec3d &direction);
-	void SetDirection(double x, double y, double z);
+	void SetDefaultOrientation(double x, double y, double z);
 	void Reset();
 	void Run();
 	Object *RunOnce();

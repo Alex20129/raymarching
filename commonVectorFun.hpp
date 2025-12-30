@@ -22,7 +22,7 @@ public:
 	double Cross(const Vec2d &other) const;
 	Vec2d Max(const Vec2d &other) const;
 	Vec2d operator=(const Vec2d &other);
-	Vec2d operator+(const Vec2d &other);
+	Vec2d operator+(const Vec2d &other) const;
 	void operator+=(const Vec2d &other);
 	Vec2d operator-(const Vec2d &other) const;
 	Vec2d operator-() const;
@@ -51,7 +51,7 @@ public:
 	Vec3d Cross(const Vec3d &other) const;
 	Vec3d Max(const Vec3d &other) const;
 	Vec3d operator=(const Vec3d &other);
-	Vec3d operator+(const Vec3d &other);
+	Vec3d operator+(const Vec3d &other) const;
 	void operator+=(const Vec3d &other);
 	Vec3d operator-(const Vec3d &other) const;
 	Vec3d operator-() const;
@@ -80,7 +80,7 @@ public:
 	Vec3f Cross(const Vec3f &other) const;
 	Vec3f Max(const Vec3f &other) const;
 	Vec3f operator=(const Vec3f &other);
-	Vec3f operator+(const Vec3f &other);
+	Vec3f operator+(const Vec3f &other) const;
 	void operator+=(const Vec3f &other);
 	Vec3f operator-(const Vec3f &other) const;
 	Vec3f operator-() const;

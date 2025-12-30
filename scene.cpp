@@ -3,7 +3,7 @@
 
 Scene::Scene()
 {
-	int X, Y;
+	int64_t X, Y;
 	Ray *newRay;
 
 	SceneObjects=new vector <Object *>;
@@ -26,7 +26,7 @@ Scene::Scene()
 		{
 			newRay=new Ray();
 			newRay->SetID(SceneRays->size());
-			newRay->SetDefaultDirection(X-pScreenWidth/2.0, Y-pScreenHeight/2.0, pScreenWidth);
+			newRay->SetDefaultOrientation(X-pScreenWidth/2.0, Y-pScreenHeight/2.0, pScreenWidth);
 			newRay->SceneObjects=this->SceneObjects;
 			SceneRays->push_back(newRay);
 		}
@@ -117,12 +117,12 @@ void Scene::Render()
 	fprintf(stdout, "FrameRenderTime: %li ms\n", FrameRenderTime.count());
 }
 
-uint64_t Scene::ScreenWidth()
+int64_t Scene::ScreenWidth()
 {
 	return(pScreenWidth);
 }
 
-uint64_t Scene::ScreenHeight()
+int64_t Scene::ScreenHeight()
 {
 	return(pScreenHeight);
 }
@@ -132,12 +132,12 @@ uint64_t Scene::RenderThreadsNum()
 	return(pRenderThreads);
 }
 
-void Scene::SetScreenWidth(uint64_t width)
+void Scene::SetScreenWidth(int64_t width)
 {
 	SetScreenSize(width, pScreenHeight);
 }
 
-void Scene::SetScreenHeight(uint64_t height)
+void Scene::SetScreenHeight(int64_t height)
 {
 	SetScreenSize(pScreenWidth, height);
 }
@@ -152,7 +152,7 @@ void Scene::SetNumOfRayRunsPerPixel(uint64_t ray_runs_per_pixel)
 	pRayRunsPerPixel=ray_runs_per_pixel;
 }
 
-void Scene::SetScreenSize(uint64_t width, uint64_t height)
+void Scene::SetScreenSize(int64_t width, int64_t height)
 {
 	pScreenWidth=width;
 	pScreenHeight=height;
