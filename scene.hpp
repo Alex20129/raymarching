@@ -20,7 +20,7 @@ class Scene
 public:
 	Scene();
 	~Scene();
-	vector <Object *> *SceneObjects, *SceneLights;
+	vector <Object *> *SceneObjects;
 	vector <unsigned char> *ImageData;
 	chrono::milliseconds FrameRenderTime;
 	void AddObject(Object *object);

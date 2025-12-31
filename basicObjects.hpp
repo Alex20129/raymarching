@@ -12,6 +12,7 @@ class Object
 {
 	bool pVisible;
 	uint64_t pID;
+	static uint64_t sLastKnownObjectID;
 	string *pName;
 protected:
 	double pBrightness;
@@ -28,7 +29,6 @@ public:
 	void SetVisible(bool visible);
 
 	uint64_t ID() const;
-	void SetID(uint64_t id);
 
 	double Brightness() const;
 	void SetBrightness(double brightness);

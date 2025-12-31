@@ -18,9 +18,14 @@ prng_u32::prng_u32()
 	pSeed=FNV32_INITIAL_OFFSET;
 }
 
-void prng_u32::set_seed_value(uint32_t new_seed)
+uint32_t prng_u32::get_seed_value() const
 {
-	pSeed=new_seed;
+	return(pSeed);
+}
+
+void prng_u32::set_seed_value(uint32_t seed_value)
+{
+	pSeed=seed_value;
 }
 
 uint32_t prng_u32::generate_mwc()
@@ -67,9 +72,14 @@ prng_u64::prng_u64()
 	pSeed=FNV64_INITIAL_OFFSET;
 }
 
-void prng_u64::set_seed_value(uint64_t new_seed)
+uint64_t prng_u64::get_seed_value() const
 {
-	pSeed=new_seed;
+	return(pSeed);
+}
+
+void prng_u64::set_seed_value(uint64_t seed_value)
+{
+	pSeed=seed_value;
 }
 
 uint64_t prng_u64::generate_mwc()

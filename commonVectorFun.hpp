@@ -14,7 +14,7 @@ public:
 	Vec2d(const Vec2d *other);
 	Vec2d(const Vec2d &other);
 	Vec2d(double x, double y);
-	void Normalize(double length=1.0);
+	void Normalize();
 	Vec2d Abs();
 	double Length();
 	double LengthSquared();
@@ -43,7 +43,7 @@ public:
 	Vec3d(const Vec3d *other);
 	Vec3d(const Vec3d &other);
 	Vec3d(double x, double y, double z);
-	void Normalize(double length=1.0);
+	void Normalize();
 	Vec3d Abs();
 	double Length();
 	double LengthSquared();
@@ -72,7 +72,7 @@ public:
 	Vec3f(const Vec3f *other);
 	Vec3f(const Vec3f &other);
 	Vec3f(float x, float y, float z);
-	void Normalize(float length=1.0);
+	void Normalize();
 	Vec3f Abs();
 	float Length();
 	float LengthSquared();

@@ -2,6 +2,8 @@
 #include <cmath>
 #include "basicObjects.hpp"
 
+uint64_t Object::sLastKnownObjectID=0;
+
 Vec3d Object::WorldToLocal(const Vec3d &point) const
 {
 	Vec3d dir = point - pPosition;
@@ -29,10 +31,10 @@ Object::Object()
 	pName=new string("Object");
 	SceneObjects=nullptr;
 	pVisible=1;
-	pID=0;
+	pID=sLastKnownObjectID++;
 	pBrightness=0.0;
 	pReflectivity=0.5;
-	pSpecularity=0.5;
+	pSpecularity=0.0;
 	pOrientation=Vec3d(0, 0, 1);
 }
 
@@ -49,11 +51,6 @@ void Object::SetVisible(bool visible)
 uint64_t Object::ID() const
 {
 	return(pID);
-}
-
-void Object::SetID(uint64_t id)
-{
-	pID=id;
 }
 
 double Object::Brightness() const
@@ -245,8 +242,8 @@ Difference::Difference(Object *object_a, Object *object_b)
 double Difference::GetDistance(Vec3d from) const
 {
 	double DistA=ObjectA->GetDistance(from);
-	double DistB=0.0-ObjectB->GetDistance(from);
-	return max(DistA, DistB);
+	double DistB=ObjectB->GetDistance(from);
+	return max(DistA, -DistB);
 }
 
 Union::Union(Object *object_a, Object *object_b)
@@ -313,24 +310,23 @@ Vec3d Ray::createRandomVector3d()
 	Vec3d randomVector;
 	do
 	{
-		randomVector.X=pPRNG.generate_xorshift();
+		randomVector.X=pPRNG.generate_xorshift_star();
 		randomVector.X/=div;
 		randomVector.X-=1.0;
-		randomVector.Y=pPRNG.generate_xorshift();
+		randomVector.Y=pPRNG.generate_xorshift_star();
 		randomVector.Y/=div;
 		randomVector.Y-=1.0;
-		randomVector.Z=pPRNG.generate_xorshift();
+		randomVector.Z=pPRNG.generate_xorshift_star();
 		randomVector.Z/=div;
 		randomVector.Z-=1.0;
-	} while (randomVector.LengthSquared() > 1.0);
+	} while(randomVector.LengthSquared() > 1.0);
 	return(randomVector);
 }
 
 Ray::Ray()
 {
 	SetName("Ray");
-	uint64_t prngSeed=(uint64_t)(this);
-	prngSeed+=pPRNG.generate_xorshift_star();
+	uint64_t prngSeed=pPRNG.get_seed_value()+this->ID();
 	pPRNG.set_seed_value(prngSeed);
 	pObjectToIgnore=nullptr;
 }
@@ -351,7 +347,6 @@ void Ray::Reset()
 void Ray::Run()
 {
 	Vec3d SurfaceNormalVec;
-	Vec3d reflectionVec;
 	Vec3f colorAcc(255, 255, 255);
 	Vec3f illuminationAcc(0, 0, 0);
 	Object *Obstacle=nullptr;
@@ -380,17 +375,29 @@ void Ray::Run()
 
 		double specularity=Obstacle->Specularity();
 
-		reflectionVec=pOrientation - (SurfaceNormalVec*2.0) * pOrientation.Dot(SurfaceNormalVec);
-		reflectionVec.Normalize(specularity);
+		Vec3d reflectionVec;
+		if(specularity>0.0)
+		{
+			reflectionVec=pOrientation - (SurfaceNormalVec*2.0) * SurfaceNormalVec.Dot(pOrientation);
+			reflectionVec.Normalize();
+			reflectionVec=reflectionVec*specularity;
+		}
 
-		Vec3d diffusionVec=createRandomVector3d();
-		diffusionVec=diffusionVec+SurfaceNormalVec;
-		diffusionVec.Normalize(1.0-specularity);
+		Vec3d diffusionVec;
+		if(specularity<1.0)
+		{
+			diffusionVec=createRandomVector3d();
+			if(SurfaceNormalVec.Dot(diffusionVec) < 0.0)
+			{
+				diffusionVec=-diffusionVec;
+			}
+			diffusionVec.Normalize();
+			diffusionVec=diffusionVec*(1.0-specularity);
+		}
 
 		SetOrientation(reflectionVec + diffusionVec);
 	}
 	pColor=pColor + (colorAcc + illuminationAcc);
-	// pColor=pColor + ColorAcc;
 }
 
 Object *Ray::RunOnce()

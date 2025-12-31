@@ -7,7 +7,6 @@ Scene::Scene()
 	Ray *newRay;
 
 	SceneObjects=new vector <Object *>;
-	SceneLights=new vector <Object *>;
 	SceneRays=new vector <Ray *>;
 	ImageData=new vector <uint8_t>;
 	pRayRunsPerPixel=1;
@@ -25,7 +24,6 @@ Scene::Scene()
 		for(X=0; X<pScreenWidth; ++X)
 		{
 			newRay=new Ray();
-			newRay->SetID(SceneRays->size());
 			newRay->SetDefaultOrientation(X-pScreenWidth/2.0, Y-pScreenHeight/2.0, pScreenWidth);
 			newRay->SceneObjects=this->SceneObjects;
 			SceneRays->push_back(newRay);
@@ -50,10 +48,6 @@ Scene::~Scene()
 void Scene::AddObject(Object *object)
 {
 	this->SceneObjects->push_back(object);
-	if(object->Brightness()>0.0)
-	{
-		this->SceneLights->push_back(object);
-	}
 	object->SceneObjects=this->SceneObjects;
 }
 

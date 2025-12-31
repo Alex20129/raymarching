@@ -29,9 +29,9 @@ Vec2d::Vec2d(double x, double y)
 	X=x, Y=y;
 }
 
-void Vec2d::Normalize(double length)
+void Vec2d::Normalize()
 {
-	double len=this->Length()/length;
+	double len=this->Length();
 	this->X/=len;
 	this->Y/=len;
 }
@@ -158,9 +158,9 @@ Vec3d::Vec3d(double x, double y, double z)
 	X=x, Y=y, Z=z;
 }
 
-void Vec3d::Normalize(double length)
+void Vec3d::Normalize()
 {
-	double len=this->Length()/length;
+	double len=this->Length();
 	this->X/=len;
 	this->Y/=len;
 	this->Z/=len;
@@ -295,9 +295,9 @@ Vec3f::Vec3f(float x, float y, float z)
 	X=x, Y=y, Z=z;
 }
 
-void Vec3f::Normalize(float length)
+void Vec3f::Normalize()
 {
-	float len=this->Length()/length;
+	float len=this->Length();
 	this->X/=len;
 	this->Y/=len;
 	this->Z/=len;

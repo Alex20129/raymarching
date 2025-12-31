@@ -65,6 +65,7 @@ int main(int argc, char *argv[])
 	NewCube1->SetLength(68);
 	NewCube1->SetPosition(0, 50, 300);
 	//NewCube1->SetReflectivity(0.6);
+	//NewCube1->SetSpecularity(0.5);
 	//NewCube1->SetBrightness(0.5);
 	NewCube1->SetColor(20, 180, 180);
 
@@ -73,6 +74,18 @@ int main(int argc, char *argv[])
 	ShpereCubeIntersection->SetSpecularity(0.75);
 	ShpereCubeIntersection->SetColor(0, 180, 180);
 
+	Cylinder *NewCylinder1=new Cylinder();
+	NewCylinder1->SetName("Cylinder 1");
+	NewCylinder1->SetLength(70);
+	NewCylinder1->SetRadius(20);
+	NewCylinder1->SetPosition(0, 50, 300);
+	//NewCylinder1->SetReflectivity(0.6);
+	//NewCylinder1->SetSpecularity(0.5);
+	//NewCylinder1->SetBrightness(0.25);
+	NewCylinder1->SetColor(20, 180, 150);
+
+	Difference *ShpereCylinderDifference=new Difference(ShpereCubeIntersection, NewCylinder1);
+
 	//========
 
 	Sphere *Sphere2=new Sphere();
@@ -80,7 +93,7 @@ int main(int argc, char *argv[])
 	Sphere2->SetRadius(32);
 	Sphere2->SetPosition(-80, 50, 300);
 	Sphere2->SetReflectivity(0.25);
-	Sphere2->SetSpecularity(0.85);
+	//Sphere2->SetSpecularity(0.85);
 	//Sphere2->SetBrightness(0.5);
 	Sphere2->SetColor(0, 0, 255);
 
@@ -89,26 +102,26 @@ int main(int argc, char *argv[])
 	Sphere3->SetRadius(32);
 	Sphere3->SetPosition(0, 50, 300);
 	Sphere3->SetReflectivity(0.25);
-	Sphere3->SetSpecularity(0.85);
+	//Sphere3->SetSpecularity(0.85);
 	//Sphere3->SetBrightness(0.5);
 	Sphere3->SetColor(0, 0, 0);
 
-	Cylinder *Cylinder1=new Cylinder();
-	Cylinder1->SetName("Cylinder 1");
-	Cylinder1->SetLength(56);
-	Cylinder1->SetRadius(28);
-	Cylinder1->SetPosition(80, 50, 300);
-	Cylinder1->SetSpecularity(0.0);
-	Cylinder1->SetBrightness(0.0);
-	Cylinder1->SetColor(150, 10, 150);
+	Cylinder *Cylinder2=new Cylinder();
+	Cylinder2->SetName("Cylinder");
+	Cylinder2->SetLength(56);
+	Cylinder2->SetRadius(28);
+	Cylinder2->SetPosition(80, 50, 300);
+	//Cylinder2->SetSpecularity(0.5);
+	//Cylinder2->SetBrightness(0.25);
+	Cylinder2->SetColor(150, 10, 150);
 
 	Cube *Cube2=new Cube();
 	Cube2->SetName("Cube 2");
 	Cube2->SetLength(56);
 	Cube2->SetPosition(80, 50, 300);
 	Cube2->SetReflectivity(0.25);
-	Cube2->SetSpecularity(0.85);
-	Cube2->SetBrightness(0.0);
+	//Cube2->SetSpecularity(0.85);
+	//Cube2->SetBrightness(0.0);
 	Cube2->SetColor(150, 10, 150);
 
 	Torus *Torus1=new Torus();
@@ -117,8 +130,8 @@ int main(int argc, char *argv[])
 	Torus1->SetRadius2(10);
 	Torus1->SetPosition(0, 50, 300);
 	Torus1->SetReflectivity(0.25);
-	Torus1->SetSpecularity(0.0);
-	Torus1->SetBrightness(0.0);
+	//Torus1->SetSpecularity(0.85);
+	//Torus1->SetBrightness(0.0);
 	Torus1->SetColor(200, 200, 80);
 
 	Cube *LightSource1=new Cube();
@@ -132,13 +145,15 @@ int main(int argc, char *argv[])
 	LightSource2->SetName("Spherical light source");
 	LightSource2->SetRadius(50);
 	LightSource2->SetPosition(0, -120, 0);
-	LightSource2->SetBrightness(1.4);
+	LightSource2->SetBrightness(1.2);
 	LightSource2->SetColor(255, 255, 255);
 
-	NewScene->AddObject(ShpereCubeIntersection);
+	//NewScene->AddObject(ShpereCubeIntersection);
+	NewScene->AddObject(ShpereCylinderDifference);
+
 	NewScene->AddObject(Sphere2);
 	// NewScene->AddObject(Sphere3);
-	NewScene->AddObject(Cylinder1);
+	NewScene->AddObject(Cylinder2);
 	// NewScene->AddObject(Cube2);
 	//NewScene->AddObject(Torus1);
 	NewScene->AddObject(LightSource1);
@@ -149,18 +164,19 @@ int main(int argc, char *argv[])
 	NewScene->AddObject(Plane4);
 	NewScene->AddObject(Plane5);
 
-	uint32_t rays_per_pixel=32;
+	uint32_t rays_per_pixel=4;
 
-	for(int32_t i=0; i<11; i++)
+	for(int32_t i=0; i<8; i++)
 	{
-		double spec=i*0.1;
+		// double spec=i*0.1;
 		// ShpereCubeIntersection->SetSpecularity(spec);
-		Sphere2->SetSpecularity(spec);
-		Sphere3->SetSpecularity(spec);
-		Cylinder1->SetSpecularity(spec);
-		Cylinder1->SetOrientation(0, std::sin(i*0.07853975), std::cos(i*0.07853975));
-		// Cube2->SetOrientation(std::sin(i*0.07853975), 0, std::cos(i*0.07853975));
-		// Torus1->SetOrientation(0, std::sin(i*0.07853975), std::cos(i*0.07853975));
+		Sphere2->SetSpecularity(1);
+		// Sphere3->SetSpecularity(spec);
+		Cylinder2->SetSpecularity(1);
+		// Cylinder1->SetOrientation(0, std::sin(i*M_PI_2/10.0), std::cos(i*M_PI_2/10.0));
+		// Cube2->SetOrientation(std::sin(i*M_PI_2/10.0), std::cos(i*M_PI_2/10.0), 0);
+		// Torus1->SetOrientation(0, std::sin(i*M_PI_2/10.0), std::cos(i*M_PI_2/10.0));
+		// NewCube1->SetOrientation(std::sin(i*M_PI_2/10.0), 0, std::cos(i*M_PI_2/10.0));
 
 		NewScene->SetNumOfRayRunsPerPixel(rays_per_pixel);
 		NewScene->Render();
@@ -169,6 +185,8 @@ int main(int argc, char *argv[])
 					QString("-")+
 					QString::number(i)+
 					QString(".png"));
+
+		rays_per_pixel*=2;
 	}
 
 //	SceneW=new Widget;
