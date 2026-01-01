@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
 	Plane4->SetColor(255, 80, 80);
 
 	Plane *Plane5=new Plane();
-	Plane4->SetName("Green wall");
+	Plane5->SetName("Green wall");
 	Plane5->SetPosition(140, 0, 0);
 	Plane5->SetOrientation(-1, 0, 0);
 	Plane5->SetSpecularity(0);
