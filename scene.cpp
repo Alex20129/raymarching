@@ -9,7 +9,7 @@ Scene::Scene()
 	SceneObjects=new vector <Object *>;
 	SceneRays=new vector <Ray *>;
 	ImageData=new vector <uint8_t>;
-	pRayRunsPerPixel=1;
+	pSamplesPerPixel=1;
 
 	pRenderThreads=thread::hardware_concurrency();
 	if(pRenderThreads<1)
@@ -72,13 +72,13 @@ void Scene::Render()
 {
 	uint64_t threadid;
 	thread *renderThread;
-	float colorDiv=pRayRunsPerPixel;
+	float colorDiv=pSamplesPerPixel;
 	queue<thread *> renderThreads;
 
 	chrono::time_point <chrono::high_resolution_clock> start=chrono::high_resolution_clock::now(), end;
 	for(threadid=0; threadid<pRenderThreads; threadid++)
 	{
-		renderThread=new thread(RayRunningWrapperFun, SceneRays, threadid, SceneRays->size()/pRenderThreads, pRayRunsPerPixel);
+		renderThread=new thread(RayRunningWrapperFun, SceneRays, threadid, SceneRays->size()/pRenderThreads, pSamplesPerPixel);
 		renderThreads.push(renderThread);
 	}
 	while(!renderThreads.empty())
@@ -107,7 +107,7 @@ void Scene::Render()
 	end=chrono::high_resolution_clock::now();
 	FrameRenderTime=chrono::duration_cast <chrono::milliseconds>(end - start);
 
-	fprintf(stdout, "RayRunsPerPixel: %lu\n", pRayRunsPerPixel);
+	fprintf(stdout, "RayRunsPerPixel: %lu\n", pSamplesPerPixel);
 	fprintf(stdout, "FrameRenderTime: %li ms\n", FrameRenderTime.count());
 }
 
@@ -141,9 +141,9 @@ void Scene::SetNumOfRenderThreads(uint64_t render_threads)
 	pRenderThreads=render_threads;
 }
 
-void Scene::SetNumOfRayRunsPerPixel(uint64_t ray_runs_per_pixel)
+void Scene::SetNumOfSamplesPerPixel(uint64_t samples_per_pixel)
 {
-	pRayRunsPerPixel=ray_runs_per_pixel;
+	pSamplesPerPixel=samples_per_pixel;
 }
 
 void Scene::SetScreenSize(int64_t width, int64_t height)

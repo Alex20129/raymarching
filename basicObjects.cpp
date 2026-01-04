@@ -6,18 +6,18 @@ uint64_t Object::sLastKnownObjectID=0;
 
 Vec3d Object::WorldToLocal(const Vec3d &point) const
 {
-	Vec3d dir = point - pPosition;
-	Vec3d right, up, forward = pOrientation;
+	Vec3d dir=point - pPosition;
+	Vec3d right, up, forward=pOrientation;
 	if(abs(forward.X) < 1.0)
 	{
-		right = Vec3d(1, 0, 0).Cross(forward);
+		right=Vec3d(1, 0, 0).Cross(forward);
 	}
 	else
 	{
-		right = Vec3d(0, 1, 0).Cross(forward);
+		right=Vec3d(0, 1, 0).Cross(forward);
 	}
 	right.Normalize();
-	up = forward.Cross(right);
+	up=forward.Cross(right);
 	up.Normalize();
 	return Vec3d(
 		dir.Dot(right),
@@ -28,13 +28,13 @@ Vec3d Object::WorldToLocal(const Vec3d &point) const
 
 Object::Object()
 {
-	pName=new string("Object");
+	SetName("Object");
 	SceneObjects=nullptr;
 	pVisible=1;
 	pID=sLastKnownObjectID++;
 	pBrightness=0.0;
-	pReflectivity=0.5;
 	pSpecularity=0.0;
+	pDiffusionChance=UINT64_MAX;
 	pOrientation=Vec3d(0, 0, 1);
 }
 
@@ -67,24 +67,6 @@ void Object::SetBrightness(double brightness)
 	pBrightness=brightness;
 }
 
-double Object::Reflectivity()
-{
-	return(pReflectivity);
-}
-
-void Object::SetReflectivity(double reflectivity)
-{
-	if(reflectivity<0.0)
-	{
-		reflectivity=0.0;
-	}
-	if(reflectivity>1.0)
-	{
-		reflectivity=1.0;
-	}
-	pReflectivity=reflectivity;
-}
-
 double Object::Specularity()
 {
 	return(pSpecularity);
@@ -101,6 +83,11 @@ void Object::SetSpecularity(double specularity)
 		specularity=1.0;
 	}
 	pSpecularity=specularity;
+	uint64_t multiplicationTrick=(1.0-specularity)*512.0;
+	uint64_t remainder=(1.0-specularity)*511.0;
+	pDiffusionChance=UINT64_MAX>>9;
+	pDiffusionChance*=multiplicationTrick;
+	pDiffusionChance+=remainder;
 }
 
 const Vec3f &Object::Color() const
@@ -151,7 +138,7 @@ const Vec3d &Object::Position() const
 	return(pPosition);
 }
 
-void Object::SetPosition(Vec3d position)
+void Object::SetPosition(const Vec3d &position)
 {
 	pPosition=position;
 }
@@ -168,35 +155,28 @@ const Vec3d &Object::Orientation() const
 	return(pOrientation);
 }
 
-void Object::SetOrientation(const Vec3d *orientation)
-{
-	Vec3d newOrientation(orientation);
-	newOrientation.Normalize();
-	pOrientation=newOrientation;
-}
-
 void Object::SetOrientation(const Vec3d &orientation)
 {
-	Vec3d newOrientation(orientation);
-	newOrientation.Normalize();
-	pOrientation=newOrientation;
+	pOrientation=orientation;
+	pOrientation.Normalize();
 }
 
 void Object::SetOrientation(double x, double y, double z)
 {
-	Vec3d newOrientation(x, y, z);
-	newOrientation.Normalize();
-	pOrientation=newOrientation;
+	pOrientation.X=x;
+	pOrientation.Y=y;
+	pOrientation.Z=z;
+	pOrientation.Normalize();
 }
 
-string Object::Name()
+const string &Object::Name() const
 {
-	return(*pName);
+	return(pName);
 }
 
-void Object::SetName(string name)
+void Object::SetName(const string &name)
 {
-	*pName=name;
+	pName=name;
 }
 
 double Object::GetDistance(Vec3d from) const
@@ -233,7 +213,6 @@ Difference::Difference(Object *object_a, Object *object_b)
 	ObjectB=object_b;
 	pColor=(ObjectA->Color()+ObjectB->Color())/2.0;
 	pBrightness=(ObjectA->Brightness()+ObjectB->Brightness())/2.0;
-	pReflectivity=(ObjectA->Reflectivity()+ObjectB->Reflectivity())/2.0;
 	pSpecularity=(ObjectA->Specularity()+ObjectB->Specularity())/2.0;
 	ObjectA->SetVisible(false);
 	ObjectB->SetVisible(false);
@@ -261,7 +240,6 @@ Union::Union(Object *object_a, Object *object_b)
 	ObjectB=object_b;
 	pColor=(ObjectA->Color()+ObjectB->Color())/2.0;
 	pBrightness=(ObjectA->Brightness()+ObjectB->Brightness())/2.0;
-	pReflectivity=(ObjectA->Reflectivity()+ObjectB->Reflectivity())/2.0;
 	pSpecularity=(ObjectA->Specularity()+ObjectB->Specularity())/2.0;
 	ObjectA->SetVisible(false);
 	ObjectB->SetVisible(false);
@@ -289,7 +267,6 @@ Intersection::Intersection(Object *object_a, Object *object_b)
 	ObjectB=object_b;
 	pColor=(ObjectA->Color()+ObjectB->Color())/2.0;
 	pBrightness=(ObjectA->Brightness()+ObjectB->Brightness())/2.0;
-	pReflectivity=(ObjectA->Reflectivity()+ObjectB->Reflectivity())/2.0;
 	pSpecularity=(ObjectA->Specularity()+ObjectB->Specularity())/2.0;
 	ObjectA->SetVisible(false);
 	ObjectB->SetVisible(false);
@@ -328,7 +305,7 @@ Ray::Ray()
 	SetName("Ray");
 	uint64_t prngSeed=pPRNG.get_seed_value()+this->ID();
 	pPRNG.set_seed_value(prngSeed);
-	pObjectToIgnore=nullptr;
+	pObjectToSkipOnce=nullptr;
 }
 
 void Ray::SetDefaultOrientation(double x, double y, double z)
@@ -347,8 +324,8 @@ void Ray::Reset()
 void Ray::Run()
 {
 	Vec3d SurfaceNormalVec;
-	Vec3f colorAcc(255, 255, 255);
-	Vec3f illuminationAcc(0, 0, 0);
+	Vec3f ColorAcc(1.0, 1.0, 1.0);
+	Vec3f Illumination(0.0, 0.0, 0.0);
 	Object *Obstacle=nullptr;
 	uint64_t CollisionsHappened=0;
 
@@ -357,47 +334,36 @@ void Ray::Run()
 		Obstacle=RunOnce();
 		if(Obstacle==nullptr)
 		{
-			colorAcc=Vec3f(0, 0, 0);
 			break;
 		}
-		pObjectToIgnore=Obstacle;
+		pObjectToSkipOnce=Obstacle;
 		CollisionsHappened++;
 
-		illuminationAcc = illuminationAcc + Obstacle->Color() * Obstacle->Brightness();
-
-		colorAcc=colorAcc * Obstacle->Color() / 255.0;
-
-		// TODO:
-		// Obstacle->Reflectivity();
+		if(Obstacle->Brightness()>0.0)
+		{
+			Illumination=Obstacle->Color() * Obstacle->Brightness();
+			break;
+		}
+		else
+		{
+			ColorAcc=ColorAcc * Obstacle->Color() / 255.0;
+		}
 
 		SurfaceNormalVec=Obstacle->GetNormalVector(pPosition);
 		SurfaceNormalVec.Normalize();
 
-		double specularity=Obstacle->Specularity();
-
-		Vec3d reflectionVec;
-		if(specularity>0.0)
+		if(pPRNG.generate_xorshift()<pDiffusionChance)
 		{
-			reflectionVec=pOrientation - (SurfaceNormalVec*2.0) * SurfaceNormalVec.Dot(pOrientation);
-			reflectionVec.Normalize();
-			reflectionVec=reflectionVec*specularity;
+			Vec3d diffusionVec=SurfaceNormalVec + createRandomVector3d();
+			SetOrientation(diffusionVec);
 		}
-
-		Vec3d diffusionVec;
-		if(specularity<1.0)
+		else
 		{
-			diffusionVec=createRandomVector3d();
-			if(SurfaceNormalVec.Dot(diffusionVec) < 0.0)
-			{
-				diffusionVec=-diffusionVec;
-			}
-			diffusionVec.Normalize();
-			diffusionVec=diffusionVec*(1.0-specularity);
+			Vec3d reflectionVec=pOrientation - (SurfaceNormalVec*2.0) * SurfaceNormalVec.Dot(pOrientation);
+			SetOrientation(reflectionVec);
 		}
-
-		SetOrientation(reflectionVec + diffusionVec);
 	}
-	pColor=pColor + (colorAcc + illuminationAcc);
+	pColor=pColor + ColorAcc * Illumination;
 }
 
 Object *Ray::RunOnce()
@@ -413,10 +379,13 @@ Object *Ray::RunOnce()
 			{
 				continue;
 			}
-			if(sceneObject==pObjectToIgnore)
+			if(pObjectToSkipOnce)
 			{
-				pObjectToIgnore=nullptr;
-				continue;
+				if(pObjectToSkipOnce==sceneObject)
+				{
+					pObjectToSkipOnce=nullptr;
+					continue;
+				}
 			}
 			distance=sceneObject->GetDistance(pPosition);
 			if(distance<mindist)
@@ -442,8 +411,8 @@ Object *Ray::RunOnce()
 
 Sphere::Sphere()
 {
-	pRadius=1.0;
 	SetName("Sphere");
+	pRadius=1.0;
 }
 
 void Sphere::SetRadius(double radius)
@@ -499,8 +468,8 @@ void Cylinder::SetRadius(double radius)
 double Cylinder::GetDistance(Vec3d from) const
 {
 	from=WorldToLocal(from);
-	double dXY = Vec2d(from.X, from.Y).Length() - pRadius;
-	double dZ = abs(from.Z) - pLength / 2.0;
+	double dXY=Vec2d(from.X, from.Y).Length() - pRadius;
+	double dZ=abs(from.Z) - pLength / 2.0;
 	Vec2d d(max(dXY, dZ), max(dXY, -dZ));
 	return min(d.Length(), max(dXY, dZ));
 }
@@ -509,9 +478,9 @@ double Cylinder::GetDistance(Vec3d from) const
 
 Torus::Torus()
 {
+	SetName("Torus");
 	pRadius1=2.0;
 	pRadius2=1.0;
-	SetName("Torus");
 }
 
 void Torus::SetRadius1(double radius)

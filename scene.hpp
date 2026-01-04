@@ -16,7 +16,7 @@ class Scene
 	vector <Ray *> *SceneRays;
 	int64_t pScreenWidth, pScreenHeight;
 	uint64_t pRenderThreads;
-	uint64_t pRayRunsPerPixel;
+	uint64_t pSamplesPerPixel;
 public:
 	Scene();
 	~Scene();
@@ -31,7 +31,7 @@ public:
 	void SetScreenWidth(int64_t width);
 	void SetScreenHeight(int64_t height);
 	void SetNumOfRenderThreads(uint64_t render_threads);
-	void SetNumOfRayRunsPerPixel(uint64_t ray_runs_per_pixel);
+	void SetNumOfSamplesPerPixel(uint64_t samples_per_pixel);
 	void SetScreenSize(int64_t width, int64_t height);
 };
 

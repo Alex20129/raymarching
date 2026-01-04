@@ -13,11 +13,11 @@ class Object
 	bool pVisible;
 	uint64_t pID;
 	static uint64_t sLastKnownObjectID;
-	string *pName;
+	string pName;
 protected:
 	double pBrightness;
-	double pReflectivity;
 	double pSpecularity;
+	uint64_t pDiffusionChance;
 	Vec3f pColor;
 	Vec3d pPosition;
 	Vec3d pOrientation;
@@ -33,9 +33,6 @@ public:
 	double Brightness() const;
 	void SetBrightness(double brightness);
 
-	double Reflectivity();
-	void SetReflectivity(double reflectivity);
-
 	double Specularity();
 	void SetSpecularity(double specularity);
 
@@ -44,16 +41,15 @@ public:
 	void SetColor(float r, float g, float b);
 
 	const Vec3d &Position() const;
-	void SetPosition(Vec3d position);
+	void SetPosition(const Vec3d &position);
 	void SetPosition(double x, double y, double z);
 
 	const Vec3d &Orientation() const;
-	void SetOrientation(const Vec3d *orientation);
 	void SetOrientation(const Vec3d &orientation);
 	void SetOrientation(double x, double y, double z);
 
-	string Name();
-	void SetName(string name);
+	const string &Name() const;
+	void SetName(const string &name);
 
 	virtual double GetDistance(Vec3d from) const;
 	Vec3d GetNormalVector(Vec3d point) const;
@@ -88,12 +84,12 @@ public:
 class Ray : public Object
 {
 	Vec3d pDefaultOrientation;
-	Object *pObjectToIgnore;
+	Object *pObjectToSkipOnce;
 	prng_u64 pPRNG;
 	Vec3d createRandomVector3d();
 public:
 	static constexpr uint64_t RAY_STEPS_PER_RUN_MAX = 512;
-	static constexpr uint64_t RAY_COLLISIONS_MAX = 5;
+	static constexpr uint64_t RAY_COLLISIONS_MAX = 6;
 	static constexpr double RAY_PROXIMITY_DISTANCE = 1.0/8.0;
 	static constexpr double RAY_COLLISION_DISTANCE = 1.0/16.0;
 	Ray();
