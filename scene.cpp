@@ -51,18 +51,15 @@ void Scene::AddObject(Object *object)
 	object->SceneObjects=this->SceneObjects;
 }
 
-static void RayRunningWrapperFun(vector <Ray *> *rays, uint64_t thread_id, uint64_t rays_per_thread, uint64_t ray_runs_per_pixel)
+static void RayRunningWrapper(const vector <Ray *> *rays, uint64_t thread_id, uint64_t rays_per_thread, uint64_t samples_per_pixel)
 {
-	uint64_t rayid, run;
-	vector <Ray *> threadLocalRays=*rays;
-	Ray *rayPtr;
+	uint64_t rayid, sample;
 	for(rayid=thread_id*rays_per_thread; rayid<(thread_id+1)*rays_per_thread; rayid++)
 	{
-		rayPtr=threadLocalRays.at(rayid);
+		Ray *rayPtr=(*rays)[rayid];
 		rayPtr->SetColor(0, 0, 0);
-		for(run=0; run<ray_runs_per_pixel; run++)
+		for(sample=0; sample<samples_per_pixel; sample++)
 		{
-			rayPtr->Reset();
 			rayPtr->Run();
 		}
 	}
@@ -78,7 +75,7 @@ void Scene::Render()
 	chrono::time_point <chrono::high_resolution_clock> start=chrono::high_resolution_clock::now(), end;
 	for(threadid=0; threadid<pRenderThreads; threadid++)
 	{
-		renderThread=new thread(RayRunningWrapperFun, SceneRays, threadid, SceneRays->size()/pRenderThreads, pSamplesPerPixel);
+		renderThread=new thread(RayRunningWrapper, SceneRays, threadid, SceneRays->size()/pRenderThreads, pSamplesPerPixel);
 		renderThreads.push(renderThread);
 	}
 	while(!renderThreads.empty())
@@ -107,7 +104,7 @@ void Scene::Render()
 	end=chrono::high_resolution_clock::now();
 	FrameRenderTime=chrono::duration_cast <chrono::milliseconds>(end - start);
 
-	fprintf(stdout, "RayRunsPerPixel: %lu\n", pSamplesPerPixel);
+	fprintf(stdout, "SamplesPerPixel: %lu\n", pSamplesPerPixel);
 	fprintf(stdout, "FrameRenderTime: %li ms\n", FrameRenderTime.count());
 }
 

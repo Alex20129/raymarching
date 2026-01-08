@@ -40,7 +40,7 @@ uint32_t prng_u32::generate_fnv1()
 {
 	uint32_t result = pSeed;
 	result *= FNV32_PRIME;
-	result ^= pSeed;
+	result ^= pSeed+1;
 	pSeed = result;
 	return(result);
 }
@@ -94,7 +94,7 @@ uint64_t prng_u64::generate_fnv1()
 {
 	uint64_t result = pSeed;
 	result *= FNV64_PRIME;
-	result ^= pSeed;
+	result ^= pSeed+1;
 	pSeed = result;
 	return(result);
 }

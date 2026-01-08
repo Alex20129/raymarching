@@ -53,6 +53,11 @@ uint64_t Object::ID() const
 	return(pID);
 }
 
+uint64_t Object::DiffusionChance() const
+{
+	return(pDiffusionChance);
+}
+
 double Object::Brightness() const
 {
 	return(pBrightness);
@@ -67,7 +72,7 @@ void Object::SetBrightness(double brightness)
 	pBrightness=brightness;
 }
 
-double Object::Specularity()
+double Object::Specularity() const
 {
 	return(pSpecularity);
 }
@@ -283,29 +288,27 @@ double Intersection::GetDistance(Vec3d from) const
 
 Vec3d Ray::createRandomVector3d()
 {
-	constexpr double div=(double)(UINT64_MAX)/(double)(2.0);
+	constexpr double div=(double)(UINT64_MAX>>12);
 	Vec3d randomVector;
 	do
 	{
-		randomVector.X=pPRNG.generate_xorshift_star();
-		randomVector.X/=div;
-		randomVector.X-=1.0;
-		randomVector.Y=pPRNG.generate_xorshift_star();
-		randomVector.Y/=div;
-		randomVector.Y-=1.0;
-		randomVector.Z=pPRNG.generate_xorshift_star();
-		randomVector.Z/=div;
-		randomVector.Z-=1.0;
-	} while(randomVector.LengthSquared() > 1.0);
+		randomVector.X=pPRNG.generate_xorshift_star()>>11;
+		randomVector.X=randomVector.X/div-1.0;
+		randomVector.Y=pPRNG.generate_xorshift_star()>>11;
+		randomVector.Y=randomVector.Y/div-1.0;
+		randomVector.Z=pPRNG.generate_xorshift_star()>>11;
+		randomVector.Z=randomVector.Z/div-1.0;
+	} while(randomVector.LengthSquared()>1.0);
 	return(randomVector);
 }
 
 Ray::Ray()
 {
 	SetName("Ray");
+	pReflectionsLimit=7;
+	pStepsPerRunLimit=1024;
 	uint64_t prngSeed=pPRNG.get_seed_value()+this->ID();
 	pPRNG.set_seed_value(prngSeed);
-	pObjectToSkipOnce=nullptr;
 }
 
 void Ray::SetDefaultOrientation(double x, double y, double z)
@@ -315,94 +318,92 @@ void Ray::SetDefaultOrientation(double x, double y, double z)
 	pDefaultOrientation=newDefaultOrientation;
 }
 
-void Ray::Reset()
+void Ray::SetReflectionsLimit(uint64_t limit)
 {
-	SetOrientation(pDefaultOrientation);
-	SetPosition(0, 0, 0);
+	pReflectionsLimit=limit;
+}
+
+void Ray::SetStepsPerRunLimit(uint64_t limit)
+{
+	pStepsPerRunLimit=limit;
 }
 
 void Ray::Run()
 {
-	Vec3d SurfaceNormalVec;
-	Vec3f ColorAcc(1.0, 1.0, 1.0);
-	Vec3f Illumination(0.0, 0.0, 0.0);
+	uint64_t ReflectionsHappened=0, ReflectionsLimit=pReflectionsLimit;
 	Object *Obstacle=nullptr;
-	uint64_t CollisionsHappened=0;
+	Vec3d SurfaceNormalVec;
+	Vec3f ColorSample(1.0, 1.0, 1.0);
 
-	while(CollisionsHappened<RAY_COLLISIONS_MAX)
+	SetOrientation(pDefaultOrientation);
+	SetPosition(0, 0, 0);
+
+	while(ReflectionsHappened<ReflectionsLimit)
 	{
 		Obstacle=RunOnce();
 		if(Obstacle==nullptr)
 		{
 			break;
 		}
-		pObjectToSkipOnce=Obstacle;
-		CollisionsHappened++;
+		ReflectionsHappened++;
 
 		if(Obstacle->Brightness()>0.0)
 		{
-			Illumination=Obstacle->Color() * Obstacle->Brightness();
+			ColorSample=ColorSample * Obstacle->Color() * Obstacle->Brightness();
 			break;
 		}
 		else
 		{
-			ColorAcc=ColorAcc * Obstacle->Color() / 255.0;
+			ColorSample=ColorSample * Obstacle->Color() / 255.0;
 		}
 
 		SurfaceNormalVec=Obstacle->GetNormalVector(pPosition);
 		SurfaceNormalVec.Normalize();
 
-		if(pPRNG.generate_xorshift()<pDiffusionChance)
+		Vec3d NewDirection;
+		if(pPRNG.generate_xorshift_star()<Obstacle->DiffusionChance())
 		{
-			Vec3d diffusionVec=SurfaceNormalVec + createRandomVector3d();
-			SetOrientation(diffusionVec);
+			NewDirection=SurfaceNormalVec + createRandomVector3d();
 		}
 		else
 		{
-			Vec3d reflectionVec=pOrientation - (SurfaceNormalVec*2.0) * SurfaceNormalVec.Dot(pOrientation);
-			SetOrientation(reflectionVec);
+			NewDirection=pOrientation - (SurfaceNormalVec*2.0) * SurfaceNormalVec.Dot(pOrientation);
 		}
+		SetOrientation(NewDirection);
+		pPosition=pPosition+pOrientation;
 	}
-	pColor=pColor + ColorAcc * Illumination;
+	pColor=pColor + ColorSample;
 }
 
 Object *Ray::RunOnce()
 {
-	double mindist=UINT32_MAX, distance;
-	uint64_t stepsDone=0;
+	uint64_t StepsTaken=0, StepsPerRunLimit=pStepsPerRunLimit;
 	Object *prettyCloseObject=nullptr;
-	while(stepsDone<RAY_STEPS_PER_RUN_MAX)
+	while(StepsTaken<StepsPerRunLimit)
 	{
+		double minDistance=(double)(UINT64_MAX>>12), Distance;
 		for(Object *sceneObject: *SceneObjects)
 		{
 			if(!sceneObject->Visible())
 			{
 				continue;
 			}
-			if(pObjectToSkipOnce)
+			Distance=sceneObject->GetDistance(pPosition);
+			if(Distance<minDistance)
 			{
-				if(pObjectToSkipOnce==sceneObject)
-				{
-					pObjectToSkipOnce=nullptr;
-					continue;
-				}
-			}
-			distance=sceneObject->GetDistance(pPosition);
-			if(distance<mindist)
-			{
-				mindist=distance;
-				if(distance<RAY_PROXIMITY_DISTANCE)
+				minDistance=Distance;
+				if(Distance<RAY_PROXIMITY_DISTANCE)
 				{
 					prettyCloseObject=sceneObject;
-					if(distance<RAY_COLLISION_DISTANCE)
+					if(Distance<RAY_COLLISION_DISTANCE)
 					{
 						return(prettyCloseObject);
 					}
 				}
 			}
 		}
-		pPosition=pPosition+pOrientation*mindist;
-		stepsDone++;
+		pPosition=pPosition+pOrientation*minDistance;
+		StepsTaken++;
 	}
 	return(prettyCloseObject);
 }

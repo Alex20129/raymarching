@@ -17,62 +17,24 @@ int main(int argc, char *argv[])
 	// QApplication RayMarchingApp(argc, argv);
 
 	double ObjectZpos=320;
-
 	NewScene=new Scene;
 
-	Plane *Plane1=new Plane();
-	Plane1->SetPosition(0, 100, 0);
-	Plane1->SetOrientation(0, -1, 0);
-	Plane1->SetSpecularity(0);
-	Plane1->SetColor(180, 180, 180);
-
-	Plane *Plane2=new Plane();
-	Plane2->SetPosition(0, -100, 0);
-	Plane2->SetOrientation(0, 1, 0);
-	Plane2->SetSpecularity(0);
-	Plane2->SetColor(180, 180, 180);
-
-	Plane *Plane3=new Plane();
-	Plane3->SetPosition(0, 0, 400);
-	Plane3->SetOrientation(0, 0, -1);
-	Plane3->SetSpecularity(0);
-	Plane3->SetColor(180, 180, 180);
-
-	Plane *Plane4=new Plane();
-	Plane4->SetName("Red wall");
-	Plane4->SetPosition(-140, 0, 0);
-	Plane4->SetOrientation(1, 0, 0);
-	Plane4->SetSpecularity(0);
-	Plane4->SetColor(255, 80, 80);
-
-	Plane *Plane5=new Plane();
-	Plane5->SetName("Green wall");
-	Plane5->SetPosition(140, 0, 0);
-	Plane5->SetOrientation(-1, 0, 0);
-	Plane5->SetSpecularity(0);
-	Plane5->SetColor(80, 255, 80);
-
-	//======== Intersection
-
+	// ======== CSG
 	Sphere *NewSphere1=new Sphere();
 	NewSphere1->SetName("Sphere 1");
 	NewSphere1->SetRadius(44);
 	NewSphere1->SetPosition(0, 50, ObjectZpos);
 	//NewSphere1->SetSpecularity(0.4);
-	//NewSphere1->SetBrightness(0.4);
-	NewSphere1->SetColor(200, 20, 20);
+	//NewSphere1->SetBrightness(1.0);
 
 	Cube *NewCube1=new Cube();
 	NewCube1->SetName("Cube 1");
 	NewCube1->SetLength(68);
 	NewCube1->SetPosition(0, 50, ObjectZpos);
 	//NewCube1->SetSpecularity(0.4);
-	//NewCube1->SetBrightness(0.4);
-	NewCube1->SetColor(20, 180, 180);
+	//NewCube1->SetBrightness(1.0);
 
 	Intersection *ShpereCubeIntersection=new Intersection(NewSphere1, NewCube1);
-	ShpereCubeIntersection->SetSpecularity(0.0);
-	//ShpereCubeIntersection->SetColor(10, 180, 180);
 
 	Cylinder *NewCylinder1=new Cylinder();
 	NewCylinder1->SetName("Cylinder 1");
@@ -81,29 +43,42 @@ int main(int argc, char *argv[])
 	NewCylinder1->SetPosition(0, 50, ObjectZpos);
 	//NewCylinder1->SetSpecularity(0.5);
 	//NewCylinder1->SetBrightness(0.25);
-	NewCylinder1->SetColor(20, 180, 150);
 
-	Difference *ShpereCylinderDifference=new Difference(ShpereCubeIntersection, NewCylinder1);
-	ShpereCylinderDifference->SetSpecularity(0.0);
-	//ShpereCylinderDifference->SetColor(10, 180, 180);
+	Difference *Construct=new Difference(ShpereCubeIntersection, NewCylinder1);
+	Construct->SetColor(20, 180, 180);
 
-	//========
+	// ========
+	Sphere *BlueSphere=new Sphere();
+	BlueSphere->SetName("Blue sphere");
+	BlueSphere->SetRadius(32);
+	BlueSphere->SetPosition(-80, 50, ObjectZpos);
+	BlueSphere->SetSpecularity(1.0);
+	//BlueSphere->SetBrightness(0.5);
+	BlueSphere->SetColor(52, 52, 255);
 
-	Sphere *Sphere2=new Sphere();
-	Sphere2->SetName("Blue sphere");
-	Sphere2->SetRadius(32);
-	Sphere2->SetPosition(-80, 50, ObjectZpos);
-	Sphere2->SetSpecularity(1.0);
-	//Sphere2->SetBrightness(0.5);
-	Sphere2->SetColor(48, 48, 255);
+	Sphere *BlackSphere=new Sphere();
+	BlackSphere->SetName("Black sphere");
+	BlackSphere->SetRadius(32);
+	BlackSphere->SetPosition(-80, 50, ObjectZpos);
+	BlackSphere->SetSpecularity(1.0);
+	//BlackSphere->SetBrightness(0.5);
+	BlackSphere->SetColor(20, 20, 20);
 
-	Sphere *Sphere3=new Sphere();
-	Sphere3->SetName("Black sphere");
-	Sphere3->SetRadius(32);
-	Sphere3->SetPosition(80, 50, ObjectZpos);
-	Sphere3->SetSpecularity(1.0);
-	//Sphere3->SetBrightness(0.5);
-	Sphere3->SetColor(18, 18, 18);
+	Sphere *YellowSphere=new Sphere();
+	YellowSphere->SetName("Yellow sphere");
+	YellowSphere->SetRadius(32);
+	YellowSphere->SetPosition(80, 50, ObjectZpos);
+	YellowSphere->SetSpecularity(1.0);
+	//YellowSphere->SetBrightness(0.5);
+	YellowSphere->SetColor(255, 255, 14);
+
+	Sphere *RedSphere=new Sphere();
+	RedSphere->SetName("Red sphere");
+	RedSphere->SetRadius(32);
+	RedSphere->SetPosition(80, 50, ObjectZpos);
+	RedSphere->SetSpecularity(1.0);
+	//RedSphere->SetBrightness(0.5);
+	RedSphere->SetColor(255, 48, 48);
 
 	Cylinder *Cylinder2=new Cylinder();
 	Cylinder2->SetName("Cylinder 2");
@@ -131,12 +106,45 @@ int main(int argc, char *argv[])
 	//Torus1->SetBrightness(0.25);
 	Torus1->SetColor(200, 200, 80);
 
+	// ======== box
+	Plane *Plane1=new Plane();
+	Plane1->SetName("Ceiling");
+	Plane1->SetPosition(0, -100, 0);
+	Plane1->SetOrientation(0, 1, 0);
+
+	Plane *Plane2=new Plane();
+	Plane1->SetName("Back wall");
+	Plane2->SetPosition(0, 0, 400);
+	Plane2->SetOrientation(0, 0, -1);
+
+	Plane *Plane3=new Plane();
+	Plane1->SetName("Floor");
+	Plane3->SetPosition(0, 100, 0);
+	Plane3->SetOrientation(0, -1, 0);
+
+	Plane *Plane4=new Plane();
+	Plane4->SetPosition(-140, 0, 0);
+	Plane4->SetOrientation(1, 0, 0);
+
+	Plane *Plane5=new Plane();
+	Plane5->SetPosition(140, 0, 0);
+	Plane5->SetOrientation(-1, 0, 0);
+
+	Union *BoxUnion1=new Union(Plane1, Plane2);
+	Union *BoxUnion2=new Union(Plane3, Plane4);
+	Union *BoxUnion3=new Union(BoxUnion1, BoxUnion2);
+	Union *Box=new Union(BoxUnion3, Plane5);
+	Box->SetColor(180, 180, 180);
+
+	// ======== lights
 	Cube *LightSource1=new Cube();
-	LightSource1->SetName("Cubical light source");
-	LightSource1->SetLength(92);
-	LightSource1->SetPosition(0, -145, ObjectZpos);
-	LightSource1->SetBrightness(10.0);
-	LightSource1->SetColor(255, 255, 255);
+	LightSource1->SetLength(90);
+	LightSource1->SetPosition(0, -144, ObjectZpos);
+
+	Difference *LightPanel=new Difference(LightSource1, Plane1);
+	LightPanel->SetName("Light panel");
+	LightPanel->SetColor(255, 255, 255);
+	LightPanel->SetBrightness(10.0);
 
 	Sphere *LightSource2=new Sphere();
 	LightSource2->SetName("Spherical light source");
@@ -145,29 +153,25 @@ int main(int argc, char *argv[])
 	LightSource2->SetBrightness(2.0);
 	LightSource2->SetColor(255, 255, 255);
 
-	// NewScene->AddObject(ShpereCubeIntersection);
-	NewScene->AddObject(ShpereCylinderDifference);
-	NewScene->AddObject(Sphere2);
-	NewScene->AddObject(Sphere3);
+	NewScene->AddObject(Construct);
+	NewScene->AddObject(BlueSphere);
+	// NewScene->AddObject(BlackSphere);
+	//NewScene->AddObject(YellowSphere);
+	NewScene->AddObject(RedSphere);
 	// NewScene->AddObject(Cylinder2);
 	// NewScene->AddObject(Cube2);
 	// NewScene->AddObject(Torus1);
-	NewScene->AddObject(LightSource1);
+	NewScene->AddObject(LightPanel);
 	// NewScene->AddObject(LightSource2);
-	NewScene->AddObject(Plane1);
-	NewScene->AddObject(Plane2);
-	NewScene->AddObject(Plane3);
-	NewScene->AddObject(Plane4);
-	NewScene->AddObject(Plane5);
+	NewScene->AddObject(Box);
 
-	uint32_t samples_per_pixel=128;
-
-	for(int32_t i=0; i<11; i++)
+	uint32_t samples_per_pixel;
+	for(samples_per_pixel=2; samples_per_pixel<1025; samples_per_pixel*=2)
 	{
-		double spec=i*0.1;
+		// double spec=i*0.1;
 		// ShpereCubeIntersection->SetSpecularity(spec);
-		Sphere2->SetSpecularity(spec);
-		Sphere3->SetSpecularity(spec);
+		// Sphere2->SetSpecularity(spec);
+		// Sphere3->SetSpecularity(spec);
 		// Cylinder2->SetSpecularity(spec);
 		// Cylinder1->SetOrientation(0, std::sin(i*M_PI_2/10.0), std::cos(i*M_PI_2/10.0));
 		// Cube2->SetOrientation(std::sin(i*M_PI_2/10.0), std::cos(i*M_PI_2/10.0), 0);
@@ -177,10 +181,9 @@ int main(int argc, char *argv[])
 		NewScene->SetNumOfSamplesPerPixel(samples_per_pixel);
 		NewScene->Render();
 		QImage img1(NewScene->ImageData->data(), NewScene->ScreenWidth(), NewScene->ScreenHeight(), QImage::Format_RGBA8888);
-		img1.save(QString::number(samples_per_pixel)+
-					QString("-")+
-					QString::number(i)+
-					QString(".png"));
+		img1.save(QString("xorshift_star_")+
+				QString::number(samples_per_pixel)+
+				QString(".png"));
 	}
 
 //	SceneW=new Widget;

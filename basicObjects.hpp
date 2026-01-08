@@ -29,11 +29,11 @@ public:
 	void SetVisible(bool visible);
 
 	uint64_t ID() const;
-
+	uint64_t DiffusionChance() const;
 	double Brightness() const;
 	void SetBrightness(double brightness);
 
-	double Specularity();
+	double Specularity() const;
 	void SetSpecularity(double specularity);
 
 	const Vec3f &Color() const;
@@ -84,17 +84,17 @@ public:
 class Ray : public Object
 {
 	Vec3d pDefaultOrientation;
-	Object *pObjectToSkipOnce;
+	uint64_t pReflectionsLimit;
+	uint64_t pStepsPerRunLimit;
 	prng_u64 pPRNG;
 	Vec3d createRandomVector3d();
 public:
-	static constexpr uint64_t RAY_STEPS_PER_RUN_MAX = 512;
-	static constexpr uint64_t RAY_COLLISIONS_MAX = 6;
 	static constexpr double RAY_PROXIMITY_DISTANCE = 1.0/8.0;
 	static constexpr double RAY_COLLISION_DISTANCE = 1.0/16.0;
 	Ray();
 	void SetDefaultOrientation(double x, double y, double z);
-	void Reset();
+	void SetReflectionsLimit(uint64_t limit);
+	void SetStepsPerRunLimit(uint64_t limit);
 	void Run();
 	Object *RunOnce();
 };
