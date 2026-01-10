@@ -194,11 +194,11 @@ double Object::GetDistance(Vec3d from) const
 Vec3d Object::GetNormalVector(Vec3d point) const
 {
 	double b=GetDistance(Vec3d(point.X - NORMAL_CALCULATION_DIST, point.Y - NORMAL_CALCULATION_DIST, point.Z - NORMAL_CALCULATION_DIST));
-	Vec3d normalV(
+	Vec3d normalVec(
 		GetDistance(Vec3d(point.X + NORMAL_CALCULATION_DIST, point.Y - NORMAL_CALCULATION_DIST, point.Z - NORMAL_CALCULATION_DIST)) - b,
 		GetDistance(Vec3d(point.X - NORMAL_CALCULATION_DIST, point.Y + NORMAL_CALCULATION_DIST, point.Z - NORMAL_CALCULATION_DIST)) - b,
 		GetDistance(Vec3d(point.X - NORMAL_CALCULATION_DIST, point.Y - NORMAL_CALCULATION_DIST, point.Z + NORMAL_CALCULATION_DIST)) - b);
-	return(normalV);
+	return(normalVec);
 }
 
 // ========= CSG ===
@@ -378,7 +378,7 @@ void Ray::Run()
 Object *Ray::RunOnce()
 {
 	uint64_t StepsTaken=0, StepsPerRunLimit=pStepsPerRunLimit;
-	Object *prettyCloseObject=nullptr;
+	Vec3d Position=pPosition, Orientation=pOrientation;
 	while(StepsTaken<StepsPerRunLimit)
 	{
 		double minDistance=(double)(UINT64_MAX>>12), Distance;
@@ -388,24 +388,21 @@ Object *Ray::RunOnce()
 			{
 				continue;
 			}
-			Distance=sceneObject->GetDistance(pPosition);
+			Distance=sceneObject->GetDistance(Position);
 			if(Distance<minDistance)
 			{
 				minDistance=Distance;
-				if(Distance<RAY_PROXIMITY_DISTANCE)
+				if(Distance<RAY_COLLISION_DISTANCE)
 				{
-					prettyCloseObject=sceneObject;
-					if(Distance<RAY_COLLISION_DISTANCE)
-					{
-						return(prettyCloseObject);
-					}
+					pPosition=Position;
+					return(sceneObject);
 				}
 			}
 		}
-		pPosition=pPosition+pOrientation*minDistance;
 		StepsTaken++;
+		Position=Position+Orientation*minDistance;
 	}
-	return(prettyCloseObject);
+	return(nullptr);
 }
 
 // ========= SPHERE ===
@@ -425,6 +422,11 @@ double Sphere::GetDistance(Vec3d from) const
 {
 	from=from-pPosition;
 	return(from.Length()-pRadius);
+}
+
+Vec3d Sphere::GetNormalVector(Vec3d point) const
+{
+	return(point-pPosition);
 }
 
 // ========= CUBE ===
@@ -512,4 +514,9 @@ double Plane::GetDistance(Vec3d from) const
 {
 	from=from-pPosition;
 	return(from.Dot(pOrientation));
+}
+
+Vec3d Plane::GetNormalVector(Vec3d point) const
+{
+	return(pOrientation);
 }

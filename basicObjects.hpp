@@ -52,7 +52,7 @@ public:
 	void SetName(const string &name);
 
 	virtual double GetDistance(Vec3d from) const;
-	Vec3d GetNormalVector(Vec3d point) const;
+	virtual Vec3d GetNormalVector(Vec3d point) const;
 
 	vector <Object *> *SceneObjects;
 };
@@ -89,7 +89,6 @@ class Ray : public Object
 	prng_u64 pPRNG;
 	Vec3d createRandomVector3d();
 public:
-	static constexpr double RAY_PROXIMITY_DISTANCE = 1.0/8.0;
 	static constexpr double RAY_COLLISION_DISTANCE = 1.0/16.0;
 	Ray();
 	void SetDefaultOrientation(double x, double y, double z);
@@ -106,6 +105,7 @@ public:
 	Sphere();
 	void SetRadius(double radius);
 	double GetDistance(Vec3d from) const;
+	Vec3d GetNormalVector(Vec3d point) const;
 };
 
 class Cube : public Object
@@ -143,6 +143,7 @@ class Plane : public Object
 public:
 	Plane();
 	double GetDistance(Vec3d from) const;
+	Vec3d GetNormalVector(Vec3d point) const;
 };
 
 #endif // BASICOBJECTS_HPP
