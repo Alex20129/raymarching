@@ -84,10 +84,9 @@ public:
 class Ray : public Object
 {
 	Vec3d pDefaultOrientation;
+	uint64_t pPrngSeedValue;
 	uint64_t pReflectionsLimit;
 	uint64_t pStepsPerRunLimit;
-	prng_u64 pPRNG;
-	Vec3d createRandomVector3d();
 public:
 	static constexpr double RAY_COLLISION_DISTANCE = 1.0/16.0;
 	Ray();

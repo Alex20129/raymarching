@@ -18,6 +18,11 @@ prng_u32::prng_u32()
 	pSeed=FNV32_INITIAL_OFFSET;
 }
 
+prng_u32::prng_u32(uint32_t seed_value)
+{
+	pSeed=seed_value;
+}
+
 uint32_t prng_u32::get_seed_value() const
 {
 	return(pSeed);
@@ -70,6 +75,11 @@ uint32_t prng_u32::generate_xorshift_star()
 prng_u64::prng_u64()
 {
 	pSeed=FNV64_INITIAL_OFFSET;
+}
+
+prng_u64::prng_u64(uint64_t seed_value)
+{
+	pSeed=seed_value;
 }
 
 uint64_t prng_u64::get_seed_value() const

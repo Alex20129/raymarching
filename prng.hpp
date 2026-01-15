@@ -9,6 +9,7 @@ private:
 	uint32_t pSeed;
 public:
 	prng_u32();
+	prng_u32(uint32_t seed_value);
 	uint32_t get_seed_value() const;
 	void set_seed_value(uint32_t new_seed);
 	uint32_t generate_mwc();
@@ -23,6 +24,7 @@ private:
 	uint64_t pSeed;
 public:
 	prng_u64();
+	prng_u64(uint64_t seed_value);
 	uint64_t get_seed_value() const;
 	void set_seed_value(uint64_t seed_value);
 	uint64_t generate_mwc();

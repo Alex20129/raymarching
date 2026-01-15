@@ -286,29 +286,12 @@ double Intersection::GetDistance(Vec3d from) const
 
 // ========= RAY ===
 
-Vec3d Ray::createRandomVector3d()
-{
-	constexpr double div=(double)(UINT64_MAX>>12);
-	Vec3d randomVector;
-	do
-	{
-		randomVector.X=pPRNG.generate_xorshift_star()>>11;
-		randomVector.X=randomVector.X/div-1.0;
-		randomVector.Y=pPRNG.generate_xorshift_star()>>11;
-		randomVector.Y=randomVector.Y/div-1.0;
-		randomVector.Z=pPRNG.generate_xorshift_star()>>11;
-		randomVector.Z=randomVector.Z/div-1.0;
-	} while(randomVector.LengthSquared()>1.0);
-	return(randomVector);
-}
-
 Ray::Ray()
 {
 	SetName("Ray");
+	pPrngSeedValue=0xDEADBEEFABCDABCD+this->ID();
 	pReflectionsLimit=7;
 	pStepsPerRunLimit=1024;
-	uint64_t prngSeed=pPRNG.get_seed_value()+this->ID();
-	pPRNG.set_seed_value(prngSeed);
 }
 
 void Ray::SetDefaultOrientation(double x, double y, double z)
@@ -331,12 +314,14 @@ void Ray::SetStepsPerRunLimit(uint64_t limit)
 void Ray::Run()
 {
 	uint64_t ReflectionsHappened=0, ReflectionsLimit=pReflectionsLimit;
+	prng_u64 StackLocalPRNG(pPrngSeedValue);
+	const double RNDiv=(double)(UINT64_MAX>>12);
 	Object *Obstacle=nullptr;
-	Vec3d SurfaceNormalVec;
 	Vec3f ColorSample(1.0, 1.0, 1.0);
+	Vec3d SurfaceNormalVec;
 
-	SetOrientation(pDefaultOrientation);
 	SetPosition(0, 0, 0);
+	SetOrientation(pDefaultOrientation);
 
 	while(ReflectionsHappened<ReflectionsLimit)
 	{
@@ -361,9 +346,20 @@ void Ray::Run()
 		SurfaceNormalVec.Normalize();
 
 		Vec3d NewDirection;
-		if(pPRNG.generate_xorshift_star()<Obstacle->DiffusionChance())
+		if(StackLocalPRNG.generate_xorshift_star()<Obstacle->DiffusionChance())
 		{
-			NewDirection=SurfaceNormalVec + createRandomVector3d();
+			Vec3d randomVector;
+			do
+			{
+				randomVector.X=StackLocalPRNG.generate_xorshift_star()>>11;
+				randomVector.X=randomVector.X/RNDiv-1.0;
+				randomVector.Y=StackLocalPRNG.generate_xorshift_star()>>11;
+				randomVector.Y=randomVector.Y/RNDiv-1.0;
+				randomVector.Z=StackLocalPRNG.generate_xorshift_star()>>11;
+				randomVector.Z=randomVector.Z/RNDiv-1.0;
+			}
+			while(randomVector.LengthSquared()>1.0);
+			NewDirection=SurfaceNormalVec + randomVector;
 		}
 		else
 		{
@@ -372,6 +368,7 @@ void Ray::Run()
 		SetOrientation(NewDirection);
 		pPosition=pPosition+pOrientation;
 	}
+	pPrngSeedValue=StackLocalPRNG.get_seed_value();
 	pColor=pColor + ColorSample;
 }
 
