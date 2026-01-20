@@ -1,5 +1,6 @@
 #include <cstdio>
 #include <cmath>
+#include <cfloat>
 #include "basicObjects.hpp"
 
 uint64_t Object::sLastKnownObjectID=0;
@@ -378,7 +379,7 @@ Object *Ray::RunOnce()
 	Vec3d Position=pPosition, Orientation=pOrientation;
 	while(StepsTaken<StepsPerRunLimit)
 	{
-		double minDistance=(double)(UINT64_MAX>>12), Distance;
+		double minDistance=DBL_MAX, Distance;
 		for(Object *sceneObject: *SceneObjects)
 		{
 			if(!sceneObject->Visible())
