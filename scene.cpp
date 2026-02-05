@@ -1,5 +1,7 @@
-#include <cstdio>
 #include "scene.hpp"
+#include <cstdio>
+#include <thread>
+#include <queue>
 
 Scene::Scene()
 {

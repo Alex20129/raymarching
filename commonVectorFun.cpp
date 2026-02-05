@@ -1,4 +1,5 @@
 #include "commonVectorFun.hpp"
+#include <math.h>
 
 //=== Vec2 double
 

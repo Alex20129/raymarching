@@ -1,15 +1,11 @@
 #ifndef SCENE_HPP
 #define SCENE_HPP
 
-#include "basicObjects.hpp"
-#include <thread>
-#include <queue>
 #include <chrono>
+#include "basicObjects.hpp"
 
 #define DEFAULT_SCREEN_WIDTH		2048
 #define DEFAULT_SCREEN_HEIGHT		1536
-
-using namespace std;
 
 class Scene
 {

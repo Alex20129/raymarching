@@ -1,9 +1,6 @@
 #ifndef COMMONVECTORFUN_HPP
 #define COMMONVECTORFUN_HPP
 
-#include <math.h>
-#include <stdint.h>
-
 //=== Vec2 double
 
 class Vec2d
