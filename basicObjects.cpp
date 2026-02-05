@@ -2,6 +2,7 @@
 #include <cmath>
 #include <cfloat>
 #include "basicObjects.hpp"
+#include "prng.hpp"
 
 uint64_t Object::sLastKnownObjectID=0;
 
