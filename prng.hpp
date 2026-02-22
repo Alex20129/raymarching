@@ -12,8 +12,6 @@ public:
 	prng_u32(uint32_t seed_value);
 	uint32_t get_seed_value() const;
 	void set_seed_value(uint32_t new_seed);
-	uint32_t generate_mwc();
-	uint32_t generate_fnv1();
 	uint32_t generate_xorshift();
 	uint32_t generate_xorshift_star();
 };
@@ -27,8 +25,6 @@ public:
 	prng_u64(uint64_t seed_value);
 	uint64_t get_seed_value() const;
 	void set_seed_value(uint64_t seed_value);
-	uint64_t generate_mwc();
-	uint64_t generate_fnv1();
 	uint64_t generate_xorshift();
 	uint64_t generate_xorshift_star();
 };

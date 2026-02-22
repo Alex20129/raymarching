@@ -33,23 +33,6 @@ void prng_u32::set_seed_value(uint32_t seed_value)
 	pSeed=seed_value;
 }
 
-uint32_t prng_u32::generate_mwc()
-{
-	uint32_t result=pSeed;
-	result=(result & UINT16_MAX) * MWC32_ALPHA + (result >> 16);
-	pSeed=result;
-	return(result);
-}
-
-uint32_t prng_u32::generate_fnv1()
-{
-	uint32_t result = pSeed;
-	result *= FNV32_PRIME;
-	result ^= pSeed+1;
-	pSeed = result;
-	return(result);
-}
-
 uint32_t prng_u32::generate_xorshift()
 {
 	uint32_t result = pSeed;
@@ -90,23 +73,6 @@ uint64_t prng_u64::get_seed_value() const
 void prng_u64::set_seed_value(uint64_t seed_value)
 {
 	pSeed=seed_value;
-}
-
-uint64_t prng_u64::generate_mwc()
-{
-	uint64_t result=pSeed;
-	result=(result & UINT32_MAX) * MWC64_ALPHA + (result >> 32);
-	pSeed=result;
-	return(result);
-}
-
-uint64_t prng_u64::generate_fnv1()
-{
-	uint64_t result = pSeed;
-	result *= FNV64_PRIME;
-	result ^= pSeed+1;
-	pSeed = result;
-	return(result);
 }
 
 uint64_t prng_u64::generate_xorshift()
