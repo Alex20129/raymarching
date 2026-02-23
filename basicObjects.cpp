@@ -21,11 +21,7 @@ Vec3d Object::WorldToLocal(const Vec3d &point) const
 	right.Normalize();
 	up=forward.Cross(right);
 	up.Normalize();
-	return Vec3d(
-		dir.Dot(right),
-		dir.Dot(up),
-		dir.Dot(forward)
-		);
+	return Vec3d(dir.Dot(right), dir.Dot(up), dir.Dot(forward));
 }
 
 Object::Object()
@@ -291,8 +287,9 @@ double Intersection::GetDistance(Vec3d from) const
 Ray::Ray()
 {
 	SetName("Ray");
-	pPrngSeedValue=0xDEADBEEFABCDABCD+this->ID();
-	pReflectionsLimit=7;
+	prng_u64 tempPRNG;
+	pPrngSeedValue=tempPRNG.get_seed_value()+this->ID();
+	pReflectionsLimit=5;
 	pStepsPerRunLimit=1024;
 }
 

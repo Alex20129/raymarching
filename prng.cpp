@@ -1,21 +1,15 @@
 #include "prng.hpp"
 
-static const uint32_t MWC32_ALPHA=0x7F545431;
-static const uint64_t MWC64_ALPHA=0x00007F5454545437;
+static constexpr uint32_t XORSHIFT32_ALPHA=0x4FA4BB39;
+static constexpr uint64_t XORSHIFT64_ALPHA=0x2545F4914FA4BB39;
 
-static const uint32_t FNV32_INITIAL_OFFSET=0x811C9DC5;
-static const uint64_t FNV64_INITIAL_OFFSET=0xCBF29CE484222325;
-
-static const uint32_t FNV32_PRIME=0x01000193;
-static const uint64_t FNV64_PRIME=0x00000100000001B3;
-
-static const uint32_t XORSHIFT32_ALPHA=0x4F6CDD1D;
-static const uint64_t XORSHIFT64_ALPHA=0x2545F4914F6CDD1D;
+static constexpr uint32_t PRNG32_INITIAL_OFFSET=0x6C835AF4;
+static constexpr uint64_t PRNG64_INITIAL_OFFSET=0x6C835AF43E27329A;
 
 // == prng-32 ====
 prng_u32::prng_u32()
 {
-	pSeed=FNV32_INITIAL_OFFSET;
+	pSeed=PRNG32_INITIAL_OFFSET;
 }
 
 prng_u32::prng_u32(uint32_t seed_value)
@@ -57,7 +51,7 @@ uint32_t prng_u32::generate_xorshift_star()
 // == prng-64 ====
 prng_u64::prng_u64()
 {
-	pSeed=FNV64_INITIAL_OFFSET;
+	pSeed=PRNG64_INITIAL_OFFSET;
 }
 
 prng_u64::prng_u64(uint64_t seed_value)
