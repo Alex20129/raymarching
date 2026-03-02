@@ -94,7 +94,7 @@ public:
 	void SetReflectionsLimit(uint64_t limit);
 	void SetStepsPerRunLimit(uint64_t limit);
 	void Run();
-	Object *RunOnce();
+	const Object *RunOnce();
 };
 
 class Sphere : public Object
@@ -143,6 +143,15 @@ public:
 	Plane();
 	double GetDistance(Vec3d from) const;
 	Vec3d GetNormalVector(Vec3d point) const;
+};
+
+class Gyroid : public Object
+{
+	double pScale;
+public:
+	Gyroid();
+	void SetScale(double scale);
+	double GetDistance(Vec3d from) const;
 };
 
 #endif // BASICOBJECTS_HPP

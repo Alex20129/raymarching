@@ -49,6 +49,18 @@ int main(int argc, char *argv[])
 	Difference *Construct=new Difference(ShpereCubeIntersection, Cylinders);
 	Construct->SetColor(18, 200, 200);
 
+	// ======== CSG: gyroid in sphere
+	Sphere *NewSphere2=new Sphere();
+	NewSphere2->SetRadius(50);
+	NewSphere2->SetPosition(0, 40, ObjectZpos);
+
+	Gyroid *NewGyroid=new Gyroid();
+	NewGyroid->SetScale(5.25);
+	NewGyroid->SetPosition(0, 40, ObjectZpos);
+
+	Intersection *SphereGyroidIntersection=new Intersection(NewSphere2, NewGyroid);
+	SphereGyroidIntersection->SetColor(80, 80, 255);
+
 	// ========
 	Sphere *BlueSphere=new Sphere();
 	BlueSphere->SetName("Blue sphere");
@@ -57,12 +69,12 @@ int main(int argc, char *argv[])
 	BlueSphere->SetSpecularity(1.0);
 	BlueSphere->SetColor(52, 52, 255);
 
-	Sphere *BlackSphere=new Sphere();
-	BlackSphere->SetName("Black sphere");
-	BlackSphere->SetRadius(32);
-	BlackSphere->SetPosition(-80, 50, ObjectZpos);
-	BlackSphere->SetSpecularity(1.0);
-	BlackSphere->SetColor(20, 20, 20);
+	Sphere *RedSphere=new Sphere();
+	RedSphere->SetName("Red sphere");
+	RedSphere->SetRadius(32);
+	RedSphere->SetPosition(80, 50, ObjectZpos);
+	RedSphere->SetSpecularity(1.0);
+	RedSphere->SetColor(255, 52, 52);
 
 	Sphere *YellowSphere=new Sphere();
 	YellowSphere->SetName("Yellow sphere");
@@ -70,13 +82,6 @@ int main(int argc, char *argv[])
 	YellowSphere->SetPosition(80, 50, ObjectZpos);
 	YellowSphere->SetSpecularity(1.0);
 	YellowSphere->SetColor(255, 255, 14);
-
-	Sphere *RedSphere=new Sphere();
-	RedSphere->SetName("Red sphere");
-	RedSphere->SetRadius(32);
-	RedSphere->SetPosition(80, 50, ObjectZpos);
-	RedSphere->SetSpecularity(1.0);
-	RedSphere->SetColor(255, 48, 48);
 
 	Cylinder *Cylinder2=new Cylinder();
 	Cylinder2->SetName("Cylinder 2");
@@ -162,21 +167,22 @@ int main(int argc, char *argv[])
 	NewScene->AddObject(Plane5);
 
 	NewScene->AddObject(LightSource1);
-	//NewScene->AddObject(LightSource2);
-	NewScene->AddObject(Construct);
-	NewScene->AddObject(BlueSphere);
-	//NewScene->AddObject(BlackSphere);
-	//NewScene->AddObject(YellowSphere);
-	NewScene->AddObject(RedSphere);
-	//NewScene->AddObject(Cylinder2);
-	//NewScene->AddObject(Cube2);
-	//NewScene->AddObject(Torus1);
+	// NewScene->AddObject(LightSource2);
 
-	uint32_t samples_per_pixel;
-	for(samples_per_pixel=2; samples_per_pixel<1025; samples_per_pixel*=2)
+	// NewScene->AddObject(Construct);
+	NewScene->AddObject(SphereGyroidIntersection);
+
+	// NewScene->AddObject(BlueSphere);
+	// NewScene->AddObject(RedSphere);
+	// NewScene->AddObject(YellowSphere);
+	// NewScene->AddObject(Cylinder2);
+	// NewScene->AddObject(Cube2);
+	// NewScene->AddObject(Torus1);
+
+	for(int i=0; i<11; i++)
 	{
-		// double spec=i*0.1;
-		// ShpereCubeIntersection->SetSpecularity(spec);
+		double spec=i*0.1;
+
 		// Sphere2->SetSpecularity(spec);
 		// Sphere3->SetSpecularity(spec);
 		// Cylinder2->SetSpecularity(spec);
@@ -184,13 +190,17 @@ int main(int argc, char *argv[])
 		// Cube2->SetOrientation(std::sin(i*M_PI_2/10.0), std::cos(i*M_PI_2/10.0), 0);
 		// Torus1->SetOrientation(0, std::sin(i*M_PI_2/10.0), std::cos(i*M_PI_2/10.0));
 		// NewCube1->SetOrientation(std::sin(i*M_PI_2/10.0), 0, std::cos(i*M_PI_2/10.0));
+		// Construct->SetSpecularity(spec);
+		SphereGyroidIntersection->SetSpecularity(spec);
+
+		// uint32_t samples_per_pixel=(i+1)*(i+1)*8;
+		uint32_t samples_per_pixel=1024;
 
 		NewScene->SetNumOfSamplesPerPixel(samples_per_pixel);
 		NewScene->Render();
+
 		QImage img1(NewScene->ImageData->data(), NewScene->ScreenWidth(), NewScene->ScreenHeight(), QImage::Format_RGBA8888);
-		img1.save(QString("xorshift_star_")+
-				QString::number(samples_per_pixel)+
-				QString(".png"));
+		img1.save(QString("alt_normal_") + QString::number(i) + QString(".png"));
 	}
 
 //	SceneW=new Widget;

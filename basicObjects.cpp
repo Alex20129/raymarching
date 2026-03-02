@@ -189,13 +189,23 @@ double Object::GetDistance(Vec3d from) const
 }
 
 // Using the gradient of the SDF, estimate the normal vector on the surface at given point
+
+// Vec3d Object::GetNormalVector(Vec3d point) const
+// {
+// 	double b=GetDistance(Vec3d(point.X - NORMAL_CALCULATION_DIST, point.Y - NORMAL_CALCULATION_DIST, point.Z - NORMAL_CALCULATION_DIST));
+// 	Vec3d normalVec(
+// 		GetDistance(Vec3d(point.X + NORMAL_CALCULATION_DIST, point.Y - NORMAL_CALCULATION_DIST, point.Z - NORMAL_CALCULATION_DIST)) - b,
+// 		GetDistance(Vec3d(point.X - NORMAL_CALCULATION_DIST, point.Y + NORMAL_CALCULATION_DIST, point.Z - NORMAL_CALCULATION_DIST)) - b,
+// 		GetDistance(Vec3d(point.X - NORMAL_CALCULATION_DIST, point.Y - NORMAL_CALCULATION_DIST, point.Z + NORMAL_CALCULATION_DIST)) - b);
+// 	return(normalVec);
+// }
+
 Vec3d Object::GetNormalVector(Vec3d point) const
 {
-	double b=GetDistance(Vec3d(point.X - NORMAL_CALCULATION_DIST, point.Y - NORMAL_CALCULATION_DIST, point.Z - NORMAL_CALCULATION_DIST));
 	Vec3d normalVec(
-		GetDistance(Vec3d(point.X + NORMAL_CALCULATION_DIST, point.Y - NORMAL_CALCULATION_DIST, point.Z - NORMAL_CALCULATION_DIST)) - b,
-		GetDistance(Vec3d(point.X - NORMAL_CALCULATION_DIST, point.Y + NORMAL_CALCULATION_DIST, point.Z - NORMAL_CALCULATION_DIST)) - b,
-		GetDistance(Vec3d(point.X - NORMAL_CALCULATION_DIST, point.Y - NORMAL_CALCULATION_DIST, point.Z + NORMAL_CALCULATION_DIST)) - b);
+		GetDistance(point + Vec3d(NORMAL_CALCULATION_DIST, 0, 0)) - GetDistance(point - Vec3d(NORMAL_CALCULATION_DIST, 0, 0)),
+		GetDistance(point + Vec3d(0, NORMAL_CALCULATION_DIST, 0)) - GetDistance(point - Vec3d(0, NORMAL_CALCULATION_DIST, 0)),
+		GetDistance(point + Vec3d(0, 0, NORMAL_CALCULATION_DIST)) - GetDistance(point - Vec3d(0, 0, NORMAL_CALCULATION_DIST)));
 	return(normalVec);
 }
 
@@ -289,7 +299,7 @@ Ray::Ray()
 	SetName("Ray");
 	prng_u64 tempPRNG;
 	pPrngSeedValue=tempPRNG.get_seed_value()+this->ID();
-	pReflectionsLimit=5;
+	pReflectionsLimit=7;
 	pStepsPerRunLimit=1024;
 }
 
@@ -315,7 +325,6 @@ void Ray::Run()
 	uint64_t ReflectionsHappened=0, ReflectionsLimit=pReflectionsLimit;
 	prng_u64 StackLocalPRNG(pPrngSeedValue);
 	const double RNDiv=(double)(UINT64_MAX>>12);
-	Object *Obstacle=nullptr;
 	Vec3f ColorSample(1.0, 1.0, 1.0);
 	Vec3d SurfaceNormalVec;
 
@@ -324,7 +333,7 @@ void Ray::Run()
 
 	while(ReflectionsHappened<ReflectionsLimit)
 	{
-		Obstacle=RunOnce();
+		const Object *Obstacle=RunOnce();
 		if(Obstacle==nullptr)
 		{
 			break;
@@ -371,14 +380,14 @@ void Ray::Run()
 	pColor=pColor + ColorSample;
 }
 
-Object *Ray::RunOnce()
+const Object *Ray::RunOnce()
 {
 	uint64_t StepsTaken=0, StepsPerRunLimit=pStepsPerRunLimit;
 	Vec3d Position=pPosition, Orientation=pOrientation;
 	while(StepsTaken<StepsPerRunLimit)
 	{
 		double minDistance=DBL_MAX, Distance;
-		for(Object *sceneObject: *SceneObjects)
+		for(const Object *sceneObject: *SceneObjects)
 		{
 			if(!sceneObject->Visible())
 			{
@@ -515,4 +524,24 @@ double Plane::GetDistance(Vec3d from) const
 Vec3d Plane::GetNormalVector(Vec3d point) const
 {
 	return(pOrientation);
+}
+
+// ========= GYROID ===
+
+Gyroid::Gyroid()
+{
+	SetName("Gyroid");
+	pScale=1.0;
+}
+
+void Gyroid::SetScale(double scale)
+{
+	pScale=scale;
+}
+
+double Gyroid::GetDistance(Vec3d from) const
+{
+	from=from-pPosition;
+	from=from/pScale;
+	return(cos(from.X)*sin(from.Y) + cos(from.Y)*sin(from.Z) + cos(from.Z)*sin(from.X));
 }
