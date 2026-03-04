@@ -200,7 +200,7 @@ int main(int argc, char *argv[])
 		NewScene->Render();
 
 		QImage img1(NewScene->ImageData->data(), NewScene->ScreenWidth(), NewScene->ScreenHeight(), QImage::Format_RGBA8888);
-		img1.save(QString("alt_normal_") + QString::number(i) + QString(".png"));
+		img1.save(QString("render_") + QString::number(i) + QString(".png"));
 	}
 
 //	SceneW=new Widget;

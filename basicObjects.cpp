@@ -189,17 +189,6 @@ double Object::GetDistance(Vec3d from) const
 }
 
 // Using the gradient of the SDF, estimate the normal vector on the surface at given point
-
-// Vec3d Object::GetNormalVector(Vec3d point) const
-// {
-// 	double b=GetDistance(Vec3d(point.X - NORMAL_CALCULATION_DIST, point.Y - NORMAL_CALCULATION_DIST, point.Z - NORMAL_CALCULATION_DIST));
-// 	Vec3d normalVec(
-// 		GetDistance(Vec3d(point.X + NORMAL_CALCULATION_DIST, point.Y - NORMAL_CALCULATION_DIST, point.Z - NORMAL_CALCULATION_DIST)) - b,
-// 		GetDistance(Vec3d(point.X - NORMAL_CALCULATION_DIST, point.Y + NORMAL_CALCULATION_DIST, point.Z - NORMAL_CALCULATION_DIST)) - b,
-// 		GetDistance(Vec3d(point.X - NORMAL_CALCULATION_DIST, point.Y - NORMAL_CALCULATION_DIST, point.Z + NORMAL_CALCULATION_DIST)) - b);
-// 	return(normalVec);
-// }
-
 Vec3d Object::GetNormalVector(Vec3d point) const
 {
 	Vec3d normalVec(
