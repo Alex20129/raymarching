@@ -88,8 +88,7 @@ int main(int argc, char *argv[])
 
 	Sphere *YellowSphere=new Sphere();
 	YellowSphere->SetRadius(32);
-	YellowSphere->SetPosition(0, 0, 0);
-	YellowSphere->SetSpecularity(1.0);
+	YellowSphere->SetPosition(0, 0, ObjectZpos);
 	YellowSphere->SetColor(255, 255, 14);
 
 	Cylinder *Cylinder2=new Cylinder();
@@ -159,11 +158,11 @@ int main(int argc, char *argv[])
 	LightSource2->SetColor(255, 255, 255);
 	LightSource2->SetBrightness(5.0);
 
-	NewScene->AddObject(Ceiling);
+	// NewScene->AddObject(Ceiling);
 	NewScene->AddObject(Floor);
-	// NewScene->AddObject(Plane3);
-	// NewScene->AddObject(Plane4);
-	// NewScene->AddObject(Plane5);
+	NewScene->AddObject(Plane3);
+	NewScene->AddObject(Plane4);
+	NewScene->AddObject(Plane5);
 
 	NewScene->AddObject(LightSource1);
 	// NewScene->AddObject(LightSource2);
@@ -182,9 +181,10 @@ int main(int argc, char *argv[])
 	NewScene->RebuildSceneTree();
 	// return 42;
 
+	uint32_t samples_per_pixel=1;
 	for(int i=0; i<11; i++)
 	{
-		double spec=i*0.1;
+		// double spec=i*0.1;
 
 		// Cylinder1->SetOrientation(0, std::sin(i*M_PI_2/10.0), std::cos(i*M_PI_2/10.0));
 		// Cube2->SetOrientation(std::sin(i*M_PI_2/10.0), std::cos(i*M_PI_2/10.0), 0);
@@ -195,11 +195,10 @@ int main(int argc, char *argv[])
 		// Sphere3->SetSpecularity(spec);
 		// Cylinder2->SetSpecularity(spec);
 		// Construct->SetSpecularity(spec);
-		//SphereGyroidIntersection->SetSpecularity(spec);
-		SphereSPIntersection->SetSpecularity(spec);
+		// SphereGyroidIntersection->SetSpecularity(spec);
+		// SphereSPIntersection->SetSpecularity(spec);
 
-		// uint32_t samples_per_pixel=(i+1)*(i+1)*8;
-		uint32_t samples_per_pixel=(uint32_t)(1)<<i;
+		samples_per_pixel*=2;
 
 		NewScene->SetNumOfSamplesPerPixel(samples_per_pixel);
 		NewScene->Render();

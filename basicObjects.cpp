@@ -1,8 +1,8 @@
-#include "basicObjects.hpp"
-#include "prng.hpp"
 #include <cstdio>
 #include <cmath>
-#include <cfloat>
+//#include "basicObjects.hpp"
+#include "octree.hpp"
+#include "prng.hpp"
 
 uint64_t Object::sLastKnownObjectID=0;
 
@@ -26,7 +26,7 @@ Vec3d Object::WorldToLocal(const Vec3d &point) const
 
 Object::Object()
 {
-	SceneObjects=nullptr;
+	SceneTree=nullptr;
 	pVisible=1;
 	pID=sLastKnownObjectID++;
 	pBrightness=0.0;
@@ -364,21 +364,23 @@ const Object *Ray::RunOnce()
 	while(StepsTaken<StepsPerRunLimit)
 	{
 		double minDistance=DBL_MAX, Distance;
-		for(const Object *sceneObject: *SceneObjects)
+		OctreeNode *Node=SceneTree->GetClosestLeafNode(Position);
+		while(!Node->object && Node->index>0)
 		{
-			if(!sceneObject->Visible())
+			Node=SceneTree->GetNode(Node->parentNodeIndex);
+		}
+		if(!Node->object)
+		{
+			return(nullptr);
+		}
+		Distance=Node->object->GetDistance(Position);
+		if(Distance<minDistance)
+		{
+			minDistance=Distance;
+			if(Distance<RAY_COLLISION_DISTANCE)
 			{
-				continue;
-			}
-			Distance=sceneObject->GetDistance(Position);
-			if(Distance<minDistance)
-			{
-				minDistance=Distance;
-				if(Distance<RAY_COLLISION_DISTANCE)
-				{
-					pPosition=Position;
-					return(sceneObject);
-				}
+				pPosition=Position;
+				return(Node->object);
 			}
 		}
 		StepsTaken++;

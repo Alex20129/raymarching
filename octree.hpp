@@ -2,10 +2,8 @@
 #define OCTREE_HPP
 
 #include <cfloat>
+#include <vector>
 #include "basicObjects.hpp"
-
-#define DEFAULT_SCREEN_WIDTH	2048
-#define DEFAULT_SCREEN_HEIGHT	1536
 
 struct OctreeNode
 {
@@ -30,7 +28,7 @@ public:
 	void Clear();
 	void Build(vector<const Object *> *objects);
 	OctreeNode *GetClosestLeafNode(Vec3d point) const;
-	OctreeNode *GetRootNode() const;
+	OctreeNode *GetNode(uint64_t node_index) const;
 };
 
 #endif // OCTREE_HPP

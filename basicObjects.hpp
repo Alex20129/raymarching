@@ -1,9 +1,10 @@
 #ifndef BASICOBJECTS_HPP
 #define BASICOBJECTS_HPP
 
-#include <vector>
 #include <cstdint>
 #include "commonVectorFun.hpp"
+
+class Octree;
 
 using namespace std;
 
@@ -22,6 +23,8 @@ protected:
 	Vec3d WorldToLocal(const Vec3d &point) const;
 public:
 	static constexpr double NORMAL_CALCULATION_DIST = 1.0/16.0;
+	Octree *SceneTree;
+
 	Object();
 	bool Visible() const;
 	void SetVisible(bool visible);
@@ -48,8 +51,6 @@ public:
 
 	virtual double GetDistance(Vec3d from) const;
 	virtual Vec3d GetNormalVector(Vec3d point) const;
-
-	vector <Object *> *SceneObjects;
 };
 
 class Difference : public Object

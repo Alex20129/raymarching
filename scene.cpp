@@ -31,7 +31,7 @@ Scene::Scene()
 		{
 			newRay=new Ray();
 			newRay->SetDefaultOrientation(X-pScreenWidth/2.0, Y-pScreenHeight/2.0, pScreenWidth);
-			newRay->SceneObjects=this->SceneObjects;
+			newRay->SceneTree=this->SceneTree;
 			SceneRays->push_back(newRay);
 		}
 	}
@@ -61,7 +61,7 @@ void Scene::RebuildSceneTree()
 void Scene::AddObject(Object *object)
 {
 	this->SceneObjects->push_back(object);
-	object->SceneObjects=this->SceneObjects;
+	object->SceneTree=this->SceneTree;
 }
 
 static void RayRunningWrapper(const vector <Ray *> *rays, uint64_t thread_id, uint64_t rays_per_thread, uint64_t samples_per_pixel)

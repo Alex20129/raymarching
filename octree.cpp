@@ -17,33 +17,44 @@ enum class IntersectionType
 
 static IntersectionType NodeIntersectsWithObjectSDF(const OctreeNode *node, const Object *object)
 {
+	IntersectionType result=IntersectionType::NoIntersection;
+	Vec3d NodeCenter=node->center;
 	double NodeHalfSize=node->halfSize;
+
+	double CenterToSurface=object->GetDistance(NodeCenter);
+	if (CenterToSurface < NodeHalfSize)
+	{
+		result=IntersectionType::PartialIntersection;
+	}
+
+	double NodeBSRadius=Vec3d(NodeHalfSize, NodeHalfSize, NodeHalfSize).Length();
+	if (CenterToSurface < -NodeBSRadius)
+	{
+		return IntersectionType::FullIntersection;
+	}
+
 	int SamplesCollected=0;
-	if (object->GetDistance(node->center) < 0.0)
+	if (object->GetDistance(NodeCenter+Vec3d(NodeHalfSize, 0, 0)) < 0.0)
 	{
 		SamplesCollected++;
 	}
-	if (object->GetDistance(node->center+Vec3d(NodeHalfSize, 0, 0)) < 0.0)
+	if (object->GetDistance(NodeCenter+Vec3d(-NodeHalfSize, 0, 0)) < 0.0)
 	{
 		SamplesCollected++;
 	}
-	if (object->GetDistance(node->center+Vec3d(-NodeHalfSize, 0, 0)) < 0.0)
+	if (object->GetDistance(NodeCenter+Vec3d(0, NodeHalfSize, 0)) < 0.0)
 	{
 		SamplesCollected++;
 	}
-	if (object->GetDistance(node->center+Vec3d(0, NodeHalfSize, 0)) < 0.0)
+	if (object->GetDistance(NodeCenter+Vec3d(0, -NodeHalfSize, 0)) < 0.0)
 	{
 		SamplesCollected++;
 	}
-	if (object->GetDistance(node->center+Vec3d(0, -NodeHalfSize, 0)) < 0.0)
+	if (object->GetDistance(NodeCenter+Vec3d(0, 0, NodeHalfSize)) < 0.0)
 	{
 		SamplesCollected++;
 	}
-	if (object->GetDistance(node->center+Vec3d(0, 0, NodeHalfSize)) < 0.0)
-	{
-		SamplesCollected++;
-	}
-	if (object->GetDistance(node->center+Vec3d(0, 0, -NodeHalfSize)) < 0.0)
+	if (object->GetDistance(NodeCenter+Vec3d(0, 0, -NodeHalfSize)) < 0.0)
 	{
 		SamplesCollected++;
 	}
@@ -52,23 +63,17 @@ static IntersectionType NodeIntersectsWithObjectSDF(const OctreeNode *node, cons
 		double dx=(n & 1) ? NodeHalfSize : -NodeHalfSize;
 		double dy=(n & 2) ? NodeHalfSize : -NodeHalfSize;
 		double dz=(n & 4) ? NodeHalfSize : -NodeHalfSize;
-		if (object->GetDistance(node->center+Vec3d(dx, dy, dz)) < 0.0)
+		if (object->GetDistance(NodeCenter+Vec3d(dx, dy, dz)) < 0.0)
 		{
 			SamplesCollected++;
 		}
 	}
-	if(SamplesCollected==0)
+	if(SamplesCollected==14)
 	{
-		return IntersectionType::NoIntersection;
+		result=IntersectionType::FullIntersection;
 	}
-	else if(SamplesCollected<15)
-	{
-		return IntersectionType::PartialIntersection;
-	}
-	else
-	{
-		return IntersectionType::FullIntersection;
-	}
+
+	return result;
 }
 
 static void checkForObjectsNearby(OctreeNode *node, vector <const Object *> *objects, std::vector<const Object *> &objects_found)
@@ -142,6 +147,8 @@ void Octree::SplitNode(OctreeNode *node, vector<const Object *> *objects)
 		}
 		else
 		{
+			newSubNode->object=ObjectsFound.back();
+			pNodesWithObjects++;
 			SplitNode(newSubNode, objects);
 		}
 	}
@@ -157,12 +164,17 @@ Octree::Octree()
 
 Octree::~Octree()
 {
-	Clear();
+	while(pNodes.size())
+	{
+		OctreeNode *node=pNodes.back();
+		pNodes.pop_back();
+		delete node;
+	}
 }
 
 void Octree::Clear()
 {
-	while(pNodes.size())
+	while(pNodes.size()>1)
 	{
 		OctreeNode *node=pNodes.back();
 		pNodes.pop_back();
@@ -178,8 +190,7 @@ void Octree::Build(vector<const Object *> *objects)
 	Vec3d globalMaxPos;
 
 	Clear();
-	OctreeNode *rootNode=new OctreeNode;
-	pNodes.push_back(rootNode);
+	OctreeNode *rootNode=pNodes.front();
 
 	if(objects->empty())
 	{
@@ -213,12 +224,7 @@ void Octree::Build(vector<const Object *> *objects)
 
 OctreeNode *Octree::GetClosestLeafNode(Vec3d point) const
 {
-	OctreeNode *Node=nullptr;
-	if(pNodes.empty())
-	{
-		return(Node);
-	}
-	Node=pNodes[0];
+	OctreeNode *Node=pNodes[0];
 	while (!Node->IsLeaf())
 	{
 		int octant_index=0;
@@ -239,13 +245,11 @@ OctreeNode *Octree::GetClosestLeafNode(Vec3d point) const
 	return(Node);
 }
 
-OctreeNode *Octree::GetRootNode() const
+OctreeNode *Octree::GetNode(uint64_t node_index) const
 {
-	OctreeNode *Node=nullptr;
-	if(pNodes.empty())
+	if(node_index>=pNodes.size())
 	{
-		return(Node);
+		node_index=pNodes.size()-1;
 	}
-	Node=pNodes[0];
-	return(Node);
+	return(pNodes[node_index]);
 }
