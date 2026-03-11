@@ -34,30 +34,6 @@ static IntersectionType NodeIntersectsWithObjectSDF(const OctreeNode *node, cons
 	}
 
 	int SamplesCollected=0;
-	if (object->GetDistance(NodeCenter+Vec3d(NodeHalfSize, 0, 0)) < 0.0)
-	{
-		SamplesCollected++;
-	}
-	if (object->GetDistance(NodeCenter+Vec3d(-NodeHalfSize, 0, 0)) < 0.0)
-	{
-		SamplesCollected++;
-	}
-	if (object->GetDistance(NodeCenter+Vec3d(0, NodeHalfSize, 0)) < 0.0)
-	{
-		SamplesCollected++;
-	}
-	if (object->GetDistance(NodeCenter+Vec3d(0, -NodeHalfSize, 0)) < 0.0)
-	{
-		SamplesCollected++;
-	}
-	if (object->GetDistance(NodeCenter+Vec3d(0, 0, NodeHalfSize)) < 0.0)
-	{
-		SamplesCollected++;
-	}
-	if (object->GetDistance(NodeCenter+Vec3d(0, 0, -NodeHalfSize)) < 0.0)
-	{
-		SamplesCollected++;
-	}
 	for (int n=0; n<8; n++)
 	{
 		double dx=(n & 1) ? NodeHalfSize : -NodeHalfSize;
@@ -68,7 +44,7 @@ static IntersectionType NodeIntersectsWithObjectSDF(const OctreeNode *node, cons
 			SamplesCollected++;
 		}
 	}
-	if(SamplesCollected==14)
+	if(SamplesCollected==8)
 	{
 		result=IntersectionType::FullIntersection;
 	}
