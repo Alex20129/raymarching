@@ -1,24 +1,25 @@
 #ifndef SCENE_HPP
 #define SCENE_HPP
 
-#include <chrono>
-#include "basicObjects.hpp"
+#include "octree.hpp"
 
-#define DEFAULT_SCREEN_WIDTH		2048
-#define DEFAULT_SCREEN_HEIGHT		1536
+#define DEFAULT_SCREEN_WIDTH	2048
+#define DEFAULT_SCREEN_HEIGHT	1536
 
 class Scene
 {
 	vector <Ray *> *SceneRays;
+	vector <Object *> *SceneObjects;
 	int64_t pScreenWidth, pScreenHeight;
 	uint64_t pRenderThreads;
 	uint64_t pSamplesPerPixel;
 public:
 	Scene();
 	~Scene();
-	vector <Object *> *SceneObjects;
+	Octree *SceneTree;
 	vector <unsigned char> *ImageData;
-	chrono::milliseconds FrameRenderTime;
+	int64_t FrameRenderTime;
+	void RebuildSceneTree();
 	void AddObject(Object *object);
 	void Render();
 	int64_t ScreenWidth();

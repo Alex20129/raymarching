@@ -2,7 +2,6 @@
 #define BASICOBJECTS_HPP
 
 #include <vector>
-#include <string>
 #include <cstdint>
 #include "commonVectorFun.hpp"
 
@@ -13,7 +12,6 @@ class Object
 	bool pVisible;
 	uint64_t pID;
 	static uint64_t sLastKnownObjectID;
-	string pName;
 protected:
 	double pBrightness;
 	double pSpecularity;
@@ -47,9 +45,6 @@ public:
 	const Vec3d &Orientation() const;
 	void SetOrientation(const Vec3d &orientation);
 	void SetOrientation(double x, double y, double z);
-
-	const string &Name() const;
-	void SetName(const string &name);
 
 	virtual double GetDistance(Vec3d from) const;
 	virtual Vec3d GetNormalVector(Vec3d point) const;
@@ -150,6 +145,15 @@ class Gyroid : public Object
 	double pScale;
 public:
 	Gyroid();
+	void SetScale(double scale);
+	double GetDistance(Vec3d from) const;
+};
+
+class SchwarzPrimitive : public Object
+{
+	double pScale;
+public:
+	SchwarzPrimitive();
 	void SetScale(double scale);
 	double GetDistance(Vec3d from) const;
 };

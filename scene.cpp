@@ -1,13 +1,17 @@
-#include "scene.hpp"
 #include <cstdio>
+#include <cfloat>
+#include <cmath>
 #include <thread>
 #include <queue>
+#include <chrono>
+#include "scene.hpp"
 
 Scene::Scene()
 {
 	int64_t X, Y;
 	Ray *newRay;
 
+	SceneTree=new Octree;
 	SceneObjects=new vector <Object *>;
 	SceneRays=new vector <Ray *>;
 	ImageData=new vector <uint8_t>;
@@ -37,14 +41,21 @@ Scene::~Scene()
 {
 	while(!SceneObjects->empty())
 	{
-		delete SceneObjects->back();
+		Object *object=SceneObjects->back();
 		SceneObjects->pop_back();
+		delete object;
 	}
 	while(!SceneRays->empty())
 	{
-		delete SceneRays->back();
+		Ray *ray=SceneRays->back();
 		SceneRays->pop_back();
+		delete ray;
 	}
+}
+
+void Scene::RebuildSceneTree()
+{
+	SceneTree->Build((vector <const Object *> *)(SceneObjects));
 }
 
 void Scene::AddObject(Object *object)
@@ -104,10 +115,10 @@ void Scene::Render()
 		ImageData->data()[ray_id*4+2]=c;
 	}
 	end=chrono::high_resolution_clock::now();
-	FrameRenderTime=chrono::duration_cast <chrono::milliseconds>(end - start);
+	FrameRenderTime=(end - start).count()/1000000;
 
 	fprintf(stdout, "SamplesPerPixel: %lu\n", pSamplesPerPixel);
-	fprintf(stdout, "FrameRenderTime: %li ms\n", FrameRenderTime.count());
+	fprintf(stdout, "FrameRenderTime: %li ms\n", FrameRenderTime);
 }
 
 int64_t Scene::ScreenWidth()

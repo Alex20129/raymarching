@@ -26,7 +26,6 @@ Vec3d Object::WorldToLocal(const Vec3d &point) const
 
 Object::Object()
 {
-	SetName("Object");
 	SceneObjects=nullptr;
 	pVisible=1;
 	pID=sLastKnownObjectID++;
@@ -172,16 +171,6 @@ void Object::SetOrientation(double x, double y, double z)
 	pOrientation.Normalize();
 }
 
-const string &Object::Name() const
-{
-	return(pName);
-}
-
-void Object::SetName(const string &name)
-{
-	pName=name;
-}
-
 double Object::GetDistance(Vec3d from) const
 {
 	from=from-pPosition;
@@ -202,7 +191,6 @@ Vec3d Object::GetNormalVector(Vec3d point) const
 
 Difference::Difference(Object *object_a, Object *object_b)
 {
-	SetName("Difference");
 	if(object_a==nullptr)
 	{
 		return;
@@ -213,11 +201,12 @@ Difference::Difference(Object *object_a, Object *object_b)
 		return;
 	}
 	ObjectB=object_b;
-	pColor=(ObjectA->Color()+ObjectB->Color())/2.0;
-	pBrightness=(ObjectA->Brightness()+ObjectB->Brightness())/2.0;
-	pSpecularity=(ObjectA->Specularity()+ObjectB->Specularity())/2.0;
-	ObjectA->SetVisible(false);
-	ObjectB->SetVisible(false);
+	pPosition=object_a->Position();
+	pColor=(object_a->Color()+object_b->Color())/2.0;
+	pBrightness=(object_a->Brightness()+object_b->Brightness())/2.0;
+	pSpecularity=(object_a->Specularity()+object_b->Specularity())/2.0;
+	object_a->SetVisible(false);
+	object_b->SetVisible(false);
 }
 
 double Difference::GetDistance(Vec3d from) const
@@ -229,7 +218,6 @@ double Difference::GetDistance(Vec3d from) const
 
 Union::Union(Object *object_a, Object *object_b)
 {
-	SetName("Union");
 	if(object_a==nullptr)
 	{
 		return;
@@ -240,23 +228,23 @@ Union::Union(Object *object_a, Object *object_b)
 		return;
 	}
 	ObjectB=object_b;
-	pColor=(ObjectA->Color()+ObjectB->Color())/2.0;
-	pBrightness=(ObjectA->Brightness()+ObjectB->Brightness())/2.0;
-	pSpecularity=(ObjectA->Specularity()+ObjectB->Specularity())/2.0;
-	ObjectA->SetVisible(false);
-	ObjectB->SetVisible(false);
+	pPosition=(object_a->Position()+object_b->Position())/2.0;
+	pColor=(object_a->Color()+object_b->Color())/2.0;
+	pBrightness=(object_a->Brightness()+object_b->Brightness())/2.0;
+	pSpecularity=(object_a->Specularity()+object_b->Specularity())/2.0;
+	object_a->SetVisible(false);
+	object_b->SetVisible(false);
 }
 
 double Union::GetDistance(Vec3d from) const
 {
 	double DistA=ObjectA->GetDistance(from);
 	double DistB=ObjectB->GetDistance(from);
-	return min(DistA, DistB);
+	return(min(DistA, DistB));
 }
 
 Intersection::Intersection(Object *object_a, Object *object_b)
 {
-	SetName("Intersection");
 	if(object_a==nullptr)
 	{
 		return;
@@ -267,25 +255,25 @@ Intersection::Intersection(Object *object_a, Object *object_b)
 		return;
 	}
 	ObjectB=object_b;
-	pColor=(ObjectA->Color()+ObjectB->Color())/2.0;
-	pBrightness=(ObjectA->Brightness()+ObjectB->Brightness())/2.0;
-	pSpecularity=(ObjectA->Specularity()+ObjectB->Specularity())/2.0;
-	ObjectA->SetVisible(false);
-	ObjectB->SetVisible(false);
+	pPosition=(object_a->Position()+object_b->Position())/2.0;
+	pColor=(object_a->Color()+object_b->Color())/2.0;
+	pBrightness=(object_a->Brightness()+object_b->Brightness())/2.0;
+	pSpecularity=(object_a->Specularity()+object_b->Specularity())/2.0;
+	object_a->SetVisible(false);
+	object_b->SetVisible(false);
 }
 
 double Intersection::GetDistance(Vec3d from) const
 {
 	double DistA=ObjectA->GetDistance(from);
 	double DistB=ObjectB->GetDistance(from);
-	return max(DistA, DistB);
+	return(max(DistA, DistB));
 }
 
 // ========= RAY ===
 
 Ray::Ray()
 {
-	SetName("Ray");
 	prng_u64 tempPRNG;
 	pPrngSeedValue=tempPRNG.get_seed_value()+this->ID();
 	pReflectionsLimit=7;
@@ -403,7 +391,6 @@ const Object *Ray::RunOnce()
 
 Sphere::Sphere()
 {
-	SetName("Sphere");
 	pRadius=1.0;
 }
 
@@ -427,27 +414,26 @@ Vec3d Sphere::GetNormalVector(Vec3d point) const
 
 Cube::Cube()
 {
-	SetName("Cube");
 	pLength=1.0;
 }
 
 void Cube::SetLength(double length)
 {
-	pLength=length/2;
+	pLength=length;
 }
 
 double Cube::GetDistance(Vec3d from) const
 {
 	from=WorldToLocal(from);
-	Vec3d d=from.Abs()-Vec3d(pLength, pLength, pLength);
-	return d.Max(Vec3d(0, 0, 0)).Length() + min(max(d.X, max(d.Y, d.Z)), 0.0);
+	double halfLength=pLength/2.0;
+	Vec3d d=from.Abs()-Vec3d(halfLength, halfLength, halfLength);
+	return(Vec3d::Max(d, Vec3d(0, 0, 0)).Length() + min(max(d.X, max(d.Y, d.Z)), 0.0));
 }
 
 // ========= CYLINDER ===
 
 Cylinder::Cylinder()
 {
-	SetName("Cylinder");
 	pLength=1.0;
 	pRadius=1.0;
 }
@@ -475,7 +461,6 @@ double Cylinder::GetDistance(Vec3d from) const
 
 Torus::Torus()
 {
-	SetName("Torus");
 	pRadius1=2.0;
 	pRadius2=1.0;
 }
@@ -501,7 +486,6 @@ double Torus::GetDistance(Vec3d from) const
 
 Plane::Plane()
 {
-	SetName("Plane");
 }
 
 double Plane::GetDistance(Vec3d from) const
@@ -519,7 +503,6 @@ Vec3d Plane::GetNormalVector(Vec3d point) const
 
 Gyroid::Gyroid()
 {
-	SetName("Gyroid");
 	pScale=1.0;
 }
 
@@ -534,3 +517,23 @@ double Gyroid::GetDistance(Vec3d from) const
 	from=from/pScale;
 	return(cos(from.X)*sin(from.Y) + cos(from.Y)*sin(from.Z) + cos(from.Z)*sin(from.X));
 }
+
+// ========= Schwarz primitive ===
+
+SchwarzPrimitive::SchwarzPrimitive()
+{
+	pScale=1.0;
+}
+
+void SchwarzPrimitive::SetScale(double scale)
+{
+	pScale=scale;
+}
+
+double SchwarzPrimitive::GetDistance(Vec3d from) const
+{
+	from=from-pPosition;
+	from=from/pScale;
+	return(cos(from.X) + cos(from.Y) + cos(from.Z));
+}
+
