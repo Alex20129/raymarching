@@ -1,13 +1,17 @@
-#include "scene.hpp"
 #include <cstdio>
+#include <cfloat>
+#include <cmath>
 #include <thread>
 #include <queue>
+#include <chrono>
+#include "scene.hpp"
 
 Scene::Scene()
 {
 	int64_t X, Y;
 	Ray *newRay;
 
+	SceneTree=new Octree;
 	SceneObjects=new vector <Object *>;
 	SceneRays=new vector <Ray *>;
 	ImageData=new vector <uint8_t>;
@@ -27,7 +31,7 @@ Scene::Scene()
 		{
 			newRay=new Ray();
 			newRay->SetDefaultOrientation(X-pScreenWidth/2.0, Y-pScreenHeight/2.0, pScreenWidth);
-			newRay->SceneObjects=this->SceneObjects;
+			newRay->SceneTree=this->SceneTree;
 			SceneRays->push_back(newRay);
 		}
 	}
@@ -37,20 +41,27 @@ Scene::~Scene()
 {
 	while(!SceneObjects->empty())
 	{
-		delete SceneObjects->back();
+		Object *object=SceneObjects->back();
 		SceneObjects->pop_back();
+		delete object;
 	}
 	while(!SceneRays->empty())
 	{
-		delete SceneRays->back();
+		Ray *ray=SceneRays->back();
 		SceneRays->pop_back();
+		delete ray;
 	}
+}
+
+void Scene::RebuildSceneTree()
+{
+	SceneTree->Build((vector <const Object *> *)(SceneObjects));
 }
 
 void Scene::AddObject(Object *object)
 {
 	this->SceneObjects->push_back(object);
-	object->SceneObjects=this->SceneObjects;
+	object->SceneTree=this->SceneTree;
 }
 
 static void RayRunningWrapper(const vector <Ray *> *rays, uint64_t thread_id, uint64_t rays_per_thread, uint64_t samples_per_pixel)
@@ -74,7 +85,9 @@ void Scene::Render()
 	float colorDiv=pSamplesPerPixel;
 	queue<thread *> renderThreads;
 
-	chrono::time_point <chrono::high_resolution_clock> start=chrono::high_resolution_clock::now(), end;
+	chrono::time_point <chrono::high_resolution_clock> finish;
+	chrono::time_point <chrono::high_resolution_clock> start=chrono::high_resolution_clock::now();
+
 	for(threadid=0; threadid<pRenderThreads; threadid++)
 	{
 		renderThread=new thread(RayRunningWrapper, SceneRays, threadid, SceneRays->size()/pRenderThreads, pSamplesPerPixel);
@@ -103,11 +116,11 @@ void Scene::Render()
 		c=std::min(c, 255);
 		ImageData->data()[ray_id*4+2]=c;
 	}
-	end=chrono::high_resolution_clock::now();
-	FrameRenderTime=chrono::duration_cast <chrono::milliseconds>(end - start);
+	finish=chrono::high_resolution_clock::now();
+	FrameRenderTime=(finish - start).count()/1000000;
 
 	fprintf(stdout, "SamplesPerPixel: %lu\n", pSamplesPerPixel);
-	fprintf(stdout, "FrameRenderTime: %li ms\n", FrameRenderTime.count());
+	fprintf(stdout, "FrameRenderTime: %li ms\n", FrameRenderTime);
 }
 
 int64_t Scene::ScreenWidth()

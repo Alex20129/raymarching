@@ -17,7 +17,8 @@ public:
 	double LengthSquared();
 	double Dot(const Vec2d &other) const;
 	double Cross(const Vec2d &other) const;
-	Vec2d Max(const Vec2d &other) const;
+	static Vec2d Min(const Vec2d &va, const Vec2d &vb);
+	static Vec2d Max(const Vec2d &va, const Vec2d &vb);
 	Vec2d operator=(const Vec2d &other);
 	Vec2d operator+(const Vec2d &other) const;
 	void operator+=(const Vec2d &other);
@@ -46,7 +47,8 @@ public:
 	double LengthSquared();
 	double Dot(const Vec3d &other) const;
 	Vec3d Cross(const Vec3d &other) const;
-	Vec3d Max(const Vec3d &other) const;
+	static Vec3d Min(const Vec3d &va, const Vec3d &vb);
+	static Vec3d Max(const Vec3d &va, const Vec3d &vb);
 	Vec3d operator=(const Vec3d &other);
 	Vec3d operator+(const Vec3d &other) const;
 	void operator+=(const Vec3d &other);
@@ -54,6 +56,7 @@ public:
 	Vec3d operator-() const;
 	Vec3d operator/(double d) const;
 	Vec3d operator*(const Vec3d &other) const;
+
 };
 
 Vec3d operator*(const Vec3d &vec, const double m);

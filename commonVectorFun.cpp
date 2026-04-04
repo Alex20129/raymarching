@@ -67,11 +67,19 @@ double Vec2d::Cross(const Vec2d &other) const
 	return(res);
 }
 
-Vec2d Vec2d::Max(const Vec2d &other) const
+Vec2d Vec2d::Min(const Vec2d &va, const Vec2d &vb)
 {
 	Vec2d res(
-		std::fmax(this->X, other.X),
-		std::fmax(this->Y, other.Y));
+		std::fmin(va.X, vb.X),
+		std::fmin(va.Y, vb.Y));
+	return(res);
+}
+
+Vec2d Vec2d::Max(const Vec2d &va, const Vec2d &vb)
+{
+	Vec2d res(
+		std::fmax(va.X, vb.X),
+		std::fmax(va.Y, vb.Y));
 	return(res);
 }
 
@@ -200,12 +208,21 @@ Vec3d Vec3d::Cross(const Vec3d &other) const
 	return(res);
 }
 
-Vec3d Vec3d::Max(const Vec3d &other) const
+Vec3d Vec3d::Min(const Vec3d &va, const Vec3d &vb)
 {
 	Vec3d res(
-		std::fmax(this->X, other.X),
-		std::fmax(this->Y, other.Y),
-		std::fmax(this->Z, other.Z));
+		std::fmin(va.X, vb.X),
+		std::fmin(va.Y, vb.Y),
+		std::fmin(va.Z, vb.Z));
+	return(res);
+}
+
+Vec3d Vec3d::Max(const Vec3d &va, const Vec3d &vb)
+{
+	Vec3d res(
+		std::fmax(va.X, vb.X),
+		std::fmax(va.Y, vb.Y),
+		std::fmax(va.Z, vb.Z));
 	return(res);
 }
 
