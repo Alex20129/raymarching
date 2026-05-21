@@ -365,41 +365,37 @@ const Object *Ray::RunOnce()
 	{
 		double minDistance=DBL_MAX, Distance;
 		OctreeNode *Node=SceneTree->GetClosestLeafNode(Position);
+		const Object *ClosestObject=nullptr;
 
-		if(Node->object)
+		if(Node->objectA)
 		{
-			Distance=Node->object->GetDistance(Position);
-			if(Distance<minDistance)
+			Distance=Node->objectA->GetDistance(Position);
+			if(minDistance>Distance)
 			{
 				minDistance=Distance;
+				ClosestObject=Node->objectA;
 			}
 		}
-		else
+
+		if(Node->objectB)
 		{
-			OctreeNode *ParentNode=SceneTree->GetNode(Node->parentNodeIndex);
-			for (int br = 0; br<8; br++)
+			Distance=Node->objectB->GetDistance(Position);
+			if(minDistance>Distance)
 			{
-				Node=SceneTree->GetNode(ParentNode->branch[br]);
-				if(Node->object)
-				{
-					Distance=Node->object->GetDistance(Position);
-					if(Distance<minDistance)
-					{
-						minDistance=Distance;
-					}
-				}
+				minDistance=Distance;
+				ClosestObject=Node->objectB;
 			}
 		}
 
 		if(minDistance<DBL_MAX)
 		{
-			StepsTaken++;
-			Position=Position+Orientation*minDistance;
-			if(Distance<RAY_COLLISION_DISTANCE)
+			if(minDistance<RAY_COLLISION_DISTANCE)
 			{
 				pPosition=Position;
-				return(Node->object);
+				return(ClosestObject);
 			}
+			StepsTaken++;
+			Position=Position+Orientation*minDistance;
 		}
 		else
 		{

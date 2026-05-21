@@ -9,20 +9,29 @@ struct OctreeNode
 {
 	uint64_t index=0;
 	uint64_t parentNodeIndex=0;
-	uint64_t branch[8]={0,0,0,0,0,0,0,0};
+	uint64_t branch[8]={0, 0, 0, 0, 0, 0, 0, 0};
 	Vec3d center;
 	double halfSize=0.0;
-	const Object *object=nullptr;
+	const Object *objectA=nullptr;
+	const Object *objectB=nullptr;
 	bool IsLeaf() const;
 };
 
 class Octree
 {
 	double pNodeSizeMin;
-	uint64_t pNodesWithObjects;
-	uint64_t pNodesEmpty;
-	std::vector<OctreeNode *> pNodes;
-	void SplitNode(OctreeNode *node, vector<const Object *> *objects);
+	vector <OctreeNode *> pNodes;
+	int SortObjectsByDistance(OctreeNode *node, vector <const Object *> *objects, vector <const Object *> &objects_by_disance);
+	void SplitNode(OctreeNode *node, vector <const Object *> *objects);
+	struct DistancedObject
+	{
+		const Object *object;
+		double distance;
+	};
+	static bool ObjectDistanceComparator(const DistancedObject &a, const DistancedObject &b)
+	{
+		return(a.distance < b.distance);
+	};
 public:
 	Octree();
 	~Octree();

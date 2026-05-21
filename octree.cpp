@@ -1,5 +1,6 @@
 #include <cmath>
 #include <cstdio>
+#include <algorithm>
 #include "octree.hpp"
 
 bool OctreeNode::IsLeaf() const
@@ -8,87 +9,43 @@ bool OctreeNode::IsLeaf() const
 		!branch[4] && !branch[5] && !branch[6] && !branch[7]);
 }
 
-enum class IntersectionType
+int Octree::SortObjectsByDistance(OctreeNode *node, vector <const Object *> *objects, vector <const Object *> &objects_by_disance)
 {
-	NoIntersection,
-	PartialIntersection,
-	FullIntersection,
-};
-
-static IntersectionType NodeIntersectsWithObjectSDF(const OctreeNode *node, const Object *object)
-{
-	IntersectionType result=IntersectionType::NoIntersection;
-	Vec3d NodeCenter=node->center;
-	double NodeHalfSize=node->halfSize;
-
-	double CenterToSurface=object->GetDistance(NodeCenter);
-	if (CenterToSurface < NodeHalfSize)
+	if(objects->empty())
 	{
-		result=IntersectionType::PartialIntersection;
+		return(0);
 	}
-
-	double NodeBSphereRadius=Vec3d(NodeHalfSize, NodeHalfSize, NodeHalfSize).Length();
-	if (CenterToSurface < -NodeBSphereRadius)
-	{
-		return IntersectionType::FullIntersection;
-	}
-
-	int SamplesCollected=0;
-	for (int n=0; n<8; n++)
-	{
-		double dx=(n & 1) ? NodeHalfSize : -NodeHalfSize;
-		double dy=(n & 2) ? NodeHalfSize : -NodeHalfSize;
-		double dz=(n & 4) ? NodeHalfSize : -NodeHalfSize;
-		if (object->GetDistance(NodeCenter+Vec3d(dx, dy, dz)) < 0.0)
-		{
-			SamplesCollected++;
-		}
-	}
-	if(SamplesCollected==8)
-	{
-		result=IntersectionType::FullIntersection;
-	}
-	return result;
-}
-
-static void checkForObjectsNearby(OctreeNode *node, vector <const Object *> *objects, std::vector<const Object *> &objects_found)
-{
+	const Vec3d NodeCenter=node->center;
+	double NodeBSphereRadius=Vec3d(node->halfSize, node->halfSize, node->halfSize).Length();
+	int ObjectsInTouch=0;
+	vector <DistancedObject> DistancedObjectsList;
 	for(const Object *object : *objects)
 	{
 		if(!object->Visible())
 		{
 			continue;
 		}
-		switch(NodeIntersectsWithObjectSDF(node, object))
+		double Distance=object->GetDistance(NodeCenter);
+		DistancedObjectsList.push_back({object, Distance});
+		if(Distance<NodeBSphereRadius)
 		{
-			case IntersectionType::NoIntersection:
-			{
-				continue;
-			}
-			case IntersectionType::PartialIntersection:
-			{
-				objects_found.push_back(object);
-				break;
-			}
-			case IntersectionType::FullIntersection:
-			{
-				objects_found.clear();
-				objects_found.push_back(object);
-				return;
-			}
+			ObjectsInTouch++;
 		}
 	}
+	objects_by_disance.clear();
+	objects_by_disance.reserve(DistancedObjectsList.size());
+	std::sort(DistancedObjectsList.begin(), DistancedObjectsList.end(), ObjectDistanceComparator);
+	for(const DistancedObject &DistancedObject : DistancedObjectsList)
+	{
+		objects_by_disance.push_back(DistancedObject.object);
+	}
+	return(ObjectsInTouch);
 }
 
-void Octree::SplitNode(OctreeNode *node, vector<const Object *> *objects)
+void Octree::SplitNode(OctreeNode *node, vector <const Object *> *objects)
 {
-	//fprintf(stderr, "Octree::SplitNode\n");
 	double SubNodeHalfSize=node->halfSize/2.0;
 	uint64_t ParentNodeIndex=node->index;
-	if(SubNodeHalfSize<1.0)
-	{
-		return;
-	}
 	pNodeSizeMin=SubNodeHalfSize*2.0;
 	for(int n=0; n<8; n++)
 	{
@@ -109,23 +66,25 @@ void Octree::SplitNode(OctreeNode *node, vector<const Object *> *objects)
 		pNodes.push_back(newSubNode);
 		node->branch[n]=newSubNode->index;
 
-		std::vector<const Object *> ObjectsFound;
-		checkForObjectsNearby(newSubNode, objects, ObjectsFound);
+		std::vector <const Object *> ObjectsOrdered;
+		int ObjectsInTouch=SortObjectsByDistance(newSubNode, objects, ObjectsOrdered);
 
-		if(ObjectsFound.empty())
+		if(ObjectsInTouch>1)
 		{
-			pNodesEmpty++;
-			continue;
-		}
-		else if(ObjectsFound.size()==1)
-		{
-			newSubNode->object=ObjectsFound.front();
-			pNodesWithObjects++;
-			continue;
+			if(SubNodeHalfSize>1.0)
+			{
+				SplitNode(newSubNode, objects);
+			}
+			else
+			{
+				newSubNode->objectA=ObjectsOrdered.at(0);
+				newSubNode->objectB=ObjectsOrdered.at(1);
+			}
 		}
 		else
 		{
-			SplitNode(newSubNode, objects);
+			newSubNode->objectA=ObjectsOrdered.at(0);
+			newSubNode->objectB=ObjectsOrdered.at(1);
 		}
 	}
 }
@@ -133,8 +92,6 @@ void Octree::SplitNode(OctreeNode *node, vector<const Object *> *objects)
 Octree::Octree()
 {
 	pNodeSizeMin=0.0;
-	pNodesWithObjects=0;
-	pNodesEmpty=0;
 	OctreeNode *rootNode=new OctreeNode;
 	pNodes.push_back(rootNode);
 }
@@ -158,8 +115,6 @@ void Octree::Clear()
 		delete node;
 	}
 	pNodeSizeMin=0.0;
-	pNodesWithObjects=0;
-	pNodesEmpty=0;
 }
 
 void Octree::Build(vector<const Object *> *objects)
@@ -175,7 +130,7 @@ void Octree::Build(vector<const Object *> *objects)
 		return;
 	}
 
-	for (const Object *obj : *objects)
+	for(const Object *obj : *objects)
 	{
 		if(!obj->Visible())
 		{
@@ -195,8 +150,6 @@ void Octree::Build(vector<const Object *> *objects)
 	SplitNode(rootNode, objects);
 
 	fprintf(stderr, "%lu nodes total\n", pNodes.size());
-	fprintf(stderr, "%lu nodes with objects\n", pNodesWithObjects);
-	fprintf(stderr, "%lu empty nodes\n", pNodesEmpty);
 	fprintf(stderr, "Root node size: %lf\n", rootNode->halfSize*2.0);
 	fprintf(stderr, "Smallest node size: %lf\n", pNodeSizeMin);
 }
@@ -204,7 +157,7 @@ void Octree::Build(vector<const Object *> *objects)
 OctreeNode *Octree::GetClosestLeafNode(Vec3d point) const
 {
 	OctreeNode *Node=pNodes[0];
-	while (!Node->IsLeaf())
+	while(!Node->IsLeaf())
 	{
 		int octant_index=0;
 		if(point.X >= Node->center.X)

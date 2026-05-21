@@ -159,11 +159,11 @@ int main(int argc, char *argv[])
 	LightSource2->SetColor(255, 255, 255);
 	LightSource2->SetBrightness(5.0);
 
-	// NewScene->AddObject(Ceiling);
+	NewScene->AddObject(Ceiling);
 	NewScene->AddObject(Floor);
 	NewScene->AddObject(Plane3);
-	// NewScene->AddObject(RedWall);
-	// NewScene->AddObject(GreenWall);
+	NewScene->AddObject(RedWall);
+	NewScene->AddObject(GreenWall);
 
 	NewScene->AddObject(LightSource1);
 	// NewScene->AddObject(LightSource2);
