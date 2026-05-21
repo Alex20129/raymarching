@@ -45,14 +45,12 @@ int Octree::SortObjectsByDistance(OctreeNode *node, vector <const Object *> *obj
 void Octree::SplitNode(OctreeNode *node, vector <const Object *> *objects)
 {
 	double SubNodeHalfSize=node->halfSize/2.0;
-	uint64_t ParentNodeIndex=node->index;
 	pNodeSizeMin=SubNodeHalfSize*2.0;
 	for(int n=0; n<8; n++)
 	{
 		OctreeNode *newSubNode=new OctreeNode;
 		newSubNode->halfSize=SubNodeHalfSize;
 		newSubNode->index=pNodes.size();
-		newSubNode->parentNodeIndex=ParentNodeIndex;
 
 		double dx=(n & 1) ? SubNodeHalfSize : -SubNodeHalfSize;
 		double dy=(n & 2) ? SubNodeHalfSize : -SubNodeHalfSize;

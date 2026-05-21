@@ -8,7 +8,6 @@
 struct OctreeNode
 {
 	uint64_t index=0;
-	uint64_t parentNodeIndex=0;
 	uint64_t branch[8]={0, 0, 0, 0, 0, 0, 0, 0};
 	Vec3d center;
 	double halfSize=0.0;
