@@ -3,30 +3,30 @@
 
 #include <stdint.h>
 
-struct prng_u32
+struct prng32
 {
 private:
 	uint32_t pSeed;
 public:
-	prng_u32();
-	prng_u32(uint32_t seed_value);
-	uint32_t get_seed_value() const;
-	void set_seed_value(uint32_t new_seed);
-	uint32_t generate_xorshift();
-	uint32_t generate_xorshift_star();
+	prng32();
+	void set_seed_value(uint32_t seed_value);
+	float get_rn_fp() const;
+	uint32_t get_rn_uint() const;
+	void generate_xorshift();
+	void generate_xorshift_star();
 };
 
-struct prng_u64
+struct prng64
 {
 private:
 	uint64_t pSeed;
 public:
-	prng_u64();
-	prng_u64(uint64_t seed_value);
-	uint64_t get_seed_value() const;
+	prng64();
 	void set_seed_value(uint64_t seed_value);
-	uint64_t generate_xorshift();
-	uint64_t generate_xorshift_star();
+	double get_rn_fp() const;
+	uint64_t get_rn_uint() const;
+	void generate_xorshift();
+	void generate_xorshift_star();
 };
 
 #endif // PRNG_H

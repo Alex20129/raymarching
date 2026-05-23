@@ -274,8 +274,8 @@ double Intersection::GetDistance(Vec3d from) const
 
 Ray::Ray()
 {
-	prng_u64 tempPRNG;
-	pPrngSeedValue=tempPRNG.get_seed_value()+this->ID();
+	prng64 tempPRNG;
+	pPrngSeedValue=tempPRNG.get_rn_uint()+this->ID();
 	pReflectionsLimit=7;
 	pStepsPerRunLimit=1024;
 }
@@ -300,10 +300,11 @@ void Ray::SetStepsPerRunLimit(uint64_t limit)
 void Ray::Run()
 {
 	uint64_t ReflectionsHappened=0, ReflectionsLimit=pReflectionsLimit;
-	prng_u64 StackLocalPRNG(pPrngSeedValue);
-	const double RNDiv=(double)(UINT64_MAX>>12);
+	prng64 StackLocalPRNG;
 	Vec3f ColorSample(1.0, 1.0, 1.0);
 	Vec3d SurfaceNormalVec;
+
+	StackLocalPRNG.set_seed_value(pPrngSeedValue);
 
 	SetPosition(0, 0, 0);
 	SetOrientation(pDefaultOrientation);
@@ -331,17 +332,18 @@ void Ray::Run()
 		SurfaceNormalVec.Normalize();
 
 		Vec3d NewDirection;
-		if(StackLocalPRNG.generate_xorshift_star()<Obstacle->DiffusionChance())
+		StackLocalPRNG.generate_xorshift_star();
+		if(StackLocalPRNG.get_rn_uint()<Obstacle->DiffusionChance())
 		{
 			Vec3d randomVector;
 			do
 			{
-				randomVector.X=StackLocalPRNG.generate_xorshift_star()>>11;
-				randomVector.X=randomVector.X/RNDiv-1.0;
-				randomVector.Y=StackLocalPRNG.generate_xorshift_star()>>11;
-				randomVector.Y=randomVector.Y/RNDiv-1.0;
-				randomVector.Z=StackLocalPRNG.generate_xorshift_star()>>11;
-				randomVector.Z=randomVector.Z/RNDiv-1.0;
+				StackLocalPRNG.generate_xorshift();
+				randomVector.X=StackLocalPRNG.get_rn_fp();
+				StackLocalPRNG.generate_xorshift();
+				randomVector.Y=StackLocalPRNG.get_rn_fp();
+				StackLocalPRNG.generate_xorshift();
+				randomVector.Z=StackLocalPRNG.get_rn_fp();
 			}
 			while(randomVector.LengthSquared()>1.0);
 			NewDirection=SurfaceNormalVec + randomVector;
@@ -353,7 +355,7 @@ void Ray::Run()
 		SetOrientation(NewDirection);
 		pPosition=pPosition+pOrientation;
 	}
-	pPrngSeedValue=StackLocalPRNG.get_seed_value();
+	pPrngSeedValue=StackLocalPRNG.get_rn_uint();
 	pColor=pColor + ColorSample;
 }
 
@@ -364,7 +366,7 @@ const Object *Ray::RunOnce()
 	while(StepsTaken<StepsPerRunLimit)
 	{
 		double minDistance=DBL_MAX, Distance;
-		OctreeNode *Node=SceneTree->GetClosestLeafNode(Position);
+		const OctreeNode *Node=SceneTree->GetClosestLeafNode(Position);
 		const Object *ClosestObject=nullptr;
 
 		if(Node->objectA)

@@ -152,9 +152,9 @@ void Octree::Build(vector<const Object *> *objects)
 	fprintf(stderr, "Smallest node size: %lf\n", pNodeSizeMin);
 }
 
-OctreeNode *Octree::GetClosestLeafNode(Vec3d point) const
+const OctreeNode *Octree::GetClosestLeafNode(Vec3d point) const
 {
-	OctreeNode *Node=pNodes[0];
+	const OctreeNode *Node=pNodes[0];
 	while(!Node->IsLeaf())
 	{
 		int octant_index=0;
@@ -170,12 +170,7 @@ OctreeNode *Octree::GetClosestLeafNode(Vec3d point) const
 		{
 			octant_index |= 4;
 		}
-		Node=pNodes.at(Node->branch[octant_index]);
+		Node=pNodes[Node->branch[octant_index]];
 	}
 	return(Node);
-}
-
-OctreeNode *Octree::GetNode(uint64_t node_index) const
-{
-	return(pNodes[node_index]);
 }

@@ -36,8 +36,7 @@ public:
 	~Octree();
 	void Clear();
 	void Build(vector<const Object *> *objects);
-	OctreeNode *GetClosestLeafNode(Vec3d point) const;
-	OctreeNode *GetNode(uint64_t node_index) const;
+	const OctreeNode *GetClosestLeafNode(Vec3d point) const;
 };
 
 #endif // OCTREE_HPP
