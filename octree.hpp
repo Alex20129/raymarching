@@ -20,7 +20,7 @@ class Octree
 {
 	double pNodeSizeMin;
 	vector <OctreeNode *> pNodes;
-	int SortObjectsByDistance(OctreeNode *node, vector <const Object *> *objects, vector <const Object *> &objects_by_disance);
+	int SortObjectsByDistance(const OctreeNode *node, vector <const Object *> *objects, vector <const Object *> &objects_by_disance);
 	void SplitNode(OctreeNode *node, vector <const Object *> *objects);
 	struct DistancedObject
 	{

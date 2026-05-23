@@ -9,13 +9,12 @@ bool OctreeNode::IsLeaf() const
 		!branch[4] && !branch[5] && !branch[6] && !branch[7]);
 }
 
-int Octree::SortObjectsByDistance(OctreeNode *node, vector <const Object *> *objects, vector <const Object *> &objects_by_disance)
+int Octree::SortObjectsByDistance(const OctreeNode *node, vector <const Object *> *objects, vector <const Object *> &objects_by_disance)
 {
 	if(objects->empty())
 	{
 		return(0);
 	}
-	const Vec3d NodeCenter=node->center;
 	double NodeBSphereRadius=Vec3d(node->halfSize, node->halfSize, node->halfSize).Length();
 	int ObjectsInTouch=0;
 	vector <DistancedObject> DistancedObjectsList;
@@ -25,16 +24,20 @@ int Octree::SortObjectsByDistance(OctreeNode *node, vector <const Object *> *obj
 		{
 			continue;
 		}
-		double Distance=object->GetDistance(NodeCenter);
+		double Distance=object->GetDistance(node->center);
 		DistancedObjectsList.push_back({object, Distance});
 		if(Distance<NodeBSphereRadius)
 		{
 			ObjectsInTouch++;
 		}
 	}
+	std::sort(DistancedObjectsList.begin(), DistancedObjectsList.end(), ObjectDistanceComparator);
+	if(DistancedObjectsList.front().distance<-NodeBSphereRadius)
+	{
+		ObjectsInTouch=1;
+	}
 	objects_by_disance.clear();
 	objects_by_disance.reserve(DistancedObjectsList.size());
-	std::sort(DistancedObjectsList.begin(), DistancedObjectsList.end(), ObjectDistanceComparator);
 	for(const DistancedObject &DistancedObject : DistancedObjectsList)
 	{
 		objects_by_disance.push_back(DistancedObject.object);
