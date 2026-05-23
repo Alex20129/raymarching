@@ -389,21 +389,13 @@ const Object *Ray::RunOnce()
 			}
 		}
 
-		if(minDistance<DBL_MAX)
-		{
-			if(minDistance<RAY_COLLISION_DISTANCE)
-			{
-				pPosition=Position;
-				return(ClosestObject);
-			}
-			StepsTaken++;
-			Position=Position+Orientation*minDistance;
-		}
-		else
+		if(minDistance<RAY_COLLISION_DISTANCE)
 		{
 			pPosition=Position;
-			return(nullptr);
+			return(ClosestObject);
 		}
+		StepsTaken++;
+		Position=Position+Orientation*minDistance;
 	}
 	return(nullptr);
 }

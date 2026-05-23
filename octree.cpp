@@ -48,7 +48,10 @@ int Octree::SortObjectsByDistance(const OctreeNode *node, vector <const Object *
 void Octree::SplitNode(OctreeNode *node, vector <const Object *> *objects)
 {
 	double SubNodeHalfSize=node->halfSize/2.0;
-	pNodeSizeMin=SubNodeHalfSize*2.0;
+	if(pNodeSizeMin>node->halfSize)
+	{
+		pNodeSizeMin=node->halfSize;
+	}
 	for(int n=0; n<8; n++)
 	{
 		OctreeNode *newSubNode=new OctreeNode;
@@ -70,22 +73,15 @@ void Octree::SplitNode(OctreeNode *node, vector <const Object *> *objects)
 		std::vector <const Object *> ObjectsOrdered;
 		int ObjectsInTouch=SortObjectsByDistance(newSubNode, objects, ObjectsOrdered);
 
+		newSubNode->objectA=ObjectsOrdered.at(0);
+		newSubNode->objectB=ObjectsOrdered.at(1);
+
 		if(ObjectsInTouch>1)
 		{
 			if(SubNodeHalfSize>1.0)
 			{
 				SplitNode(newSubNode, objects);
 			}
-			else
-			{
-				newSubNode->objectA=ObjectsOrdered.at(0);
-				newSubNode->objectB=ObjectsOrdered.at(1);
-			}
-		}
-		else
-		{
-			newSubNode->objectA=ObjectsOrdered.at(0);
-			newSubNode->objectB=ObjectsOrdered.at(1);
 		}
 	}
 }
@@ -147,6 +143,7 @@ void Octree::Build(vector<const Object *> *objects)
 	}
 
 	rootNode->halfSize=globalMaxPos.Length();
+	pNodeSizeMin=rootNode->halfSize*2.0;
 
 	SplitNode(rootNode, objects);
 
