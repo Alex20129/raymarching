@@ -32,9 +32,13 @@ Vec2d::Vec2d(double x, double y)
 
 void Vec2d::Normalize()
 {
-	double len=this->Length();
-	this->X/=len;
-	this->Y/=len;
+	double lenSq=X*X+Y*Y;
+	if(lenSq!=1.0 && lenSq!=0.0)
+	{
+		double len=std::sqrt(lenSq);
+		this->X/=len;
+		this->Y/=len;
+	}
 }
 
 Vec2d Vec2d::Abs()
@@ -169,10 +173,14 @@ Vec3d::Vec3d(double x, double y, double z)
 
 void Vec3d::Normalize()
 {
-	double len=this->Length();
-	this->X/=len;
-	this->Y/=len;
-	this->Z/=len;
+	double lenSq=X*X+Y*Y+Z*Z;
+	if(lenSq!=1.0 && lenSq!=0.0)
+	{
+		double len=std::sqrt(lenSq);
+		this->X/=len;
+		this->Y/=len;
+		this->Z/=len;
+	}
 }
 
 Vec3d Vec3d::Abs()
@@ -315,10 +323,14 @@ Vec3f::Vec3f(float x, float y, float z)
 
 void Vec3f::Normalize()
 {
-	float len=this->Length();
-	this->X/=len;
-	this->Y/=len;
-	this->Z/=len;
+	float lenSq=X*X+Y*Y+Z*Z;
+	if(lenSq!=1.0 && lenSq!=0.0)
+	{
+		float len=std::sqrt(lenSq);
+		this->X/=len;
+		this->Y/=len;
+		this->Z/=len;
+	}
 }
 
 Vec3f Vec3f::Abs()

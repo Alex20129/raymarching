@@ -199,13 +199,15 @@ int main(int argc, char *argv[])
 		// SphereGyroidIntersection->SetSpecularity(spec);
 		// SphereSPIntersection->SetSpecularity(spec);
 
-		samples_per_pixel*=2;
-
 		NewScene->SetNumOfSamplesPerPixel(samples_per_pixel);
 		NewScene->Render();
 
 		QImage img1(NewScene->ImageData->data(), NewScene->ScreenWidth(), NewScene->ScreenHeight(), QImage::Format_RGBA8888);
-		img1.save(QString("render_") + QString::number(i) + QString(".png"));
+		img1.save(QString("render_") +
+				QString::number(samples_per_pixel) +
+				QString("_spp.png"));
+
+		samples_per_pixel*=2;
 	}
 
 //	SceneW=new Widget;

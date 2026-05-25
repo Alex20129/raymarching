@@ -20,7 +20,6 @@ Vec3d Object::WorldToLocal(const Vec3d &point) const
 	}
 	right.Normalize();
 	up=forward.Cross(right);
-	up.Normalize();
 	return Vec3d(dir.Dot(right), dir.Dot(up), dir.Dot(forward));
 }
 
