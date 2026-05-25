@@ -8,25 +8,30 @@ uint64_t Object::sLastKnownObjectID=0;
 
 Vec3d Object::WorldToLocal(const Vec3d &point) const
 {
-	Vec3d dir=point - pPosition;
-	Vec3d right, up, forward=pOrientation;
-	if(abs(forward.X) < 1.0)
+	Vec3d dir=point-pPosition;
+	return Vec3d(dir.Dot(pVRight), dir.Dot(pVUp), dir.Dot(pVForward));
+}
+
+void Object::UpdateBasis(const Vec3d &forward)
+{
+	pVForward=forward;
+	pVForward.Normalize();
+	if(abs(pVForward.X) < 1.0)
 	{
-		right=Vec3d(1, 0, 0).Cross(forward);
+		pVRight=Vec3d(1, 0, 0).Cross(pVForward);
 	}
 	else
 	{
-		right=Vec3d(0, 1, 0).Cross(forward);
+		pVRight=Vec3d(0, 1, 0).Cross(pVForward);
 	}
-	right.Normalize();
-	up=forward.Cross(right);
-	return Vec3d(dir.Dot(right), dir.Dot(up), dir.Dot(forward));
+	pVRight.Normalize();
+	pVUp=pVForward.Cross(pVRight);
 }
 
 Object::Object()
 {
 	pID=sLastKnownObjectID++;
-	pOrientation=Vec3d(0, 0, 1);
+	UpdateBasis(Vec3d(0, 0, 1));
 }
 
 bool Object::Visible() const
@@ -148,21 +153,17 @@ void Object::SetPosition(double x, double y, double z)
 
 const Vec3d &Object::Orientation() const
 {
-	return(pOrientation);
+	return(pVForward);
 }
 
 void Object::SetOrientation(const Vec3d &orientation)
 {
-	pOrientation=orientation;
-	pOrientation.Normalize();
+	UpdateBasis(orientation);
 }
 
 void Object::SetOrientation(double x, double y, double z)
 {
-	pOrientation.X=x;
-	pOrientation.Y=y;
-	pOrientation.Z=z;
-	pOrientation.Normalize();
+	UpdateBasis(Vec3d(x, y, z));
 }
 
 double Object::GetDistance(Vec3d from) const
@@ -294,18 +295,18 @@ void Ray::SetStepsPerRunLimit(uint64_t limit)
 void Ray::Run()
 {
 	uint64_t ReflectionsHappened=0, ReflectionsLimit=pReflectionsLimit;
-	prng64 StackLocalPRNG;
 	Vec3f ColorSample(1.0, 1.0, 1.0);
-	Vec3d SurfaceNormalVec;
-
+	prng64 StackLocalPRNG;
 	StackLocalPRNG.set_seed_value(pPrngSeedValue);
 
 	SetPosition(0, 0, 0);
 	SetOrientation(pDefaultOrientation);
 
+	Vec3d Direction=pVForward;
+
 	while(ReflectionsHappened<ReflectionsLimit)
 	{
-		const Object *Obstacle=RunOnce();
+		const Object *Obstacle=RunOnce(Direction);
 		if(Obstacle==nullptr)
 		{
 			break;
@@ -322,10 +323,9 @@ void Ray::Run()
 			ColorSample=ColorSample * Obstacle->Color() / 255.0;
 		}
 
-		SurfaceNormalVec=Obstacle->GetNormalVector(pPosition);
+		Vec3d SurfaceNormalVec=Obstacle->GetNormalVector(pPosition);
 		SurfaceNormalVec.Normalize();
 
-		Vec3d NewDirection;
 		StackLocalPRNG.generate_xorshift_star();
 		if(StackLocalPRNG.get_rn_uint()<Obstacle->DiffusionChance())
 		{
@@ -340,23 +340,23 @@ void Ray::Run()
 				StackLocalPRNG.generate_xorshift();
 			}
 			while(randomVector.LengthSquared()>1.0);
-			NewDirection=SurfaceNormalVec + randomVector;
+			Direction=SurfaceNormalVec + randomVector;
 		}
 		else
 		{
-			NewDirection=pOrientation - (SurfaceNormalVec*2.0) * SurfaceNormalVec.Dot(pOrientation);
+			Direction=Direction - (SurfaceNormalVec*2.0) * SurfaceNormalVec.Dot(Direction);
 		}
-		SetOrientation(NewDirection);
-		pPosition=pPosition+pOrientation;
+		Direction.Normalize();
+		pPosition=pPosition+Direction;
 	}
 	pPrngSeedValue=StackLocalPRNG.get_rn_uint();
 	pColor=pColor + ColorSample;
 }
 
-const Object *Ray::RunOnce()
+const Object *Ray::RunOnce(Vec3d direction)
 {
 	uint64_t StepsTaken=0, StepsPerRunLimit=pStepsPerRunLimit;
-	Vec3d Position=pPosition, Orientation=pOrientation;
+	Vec3d Position=pPosition;
 	while(StepsTaken<StepsPerRunLimit)
 	{
 		double minDistance=DBL_MAX, Distance;
@@ -377,8 +377,9 @@ const Object *Ray::RunOnce()
 			return(ClosestObject);
 		}
 		StepsTaken++;
-		Position=Position+Orientation*minDistance;
+		Position=Position+direction*minDistance;
 	}
+	pPosition=Position;
 	return(nullptr);
 }
 
@@ -486,12 +487,12 @@ Plane::Plane()
 double Plane::GetDistance(Vec3d from) const
 {
 	from=from-pPosition;
-	return(from.Dot(pOrientation));
+	return(from.Dot(pVForward));
 }
 
 Vec3d Plane::GetNormalVector(Vec3d point) const
 {
-	return(pOrientation);
+	return(pVForward);
 }
 
 // ========= GYROID ===

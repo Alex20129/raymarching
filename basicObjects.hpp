@@ -19,8 +19,9 @@ protected:
 	uint64_t pDiffusionChance=UINT64_MAX;
 	Vec3f pColor;
 	Vec3d pPosition;
-	Vec3d pOrientation;
+	Vec3d pVForward, pVRight, pVUp;
 	Vec3d WorldToLocal(const Vec3d &point) const;
+	void UpdateBasis(const Vec3d &forward);
 public:
 	static constexpr double NORMAL_CALCULATION_DIST = 1.0/16.0;
 	Octree *SceneTree=nullptr;
@@ -89,7 +90,7 @@ public:
 	void SetReflectionsLimit(uint64_t limit);
 	void SetStepsPerRunLimit(uint64_t limit);
 	void Run();
-	const Object *RunOnce();
+	const Object *RunOnce(Vec3d direction);
 };
 
 class Sphere : public Object
