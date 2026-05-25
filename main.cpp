@@ -168,13 +168,13 @@ int main(int argc, char *argv[])
 	NewScene->AddObject(LightSource1);
 	// NewScene->AddObject(LightSource2);
 
-	// NewScene->AddObject(Construct);
+	NewScene->AddObject(Construct);
 	// NewScene->AddObject(SphereGyroidIntersection);
 	// NewScene->AddObject(SphereSPIntersection);
 
 	NewScene->AddObject(BlueSphere);
 	NewScene->AddObject(RedSphere);
-	NewScene->AddObject(GreenSphere);
+	// NewScene->AddObject(GreenSphere);
 	// NewScene->AddObject(Cylinder2);
 	// NewScene->AddObject(Cube2);
 	// NewScene->AddObject(Torus1);

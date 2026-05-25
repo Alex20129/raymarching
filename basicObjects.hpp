@@ -10,21 +10,20 @@ using namespace std;
 
 class Object
 {
-	bool pVisible;
+	bool pVisible=true;
 	uint64_t pID;
 	static uint64_t sLastKnownObjectID;
 protected:
-	double pBrightness;
-	double pSpecularity;
-	uint64_t pDiffusionChance;
+	double pBrightness=0.0;
+	double pSpecularity=0.0;
+	uint64_t pDiffusionChance=UINT64_MAX;
 	Vec3f pColor;
 	Vec3d pPosition;
 	Vec3d pOrientation;
 	Vec3d WorldToLocal(const Vec3d &point) const;
 public:
 	static constexpr double NORMAL_CALCULATION_DIST = 1.0/16.0;
-	Octree *SceneTree;
-
+	Octree *SceneTree=nullptr;
 	Object();
 	bool Visible() const;
 	void SetVisible(bool visible);

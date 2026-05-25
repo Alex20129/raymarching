@@ -1,6 +1,7 @@
 #ifndef SCENE_HPP
 #define SCENE_HPP
 
+#include <vector>
 #include "octree.hpp"
 
 #define DEFAULT_SCREEN_WIDTH	2048
@@ -8,15 +9,15 @@
 
 class Scene
 {
-	vector <Ray *> *SceneRays;
+	Octree *SceneTree;
 	vector <Object *> *SceneObjects;
+	vector <Ray *> *SceneRays;
 	int64_t pScreenWidth, pScreenHeight;
 	uint64_t pRenderThreads;
 	uint64_t pSamplesPerPixel;
 public:
 	Scene();
 	~Scene();
-	Octree *SceneTree;
 	vector <unsigned char> *ImageData;
 	int64_t FrameRenderTime;
 	void RebuildSceneTree();

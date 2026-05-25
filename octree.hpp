@@ -1,7 +1,6 @@
 #ifndef OCTREE_HPP
 #define OCTREE_HPP
 
-#include <cfloat>
 #include <vector>
 #include "basicObjects.hpp"
 
@@ -11,8 +10,7 @@ struct OctreeNode
 	uint64_t branch[8]={0, 0, 0, 0, 0, 0, 0, 0};
 	Vec3d center;
 	double halfSize=0.0;
-	const Object *objectA=nullptr;
-	const Object *objectB=nullptr;
+	const Object *objects[4]={nullptr, nullptr, nullptr, nullptr};
 	bool IsLeaf() const;
 };
 
@@ -20,8 +18,6 @@ class Octree
 {
 	double pNodeSizeMin;
 	vector <OctreeNode *> pNodes;
-	int SortObjectsByDistance(const OctreeNode *node, vector <const Object *> *objects, vector <const Object *> &objects_by_disance);
-	void SplitNode(OctreeNode *node, vector <const Object *> *objects);
 	struct DistancedObject
 	{
 		const Object *object;
@@ -31,6 +27,8 @@ class Octree
 	{
 		return(a.distance < b.distance);
 	};
+	int SortObjectsByDistance(const OctreeNode *node, vector <const Object *> *objects, vector<DistancedObject> &objects_by_disance);
+	void SplitNode(OctreeNode *node, vector <const Object *> *objects);
 public:
 	Octree();
 	~Octree();

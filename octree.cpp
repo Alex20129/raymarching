@@ -9,7 +9,7 @@ bool OctreeNode::IsLeaf() const
 		!branch[4] && !branch[5] && !branch[6] && !branch[7]);
 }
 
-int Octree::SortObjectsByDistance(const OctreeNode *node, vector <const Object *> *objects, vector <const Object *> &objects_by_disance)
+int Octree::SortObjectsByDistance(const OctreeNode *node, vector <const Object *> *objects, vector <DistancedObject> &objects_by_disance)
 {
 	if(objects->empty())
 	{
@@ -17,7 +17,7 @@ int Octree::SortObjectsByDistance(const OctreeNode *node, vector <const Object *
 	}
 	double NodeBSphereRadius=Vec3d(node->halfSize, node->halfSize, node->halfSize).Length();
 	int ObjectsInTouch=0;
-	vector <DistancedObject> DistancedObjectsList;
+	objects_by_disance.clear();
 	for(const Object *object : *objects)
 	{
 		if(!object->Visible())
@@ -25,22 +25,16 @@ int Octree::SortObjectsByDistance(const OctreeNode *node, vector <const Object *
 			continue;
 		}
 		double Distance=object->GetDistance(node->center);
-		DistancedObjectsList.push_back({object, Distance});
+		objects_by_disance.push_back({object, Distance});
 		if(Distance<NodeBSphereRadius)
 		{
 			ObjectsInTouch++;
 		}
 	}
-	std::sort(DistancedObjectsList.begin(), DistancedObjectsList.end(), ObjectDistanceComparator);
-	if(DistancedObjectsList.front().distance<-NodeBSphereRadius)
+	std::sort(objects_by_disance.begin(), objects_by_disance.end(), ObjectDistanceComparator);
+	if(objects_by_disance.front().distance<-NodeBSphereRadius)
 	{
 		ObjectsInTouch=1;
-	}
-	objects_by_disance.clear();
-	objects_by_disance.reserve(DistancedObjectsList.size());
-	for(const DistancedObject &DistancedObject : DistancedObjectsList)
-	{
-		objects_by_disance.push_back(DistancedObject.object);
 	}
 	return(ObjectsInTouch);
 }
@@ -70,18 +64,17 @@ void Octree::SplitNode(OctreeNode *node, vector <const Object *> *objects)
 		pNodes.push_back(newSubNode);
 		node->branch[n]=newSubNode->index;
 
-		std::vector <const Object *> ObjectsOrdered;
+		std::vector <DistancedObject> ObjectsOrdered;
 		int ObjectsInTouch=SortObjectsByDistance(newSubNode, objects, ObjectsOrdered);
 
-		newSubNode->objectA=ObjectsOrdered.at(0);
-		newSubNode->objectB=ObjectsOrdered.at(1);
-
-		if(ObjectsInTouch>1)
+		for(int obj=0; obj<4; obj++)
 		{
-			if(SubNodeHalfSize>1.0)
-			{
-				SplitNode(newSubNode, objects);
-			}
+			newSubNode->objects[obj]=ObjectsOrdered.at(obj).object;
+		}
+
+		if(ObjectsInTouch>1 && SubNodeHalfSize>2.0)
+		{
+			SplitNode(newSubNode, objects);
 		}
 	}
 }
