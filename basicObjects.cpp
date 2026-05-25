@@ -333,12 +333,12 @@ void Ray::Run()
 			Vec3d randomVector;
 			do
 			{
-				StackLocalPRNG.generate_xorshift();
 				randomVector.X=StackLocalPRNG.get_rn_fp();
 				StackLocalPRNG.generate_xorshift();
 				randomVector.Y=StackLocalPRNG.get_rn_fp();
 				StackLocalPRNG.generate_xorshift();
 				randomVector.Z=StackLocalPRNG.get_rn_fp();
+				StackLocalPRNG.generate_xorshift();
 			}
 			while(randomVector.LengthSquared()>1.0);
 			NewDirection=SurfaceNormalVec + randomVector;

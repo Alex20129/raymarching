@@ -3,9 +3,8 @@
 
 #include <stdint.h>
 
-struct prng32
+class prng32
 {
-private:
 	uint32_t pSeed;
 public:
 	prng32();
@@ -16,9 +15,8 @@ public:
 	void generate_xorshift_star();
 };
 
-struct prng64
+class prng64
 {
-private:
 	uint64_t pSeed;
 public:
 	prng64();
