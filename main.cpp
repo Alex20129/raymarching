@@ -44,10 +44,17 @@ int main(int argc, char *argv[])
 	NewCylinder2->SetPosition(0, 50, ObjectZpos);
 	NewCylinder2->SetOrientation(1, 0, 0);
 
-	Union *Cylinders=new Union(NewCylinder1, NewCylinder2);
+	Cylinder *NewCylinder3=new Cylinder();
+	NewCylinder3->SetLength(70);
+	NewCylinder3->SetRadius(20);
+	NewCylinder3->SetPosition(0, 50, ObjectZpos);
+	NewCylinder3->SetOrientation(0, 1, 0);
 
-	Difference *Construct=new Difference(ShpereCubeIntersection, Cylinders);
-	Construct->SetColor(18, 200, 200);
+	Union *Cylinders1=new Union(NewCylinder1, NewCylinder2);
+	Union *Cylinders2=new Union(Cylinders1, NewCylinder3);
+
+	Difference *Construct=new Difference(ShpereCubeIntersection, Cylinders2);
+	Construct->SetColor(30, 200, 30);
 
 	// ======== CSG: gyroid in sphere
 	Sphere *NewSphere2=new Sphere();
@@ -124,27 +131,27 @@ int main(int argc, char *argv[])
 	Plane1->SetOrientation(0, 1, 0);
 
 	Difference *Ceiling=new Difference(Plane1, Cube3);
-	Ceiling->SetColor(180, 180, 180);
+	Ceiling->SetColor(240, 240, 240);
 
 	Plane *Floor=new Plane();
 	Floor->SetPosition(0, 100, 0);
 	Floor->SetOrientation(0, -1, 0);
-	Floor->SetColor(180, 180, 180);
+	Floor->SetColor(240, 240, 240);
 
 	Plane *Plane3=new Plane();
 	Plane3->SetPosition(0, 0, 400);
 	Plane3->SetOrientation(0, 0, -1);
-	Plane3->SetColor(180, 180, 180);
+	Plane3->SetColor(240, 240, 240);
 
 	Plane *RedWall=new Plane();
 	RedWall->SetPosition(-140, 0, 0);
 	RedWall->SetOrientation(1, 0, 0);
-	RedWall->SetColor(255, 100, 100);
+	RedWall->SetColor(255, 120, 120);
 
-	Plane *GreenWall=new Plane();
-	GreenWall->SetPosition(140, 0, 0);
-	GreenWall->SetOrientation(-1, 0, 0);
-	GreenWall->SetColor(100, 255, 100);
+	Plane *BlueWall=new Plane();
+	BlueWall->SetPosition(140, 0, 0);
+	BlueWall->SetOrientation(-1, 0, 0);
+	BlueWall->SetColor(120, 120, 255);
 
 	// ======== lights
 	Cube *LightSource1=new Cube();
@@ -157,13 +164,14 @@ int main(int argc, char *argv[])
 	LightSource2->SetRadius(10);
 	LightSource2->SetPosition(80, -100, ObjectZpos);
 	LightSource2->SetColor(255, 255, 255);
-	LightSource2->SetBrightness(5.0);
+	LightSource2->SetBrightness(10.0);
 
+	// ========
 	NewScene->AddObject(Ceiling);
 	NewScene->AddObject(Floor);
 	NewScene->AddObject(Plane3);
 	NewScene->AddObject(RedWall);
-	NewScene->AddObject(GreenWall);
+	NewScene->AddObject(BlueWall);
 
 	NewScene->AddObject(LightSource1);
 	// NewScene->AddObject(LightSource2);
@@ -182,18 +190,19 @@ int main(int argc, char *argv[])
 	NewScene->RebuildSceneTree();
 	// return 42;
 
-	uint32_t samples_per_pixel=1;
+	uint32_t samples_per_pixel=8;
 	for(int i=0; i<11; i++)
 	{
 		// double spec=i*0.1;
+		// double brig=i*0.5;
 
 		// Cylinder1->SetOrientation(0, std::sin(i*M_PI_2/10.0), std::cos(i*M_PI_2/10.0));
 		// Cube2->SetOrientation(std::sin(i*M_PI_2/10.0), std::cos(i*M_PI_2/10.0), 0);
 		// Torus1->SetOrientation(0, std::sin(i*M_PI_2/10.0), std::cos(i*M_PI_2/10.0));
 		// NewCube1->SetOrientation(std::sin(i*M_PI_2/10.0), 0, std::cos(i*M_PI_2/10.0));
 
-		// Sphere2->SetSpecularity(spec);
-		// Sphere3->SetSpecularity(spec);
+		// BlueSphere->SetBrightness(brig);
+		// BlueSphere->SetSpecularity(spec);
 		// Cylinder2->SetSpecularity(spec);
 		// Construct->SetSpecularity(spec);
 		// SphereGyroidIntersection->SetSpecularity(spec);
@@ -204,8 +213,8 @@ int main(int argc, char *argv[])
 
 		QImage img1(NewScene->ImageData->data(), NewScene->ScreenWidth(), NewScene->ScreenHeight(), QImage::Format_RGBA8888);
 		img1.save(QString("render_") +
-				QString::number(samples_per_pixel) +
-				QString("_spp.png"));
+				QString::number(i) + QString("_") +
+				QString::number(samples_per_pixel) + QString("_spp.png"));
 
 		samples_per_pixel*=2;
 	}

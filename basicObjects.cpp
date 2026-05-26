@@ -292,26 +292,31 @@ void Ray::SetStepsPerRunLimit(uint64_t limit)
 	pStepsPerRunLimit=limit;
 }
 
-void Ray::Run()
+void Ray::Trace()
 {
 	uint64_t ReflectionsHappened=0, ReflectionsLimit=pReflectionsLimit;
 	Vec3f ColorSample(1.0, 1.0, 1.0);
 	prng64 StackLocalPRNG;
 	StackLocalPRNG.set_seed_value(pPrngSeedValue);
 
-	SetPosition(0, 0, 0);
+	SetPosition(pFirstCollisionPoint);
 	SetOrientation(pDefaultOrientation);
 
 	Vec3d Direction=pVForward;
 
-	while(ReflectionsHappened<ReflectionsLimit)
+	if(pFirstCollisionPoint.X==0 && pFirstCollisionPoint.Y==0 && pFirstCollisionPoint.Z==0)
+	{
+		RunOnce(Direction);
+		pFirstCollisionPoint=pPosition;
+	}
+
+	while(ReflectionsHappened++<ReflectionsLimit)
 	{
 		const Object *Obstacle=RunOnce(Direction);
 		if(Obstacle==nullptr)
 		{
 			break;
 		}
-		ReflectionsHappened++;
 
 		if(Obstacle->Brightness()>0.0)
 		{
@@ -350,7 +355,7 @@ void Ray::Run()
 		pPosition=pPosition+Direction;
 	}
 	pPrngSeedValue=StackLocalPRNG.get_rn_uint();
-	pColor=pColor + ColorSample;
+	pColor=pColor+ColorSample;
 }
 
 const Object *Ray::RunOnce(Vec3d direction)

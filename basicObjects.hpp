@@ -79,7 +79,7 @@ public:
 
 class Ray : public Object
 {
-	Vec3d pDefaultOrientation;
+	Vec3d pDefaultOrientation, pFirstCollisionPoint;
 	uint64_t pPrngSeedValue;
 	uint64_t pReflectionsLimit;
 	uint64_t pStepsPerRunLimit;
@@ -89,7 +89,7 @@ public:
 	void SetDefaultOrientation(double x, double y, double z);
 	void SetReflectionsLimit(uint64_t limit);
 	void SetStepsPerRunLimit(uint64_t limit);
-	void Run();
+	void Trace();
 	const Object *RunOnce(Vec3d direction);
 };
 

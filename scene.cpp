@@ -73,7 +73,7 @@ static void RayRunningWrapper(const vector <Ray *> *rays, uint64_t thread_id, ui
 		rayPtr->SetColor(0, 0, 0);
 		for(sample=0; sample<samples_per_pixel; sample++)
 		{
-			rayPtr->Run();
+			rayPtr->Trace();
 		}
 	}
 }
