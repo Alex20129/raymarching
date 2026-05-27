@@ -63,6 +63,5 @@ void ControlWidget::on_renderButton_clicked()
 	ui->Zdial->setValue(objpos.Z);
 
 	NewScene->Render();
-	ui->rendertime->setText(QString::number(NewScene->FrameRenderTime));
 	SceneW->update();
 }

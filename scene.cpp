@@ -117,25 +117,31 @@ void Scene::Render()
 		ImageData->data()[ray_id*4+2]=c;
 	}
 	finish=chrono::high_resolution_clock::now();
-	FrameRenderTime=(finish - start).count()/1000000;
+	pRenderTime=(finish - start).count()/1000000;
 
 	fprintf(stdout, "SamplesPerPixel: %lu\n", pSamplesPerPixel);
-	fprintf(stdout, "FrameRenderTime: %li ms\n", FrameRenderTime);
+	fprintf(stdout, "RenderThreads: %lu\n", pRenderThreads);
+	fprintf(stdout, "RenderTime: %li ms\n", pRenderTime);
 }
 
-int64_t Scene::ScreenWidth()
+int64_t Scene::ScreenWidth() const
 {
 	return(pScreenWidth);
 }
 
-int64_t Scene::ScreenHeight()
+int64_t Scene::ScreenHeight() const
 {
 	return(pScreenHeight);
 }
 
-uint64_t Scene::RenderThreadsNum()
+uint64_t Scene::RenderThreads() const
 {
 	return(pRenderThreads);
+}
+
+int64_t Scene::RenderTime() const
+{
+	return(pRenderTime);
 }
 
 void Scene::SetScreenWidth(int64_t width)

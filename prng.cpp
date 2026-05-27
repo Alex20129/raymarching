@@ -1,4 +1,3 @@
-//#include <string.h>
 #include "prng.hpp"
 
 static constexpr uint32_t XORSHIFT32_ALPHA=0x2545F491;

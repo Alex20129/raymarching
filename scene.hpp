@@ -15,17 +15,18 @@ class Scene
 	int64_t pScreenWidth, pScreenHeight;
 	uint64_t pRenderThreads;
 	uint64_t pSamplesPerPixel;
+	int64_t pRenderTime;
 public:
 	Scene();
 	~Scene();
 	vector <unsigned char> *ImageData;
-	int64_t FrameRenderTime;
 	void RebuildSceneTree();
 	void AddObject(Object *object);
 	void Render();
-	int64_t ScreenWidth();
-	int64_t ScreenHeight();
-	uint64_t RenderThreadsNum();
+	int64_t ScreenWidth() const;
+	int64_t ScreenHeight() const;
+	uint64_t RenderThreads() const;
+	int64_t RenderTime() const;
 	void SetScreenWidth(int64_t width);
 	void SetScreenHeight(int64_t height);
 	void SetNumOfRenderThreads(uint64_t render_threads);

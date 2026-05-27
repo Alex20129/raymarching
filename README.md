@@ -1,6 +1,6 @@
 # raymarching
-A simple raymarching demo written in C++/Qt. It has only CPU rendering, no GPU usage.
-The work is not finished yet. Someday I will finish it... maybe.
+A simple 'ray marching' demo written in C++. It implements CPU-only rendering. Ray marching technique is used for ray tracing and collision handling. A simplified Monte Carlo rendering technique is used to process light diffusion.
 
+![alt tag](https://github.com/Alex20129/raymarching/blob/main/raymarching_spheres.png)
 ![alt tag](https://github.com/Alex20129/raymarching/blob/main/raymarching_csg.png)
 ![alt tag](https://github.com/Alex20129/raymarching/blob/main/raymarching_gyroid.png)
