@@ -16,7 +16,9 @@ class Object
 protected:
 	double pBrightness=0.0;
 	double pSpecularity=0.0;
+	double pTransparency=0.0;
 	uint64_t pDiffusionChance=UINT64_MAX;
+	uint64_t pPassthroughChance=0;
 	Vec3f pColor;
 	Vec3d pPosition;
 	Vec3d pVForward, pVRight, pVUp;
@@ -36,6 +38,9 @@ public:
 
 	double Specularity() const;
 	void SetSpecularity(double specularity);
+
+	double Transparency() const;
+	void SetTransparency(double transparency);
 
 	const Vec3f &Color() const;
 	void SetColor(Vec3f color);

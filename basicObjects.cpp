@@ -91,6 +91,29 @@ void Object::SetSpecularity(double specularity)
 	pDiffusionChance+=remainder;
 }
 
+double Object::Transparency() const
+{
+	return(pTransparency);
+}
+
+void Object::SetTransparency(double transparency)
+{
+	if(transparency<0.0)
+	{
+		transparency=0.0;
+	}
+	if(transparency>1.0)
+	{
+		transparency=1.0;
+	}
+	pTransparency=transparency;
+	uint64_t multiplicationTrick=transparency*512.0;
+	uint64_t remainder=transparency*511.0;
+	pPassthroughChance=UINT64_MAX>>9;
+	pPassthroughChance*=multiplicationTrick;
+	pPassthroughChance+=remainder;
+}
+
 const Vec3f &Object::Color() const
 {
 	return(pColor);
