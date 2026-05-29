@@ -43,7 +43,7 @@ void Vec2d::Normalize()
 
 Vec2d Vec2d::Abs()
 {
-	Vec2d res(std::abs(X), std::abs(Y));
+	Vec2d res(std::fabs(X), std::fabs(Y));
 	return(res);
 }
 
@@ -185,7 +185,7 @@ void Vec3d::Normalize()
 
 Vec3d Vec3d::Abs()
 {
-	Vec3d res(std::abs(X), std::abs(Y), std::abs(Z));
+	Vec3d res(std::fabs(X), std::fabs(Y), std::fabs(Z));
 	return(res);
 }
 
@@ -335,7 +335,7 @@ void Vec3f::Normalize()
 
 Vec3f Vec3f::Abs()
 {
-	Vec3f res(std::abs(X), std::abs(Y), std::abs(Z));
+	Vec3f res(std::fabs(X), std::fabs(Y), std::fabs(Z));
 	return(res);
 }
 

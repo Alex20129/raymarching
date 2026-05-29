@@ -54,6 +54,11 @@ uint64_t Object::DiffusionChance() const
 	return(pDiffusionChance);
 }
 
+uint64_t Object::PassthroughChance() const
+{
+	return(pPassthroughChance);
+}
+
 double Object::Brightness() const
 {
 	return(pBrightness);
@@ -325,6 +330,7 @@ void Ray::Trace()
 	SetPosition(pFirstCollisionPoint);
 	SetOrientation(pDefaultOrientation);
 
+	const Object *TransparentObject=nullptr;
 	Vec3d Direction=pVForward;
 
 	if(pFirstCollisionPoint.X==0 && pFirstCollisionPoint.Y==0 && pFirstCollisionPoint.Z==0)
@@ -335,7 +341,9 @@ void Ray::Trace()
 
 	while(ReflectionsHappened++<ReflectionsLimit)
 	{
-		const Object *Obstacle=RunOnce(Direction);
+		StackLocalPRNG.generate_xorshift_star();
+
+		const Object *Obstacle=RunOnce(Direction, TransparentObject);
 		if(Obstacle==nullptr)
 		{
 			break;
@@ -351,10 +359,17 @@ void Ray::Trace()
 			ColorSample=ColorSample * Obstacle->Color() / 255.0;
 		}
 
+		if(StackLocalPRNG.get_rn_uint()<Obstacle->PassthroughChance())
+		{
+			TransparentObject=Obstacle;
+			continue;
+		}
+		else
+		{
+			TransparentObject=nullptr;
+		}
 		Vec3d SurfaceNormalVec=Obstacle->GetNormalVector(pPosition);
 		SurfaceNormalVec.Normalize();
-
-		StackLocalPRNG.generate_xorshift_star();
 		if(StackLocalPRNG.get_rn_uint()<Obstacle->DiffusionChance())
 		{
 			Vec3d randomVector;
@@ -381,7 +396,7 @@ void Ray::Trace()
 	pColor=pColor+ColorSample;
 }
 
-const Object *Ray::RunOnce(Vec3d direction)
+const Object *Ray::RunOnce(Vec3d direction, const Object *skip)
 {
 	uint64_t StepsTaken=0, StepsPerRunLimit=pStepsPerRunLimit;
 	Vec3d Position=pPosition;
@@ -392,6 +407,10 @@ const Object *Ray::RunOnce(Vec3d direction)
 		const OctreeNode *Node=SceneTree->GetClosestLeafNode(Position);
 		for(int obj=0; Node->objects[obj] && obj<4; obj++)
 		{
+			if(Node->objects[obj]==skip)
+			{
+				continue;
+			}
 			Distance=Node->objects[obj]->GetDistance(Position);
 			if(minDistance>Distance)
 			{

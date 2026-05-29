@@ -33,6 +33,8 @@ public:
 
 	uint64_t ID() const;
 	uint64_t DiffusionChance() const;
+	uint64_t PassthroughChance() const;
+
 	double Brightness() const;
 	void SetBrightness(double brightness);
 
@@ -95,7 +97,7 @@ public:
 	void SetReflectionsLimit(uint64_t limit);
 	void SetStepsPerRunLimit(uint64_t limit);
 	void Trace();
-	const Object *RunOnce(Vec3d direction);
+	const Object *RunOnce(Vec3d direction, const Object *skip=nullptr);
 };
 
 class Sphere : public Object

@@ -81,46 +81,47 @@ int main(int argc, char *argv[])
 	Intersection *SphereSPIntersection=new Intersection(NewSphere2, NewSchwarzPrimitive);
 	SphereSPIntersection->SetColor(80, 80, 200);
 
-	// ========
-	Sphere *BlueSphere=new Sphere();
-	BlueSphere->SetRadius(32);
-	BlueSphere->SetPosition(-80, 50, ObjectZpos);
-	BlueSphere->SetSpecularity(1.0);
-	BlueSphere->SetColor(52, 52, 255);
-
-	Sphere *RedSphere=new Sphere();
-	RedSphere->SetRadius(32);
-	RedSphere->SetPosition(80, 50, ObjectZpos);
-	RedSphere->SetSpecularity(1.0);
-	RedSphere->SetColor(255, 52, 52);
-
-	Sphere *GreenSphere=new Sphere();
-	GreenSphere->SetRadius(32);
-	GreenSphere->SetPosition(0, 50, ObjectZpos);
-	GreenSphere->SetSpecularity(1.0);
-	GreenSphere->SetColor(52, 255, 52);
-
+	// ======== primitives
 	Cylinder *Cylinder2=new Cylinder();
 	Cylinder2->SetLength(56);
 	Cylinder2->SetRadius(28);
 	Cylinder2->SetPosition(80, 50, ObjectZpos);
-	Cylinder2->SetSpecularity(1.0);
+	Cylinder2->SetSpecularity(0.5);
 	Cylinder2->SetColor(240, 18, 240);
 
 	Cube *Cube2=new Cube();
 	Cube2->SetLength(56);
 	Cube2->SetPosition(80, 50, ObjectZpos);
-	//Cube2->SetSpecularity(0.85);
-	//Cube2->SetBrightness(0.25);
+	Cube2->SetSpecularity(0.5);
 	Cube2->SetColor(150, 10, 150);
 
 	Torus *Torus1=new Torus();
 	Torus1->SetRadius1(34);
 	Torus1->SetRadius2(10);
 	Torus1->SetPosition(0, 50, ObjectZpos);
-	//Torus1->SetSpecularity(0.85);
-	//Torus1->SetBrightness(0.25);
+	Torus1->SetSpecularity(0.5);
 	Torus1->SetColor(200, 200, 80);
+
+	Sphere *BlueSphere=new Sphere();
+	BlueSphere->SetRadius(32);
+	BlueSphere->SetPosition(-80, 60, ObjectZpos);
+	BlueSphere->SetSpecularity(1.0);
+	BlueSphere->SetColor(52, 52, 255);
+	BlueSphere->SetTransparency(0.5);
+
+	Sphere *GreenSphere=new Sphere();
+	GreenSphere->SetRadius(32);
+	GreenSphere->SetPosition(0, 60, ObjectZpos);
+	GreenSphere->SetSpecularity(1.0);
+	GreenSphere->SetColor(52, 255, 52);
+	GreenSphere->SetTransparency(0.5);
+
+	Sphere *RedSphere=new Sphere();
+	RedSphere->SetRadius(32);
+	RedSphere->SetPosition(80, 60, ObjectZpos);
+	RedSphere->SetSpecularity(1.0);
+	RedSphere->SetColor(255, 52, 52);
+	RedSphere->SetTransparency(0.5);
 
 	// ======== box
 	Cube *Cube3=new Cube();
@@ -189,7 +190,6 @@ int main(int argc, char *argv[])
 	// NewScene->AddObject(Torus1);
 
 	NewScene->RebuildSceneTree();
-	// return 42;
 
 	uint32_t i, samples_per_pixel=16;
 	for(i=0; i<10; i++, samples_per_pixel*=2)
