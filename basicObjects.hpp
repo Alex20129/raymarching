@@ -143,7 +143,6 @@ public:
 class Plane : public Object
 {
 public:
-	Plane();
 	double GetDistance(Vec3d from) const;
 	Vec3d GetNormalVector(Vec3d point) const;
 };

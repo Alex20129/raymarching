@@ -228,6 +228,7 @@ Difference::Difference(Object *object_a, Object *object_b)
 	pColor=(object_a->Color()+object_b->Color())/2.0;
 	pBrightness=(object_a->Brightness()+object_b->Brightness())/2.0;
 	pSpecularity=(object_a->Specularity()+object_b->Specularity())/2.0;
+	pTransparency=(object_a->Transparency()+object_b->Transparency())/2.0;
 	object_a->SetVisible(false);
 	object_b->SetVisible(false);
 }
@@ -255,6 +256,7 @@ Union::Union(Object *object_a, Object *object_b)
 	pColor=(object_a->Color()+object_b->Color())/2.0;
 	pBrightness=(object_a->Brightness()+object_b->Brightness())/2.0;
 	pSpecularity=(object_a->Specularity()+object_b->Specularity())/2.0;
+	pTransparency=(object_a->Transparency()+object_b->Transparency())/2.0;
 	object_a->SetVisible(false);
 	object_b->SetVisible(false);
 }
@@ -282,6 +284,7 @@ Intersection::Intersection(Object *object_a, Object *object_b)
 	pColor=(object_a->Color()+object_b->Color())/2.0;
 	pBrightness=(object_a->Brightness()+object_b->Brightness())/2.0;
 	pSpecularity=(object_a->Specularity()+object_b->Specularity())/2.0;
+	pTransparency=(object_a->Transparency()+object_b->Transparency())/2.0;
 	object_a->SetVisible(false);
 	object_b->SetVisible(false);
 }
@@ -527,10 +530,6 @@ double Torus::GetDistance(Vec3d from) const
 
 // ========= PLANE ===
 
-Plane::Plane()
-{
-}
-
 double Plane::GetDistance(Vec3d from) const
 {
 	from=from-pPosition;
@@ -556,7 +555,7 @@ void Gyroid::SetScale(double scale)
 
 double Gyroid::GetDistance(Vec3d from) const
 {
-	from=from-pPosition;
+	from=WorldToLocal(from);
 	from=from/pScale;
 	return(cos(from.X)*sin(from.Y) + cos(from.Y)*sin(from.Z) + cos(from.Z)*sin(from.X));
 }
@@ -575,8 +574,7 @@ void SchwarzPrimitive::SetScale(double scale)
 
 double SchwarzPrimitive::GetDistance(Vec3d from) const
 {
-	from=from-pPosition;
+	from=WorldToLocal(from);
 	from=from/pScale;
 	return(cos(from.X) + cos(from.Y) + cos(from.Z));
 }
-

@@ -1,23 +1,13 @@
-#include <QApplication>
-#include <QTimer>
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
-#include "widget.hpp"
-#include "controlwidget.hpp"
+#include <png++/png.hpp>
 #include "scene.hpp"
 
 Scene *NewScene;
-Widget *SceneW;
-ControlWidget *ControlsW;
-
-#include <cmath>
 
 int main(int argc, char *argv[])
 {
-	// QApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
-	// QApplication RayMarchingApp(argc, argv);
-
 	double ObjectZpos=320;
 	NewScene=new Scene;
 
@@ -55,31 +45,32 @@ int main(int argc, char *argv[])
 	Union *Cylinders2=new Union(Cylinders1, NewCylinder3);
 
 	Difference *Construct=new Difference(ShpereCubeIntersection, Cylinders2);
-	Construct->SetColor(25, 125, 125);
+	Construct->SetColor(30, 130, 130);
 
 	// ======== CSG: gyroid in sphere
 	Sphere *NewSphere2=new Sphere();
 	NewSphere2->SetRadius(50);
-	NewSphere2->SetPosition(0, 40, ObjectZpos);
+	NewSphere2->SetPosition(0, 50, ObjectZpos);
 
 	Gyroid *NewGyroid=new Gyroid();
 	NewGyroid->SetScale(5.0);
-	NewGyroid->SetPosition(0, 40, ObjectZpos);
+	NewGyroid->SetPosition(0, 50, ObjectZpos);
 
 	Intersection *SphereGyroidIntersection=new Intersection(NewSphere2, NewGyroid);
-	SphereGyroidIntersection->SetColor(25, 125, 125);
+	SphereGyroidIntersection->SetColor(30, 130, 130);
 
 	// ======== CSG: Schwarz primitive in sphere
 	Sphere *NewSphere3=new Sphere();
 	NewSphere3->SetRadius(50);
-	NewSphere3->SetPosition(0, 40, ObjectZpos);
+	NewSphere3->SetPosition(0, 50, ObjectZpos);
 
 	SchwarzPrimitive *NewSchwarzPrimitive=new SchwarzPrimitive();
 	NewSchwarzPrimitive->SetScale(5.0);
-	NewSchwarzPrimitive->SetPosition(0, 40, ObjectZpos);
+	NewSchwarzPrimitive->SetPosition(0, 50, ObjectZpos);
+	NewSchwarzPrimitive->SetOrientation(1, 0, 1);
 
-	Intersection *SphereSPIntersection=new Intersection(NewSphere2, NewSchwarzPrimitive);
-	SphereSPIntersection->SetColor(80, 80, 200);
+	Intersection *SphereSchwarzIntersection=new Intersection(NewSphere2, NewSchwarzPrimitive);
+	SphereSchwarzIntersection->SetColor(30, 130, 130);
 
 	// ======== primitives
 	Cylinder *Cylinder2=new Cylinder();
@@ -178,18 +169,20 @@ int main(int argc, char *argv[])
 	NewScene->AddObject(LightSource1);
 	// NewScene->AddObject(LightSource2);
 
-	// NewScene->AddObject(Construct);
+	NewScene->AddObject(Construct);
 	// NewScene->AddObject(SphereGyroidIntersection);
-	// NewScene->AddObject(SphereSPIntersection);
+	// NewScene->AddObject(SphereSchwarzIntersection);
 
-	NewScene->AddObject(BlueSphere);
-	NewScene->AddObject(RedSphere);
-	NewScene->AddObject(GreenSphere);
+	// NewScene->AddObject(BlueSphere);
+	// NewScene->AddObject(RedSphere);
+	// NewScene->AddObject(GreenSphere);
 	// NewScene->AddObject(Cylinder2);
 	// NewScene->AddObject(Cube2);
 	// NewScene->AddObject(Torus1);
 
 	NewScene->RebuildSceneTree();
+
+	png::image<png::rgba_pixel> test_image(NewScene->ScreenWidth(), NewScene->ScreenHeight());
 
 	uint32_t i, samples_per_pixel=16;
 	for(i=0; i<10; i++, samples_per_pixel*=2)
@@ -204,29 +197,26 @@ int main(int argc, char *argv[])
 		// BlueSphere->SetSpecularity(spec);
 		// Cylinder2->SetSpecularity(spec);
 		// Construct->SetSpecularity(spec);
-		// SphereGyroidIntersection->SetSpecularity(spec);
-		// SphereSPIntersection->SetSpecularity(spec);
 
 		NewScene->SetNumOfSamplesPerPixel(samples_per_pixel);
 		NewScene->Render();
 
-		QImage img1(NewScene->ImageData->data(), NewScene->ScreenWidth(), NewScene->ScreenHeight(), QImage::Format_RGBA8888);
-		img1.save(QString("render_") +
-				//QString::number(i) + QString("_") +
-				QString::number(samples_per_pixel) + QString("_spp.png"));
+		for (size_t y = 0; y < NewScene->ScreenHeight(); ++y)
+		{
+			for (size_t x = 0; x < NewScene->ScreenWidth(); ++x)
+			{
+				uint32_t ind=(x+y*NewScene->ScreenWidth())*4;
+				uint8_t r = NewScene->ImageData->data()[ind];
+				uint8_t g = NewScene->ImageData->data()[ind+1];
+				uint8_t b = NewScene->ImageData->data()[ind+2];
+				uint8_t a = 255;
+				test_image[y][x] = png::rgba_pixel(r, g, b, a);
+			}
+		}
+
+		string fileName=string("render_")+to_string(samples_per_pixel)+string("_spp.png");
+		test_image.write(fileName);
 	}
 
-//	SceneW=new Widget;
-//	ControlsW=new ControlWidget;
-//	ControlsW->setWindowModality(Qt::ApplicationModal);
-
-//	SceneW->setImage(&img1);
-
-//	QTimer::singleShot(0, SceneW, SLOT(showNormal()));
-//	QTimer::singleShot(0, SceneW, SLOT(showFullScreen()));
-//	QTimer::singleShot(0, SceneW, SLOT(showMaximized()));
-//	QTimer::singleShot(0, ControlsW, SLOT(show()));
-
-//	return RayMarchingApp.exec();
 	return 0;
 }

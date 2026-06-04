@@ -56,7 +56,6 @@ public:
 	Vec3d operator-() const;
 	Vec3d operator/(double d) const;
 	Vec3d operator*(const Vec3d &other) const;
-
 };
 
 Vec3d operator*(const Vec3d &vec, const double m);
