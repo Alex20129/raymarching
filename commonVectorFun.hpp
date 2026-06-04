@@ -61,6 +61,36 @@ public:
 Vec3d operator*(const Vec3d &vec, const double m);
 Vec3d operator*(const double m, const Vec3d &vec);
 
+//=== Vec2 float
+
+class Vec2f
+{
+public:
+	float X, Y;
+	Vec2f();
+	Vec2f(const Vec2f *other);
+	Vec2f(const Vec2f &other);
+	Vec2f(float x, float y);
+	void Normalize();
+	Vec2f Abs() const;
+	float Length() const;
+	float LengthSquared() const;
+	float Dot(const Vec2f &other) const;
+	float Cross(const Vec2f &other) const;
+	static Vec2f Min(const Vec2f &va, const Vec2f &vb);
+	static Vec2f Max(const Vec2f &va, const Vec2f &vb);
+	Vec2f operator=(const Vec2f &other);
+	Vec2f operator+(const Vec2f &other) const;
+	void operator+=(const Vec2f &other);
+	Vec2f operator-(const Vec2f &other) const;
+	Vec2f operator-() const;
+	Vec2f operator/(float d) const;
+	Vec2f operator*(const Vec2f &other) const;
+};
+
+Vec2f operator*(const Vec2f &vec, const float m);
+Vec2f operator*(const float m, const Vec2f &vec);
+
 //=== Vec3 float
 
 class Vec3f

@@ -292,6 +292,147 @@ Vec3d operator*(const double m, const Vec3d &vec)
 	return(Vec3d(vec.X*m, vec.Y*m, vec.Z*m));
 }
 
+//=== Vec2 float
+
+Vec2f::Vec2f()
+{
+	X=Y=0.0;
+}
+
+Vec2f::Vec2f(const Vec2f *other)
+{
+	if(other)
+	{
+		X=other->X, Y=other->Y;
+	}
+	else
+	{
+		X=Y=0.0;
+	}
+}
+
+Vec2f::Vec2f(const Vec2f &other)
+{
+	X=other.X, Y=other.Y;
+}
+
+Vec2f::Vec2f(float x, float y)
+{
+	X=x, Y=y;
+}
+
+void Vec2f::Normalize()
+{
+	float lenSq=X*X+Y*Y;
+	if(lenSq!=1.0 && lenSq!=0.0)
+	{
+		float len=std::sqrt(lenSq);
+		this->X/=len;
+		this->Y/=len;
+	}
+}
+
+Vec2f Vec2f::Abs() const
+{
+	Vec2f res(std::fabs(X), std::fabs(Y));
+	return(res);
+}
+
+float Vec2f::Length() const
+{
+	float res=std::sqrt(X*X+Y*Y);
+	return(res);
+}
+
+float Vec2f::LengthSquared() const
+{
+	float res=X*X+Y*Y;
+	return(res);
+}
+
+float Vec2f::Dot(const Vec2f &other) const
+{
+	float res=this->X*other.X+this->Y*other.Y;
+	return(res);
+}
+
+float Vec2f::Cross(const Vec2f &other) const
+{
+	float res=this->X*other.Y-this->Y*other.X;
+	return(res);
+}
+
+Vec2f Vec2f::Min(const Vec2f &va, const Vec2f &vb)
+{
+	Vec2f res(
+		std::fmin(va.X, vb.X),
+		std::fmin(va.Y, vb.Y));
+	return(res);
+}
+
+Vec2f Vec2f::Max(const Vec2f &va, const Vec2f &vb)
+{
+	Vec2f res(
+		std::fmax(va.X, vb.X),
+		std::fmax(va.Y, vb.Y));
+	return(res);
+}
+
+Vec2f Vec2f::operator=(const Vec2f &other)
+{
+	this->X=other.X;
+	this->Y=other.Y;
+	return(*this);
+}
+
+Vec2f Vec2f::operator+(const Vec2f &other) const
+{
+	Vec2f res(this->X+other.X, this->Y+other.Y);
+	return(res);
+}
+
+void Vec2f::operator+=(const Vec2f &other)
+{
+	this->X+=other.X;
+	this->Y+=other.Y;
+}
+
+Vec2f Vec2f::operator-(const Vec2f &other) const
+{
+	Vec2f res(this);
+	res.X-=other.X;
+	res.Y-=other.Y;
+	return(res);
+}
+
+Vec2f Vec2f::operator-() const
+{
+	Vec2f res(-X, -Y);
+	return(res);
+}
+
+Vec2f Vec2f::operator/(float d) const
+{
+	Vec2f res(X/d, Y/d);
+	return(res);
+}
+
+Vec2f Vec2f::operator*(const Vec2f &other) const
+{
+	Vec2f res(this->X*other.X, this->Y*other.Y);
+	return res;
+}
+
+Vec2f operator*(const Vec2f &vec, const float m)
+{
+	return(Vec2f(vec.X*m, vec.Y*m));
+}
+
+Vec2f operator*(const float m, const Vec2f &vec)
+{
+	return(Vec2f(vec.X*m, vec.Y*m));
+}
+
 //=== Vec3 float
 
 Vec3f::Vec3f()
