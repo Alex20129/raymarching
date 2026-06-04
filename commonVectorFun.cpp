@@ -366,12 +366,21 @@ Vec3f Vec3f::Cross(const Vec3f &other) const
 	return(res);
 }
 
-Vec3f Vec3f::Max(const Vec3f &other) const
+Vec3f Vec3f::Min(const Vec3f &va, const Vec3f &vb)
 {
 	Vec3f res(
-		std::fmax(this->X, other.X),
-		std::fmax(this->Y, other.Y),
-		std::fmax(this->Z, other.Z));
+		std::fmin(va.X, vb.X),
+		std::fmin(va.Y, vb.Y),
+		std::fmin(va.Z, vb.Z));
+	return(res);
+}
+
+Vec3f Vec3f::Max(const Vec3f &va, const Vec3f &vb)
+{
+	Vec3f res(
+		std::fmax(va.X, vb.X),
+		std::fmax(va.Y, vb.Y),
+		std::fmax(va.Z, vb.Z));
 	return(res);
 }
 

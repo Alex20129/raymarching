@@ -77,7 +77,8 @@ public:
 	float LengthSquared() const;
 	float Dot(const Vec3f &other) const;
 	Vec3f Cross(const Vec3f &other) const;
-	Vec3f Max(const Vec3f &other) const;
+	static Vec3f Min(const Vec3f &va, const Vec3f &vb);
+	static Vec3f Max(const Vec3f &va, const Vec3f &vb);
 	Vec3f operator=(const Vec3f &other);
 	Vec3f operator+(const Vec3f &other) const;
 	void operator+=(const Vec3f &other);
