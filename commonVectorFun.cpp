@@ -41,19 +41,19 @@ void Vec2d::Normalize()
 	}
 }
 
-Vec2d Vec2d::Abs()
+Vec2d Vec2d::Abs() const
 {
 	Vec2d res(std::fabs(X), std::fabs(Y));
 	return(res);
 }
 
-double Vec2d::Length()
+double Vec2d::Length() const
 {
 	double res=std::sqrt(X*X+Y*Y);
 	return(res);
 }
 
-double Vec2d::LengthSquared()
+double Vec2d::LengthSquared() const
 {
 	double res=X*X+Y*Y;
 	return(res);
@@ -183,19 +183,19 @@ void Vec3d::Normalize()
 	}
 }
 
-Vec3d Vec3d::Abs()
+Vec3d Vec3d::Abs() const
 {
 	Vec3d res(std::fabs(X), std::fabs(Y), std::fabs(Z));
 	return(res);
 }
 
-double Vec3d::Length()
+double Vec3d::Length() const
 {
 	double res=std::sqrt(X*X+Y*Y+Z*Z);
 	return(res);
 }
 
-double Vec3d::LengthSquared()
+double Vec3d::LengthSquared() const
 {
 	double res=X*X+Y*Y+Z*Z;
 	return(res);
@@ -333,19 +333,19 @@ void Vec3f::Normalize()
 	}
 }
 
-Vec3f Vec3f::Abs()
+Vec3f Vec3f::Abs() const
 {
 	Vec3f res(std::fabs(X), std::fabs(Y), std::fabs(Z));
 	return(res);
 }
 
-float Vec3f::Length()
+float Vec3f::Length() const
 {
 	float res=std::sqrt(X*X+Y*Y+Z*Z);
 	return(res);
 }
 
-float Vec3f::LengthSquared()
+float Vec3f::LengthSquared() const
 {
 	float res=X*X+Y*Y+Z*Z;
 	return(res);

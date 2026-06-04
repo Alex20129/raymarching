@@ -12,9 +12,9 @@ public:
 	Vec2d(const Vec2d &other);
 	Vec2d(double x, double y);
 	void Normalize();
-	Vec2d Abs();
-	double Length();
-	double LengthSquared();
+	Vec2d Abs() const;
+	double Length() const;
+	double LengthSquared() const;
 	double Dot(const Vec2d &other) const;
 	double Cross(const Vec2d &other) const;
 	static Vec2d Min(const Vec2d &va, const Vec2d &vb);
@@ -42,9 +42,9 @@ public:
 	Vec3d(const Vec3d &other);
 	Vec3d(double x, double y, double z);
 	void Normalize();
-	Vec3d Abs();
-	double Length();
-	double LengthSquared();
+	Vec3d Abs() const;
+	double Length() const;
+	double LengthSquared() const;
 	double Dot(const Vec3d &other) const;
 	Vec3d Cross(const Vec3d &other) const;
 	static Vec3d Min(const Vec3d &va, const Vec3d &vb);
@@ -72,9 +72,9 @@ public:
 	Vec3f(const Vec3f &other);
 	Vec3f(float x, float y, float z);
 	void Normalize();
-	Vec3f Abs();
-	float Length();
-	float LengthSquared();
+	Vec3f Abs() const;
+	float Length() const;
+	float LengthSquared() const;
 	float Dot(const Vec3f &other) const;
 	Vec3f Cross(const Vec3f &other) const;
 	Vec3f Max(const Vec3f &other) const;
