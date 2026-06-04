@@ -1,7 +1,6 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
-#include <png++/png.hpp>
 #include "scene.hpp"
 
 Scene *NewScene;
@@ -169,8 +168,8 @@ int main(int argc, char *argv[])
 	NewScene->AddObject(LightSource1);
 	// NewScene->AddObject(LightSource2);
 
-	NewScene->AddObject(Construct);
-	// NewScene->AddObject(SphereGyroidIntersection);
+	// NewScene->AddObject(Construct);
+	NewScene->AddObject(SphereGyroidIntersection);
 	// NewScene->AddObject(SphereSchwarzIntersection);
 
 	// NewScene->AddObject(BlueSphere);
@@ -182,9 +181,9 @@ int main(int argc, char *argv[])
 
 	NewScene->RebuildSceneTree();
 
-	png::image<png::rgba_pixel> test_image(NewScene->ScreenWidth(), NewScene->ScreenHeight());
+	png::image<png::rgb_pixel> test_image(NewScene->ScreenWidth(), NewScene->ScreenHeight());
 
-	uint32_t i, samples_per_pixel=16;
+	uint32_t i, samples_per_pixel=1;
 	for(i=0; i<10; i++, samples_per_pixel*=2)
 	{
 		// double spec=i*0.1;
@@ -209,8 +208,7 @@ int main(int argc, char *argv[])
 				uint8_t r = NewScene->ImageData->data()[ind];
 				uint8_t g = NewScene->ImageData->data()[ind+1];
 				uint8_t b = NewScene->ImageData->data()[ind+2];
-				uint8_t a = 255;
-				test_image[y][x] = png::rgba_pixel(r, g, b, a);
+				test_image[y][x] = png::rgb_pixel(r, g, b);
 			}
 		}
 

@@ -194,14 +194,13 @@ void Object::SetOrientation(double x, double y, double z)
 	UpdateBasis(Vec3d(x, y, z));
 }
 
-double Object::GetDistance(Vec3d from) const
+double Object::GetDistance(const Vec3d &from) const
 {
-	from=from-pPosition;
-	return(from.Length());
+	return((from-pPosition).Length());
 }
 
 // Using the gradient of the SDF, estimate the normal vector on the surface at given point
-Vec3d Object::GetNormalVector(Vec3d point) const
+Vec3d Object::GetNormalVector(const Vec3d &point) const
 {
 	Vec3d normalVec(
 		GetDistance(point + Vec3d(NORMAL_CALCULATION_DIST, 0, 0)) - GetDistance(point - Vec3d(NORMAL_CALCULATION_DIST, 0, 0)),
@@ -233,7 +232,7 @@ Difference::Difference(Object *object_a, Object *object_b)
 	object_b->SetVisible(false);
 }
 
-double Difference::GetDistance(Vec3d from) const
+double Difference::GetDistance(const Vec3d &from) const
 {
 	double DistA=ObjectA->GetDistance(from);
 	double DistB=ObjectB->GetDistance(from);
@@ -261,7 +260,7 @@ Union::Union(Object *object_a, Object *object_b)
 	object_b->SetVisible(false);
 }
 
-double Union::GetDistance(Vec3d from) const
+double Union::GetDistance(const Vec3d &from) const
 {
 	double DistA=ObjectA->GetDistance(from);
 	double DistB=ObjectB->GetDistance(from);
@@ -289,7 +288,7 @@ Intersection::Intersection(Object *object_a, Object *object_b)
 	object_b->SetVisible(false);
 }
 
-double Intersection::GetDistance(Vec3d from) const
+double Intersection::GetDistance(const Vec3d &from) const
 {
 	double DistA=ObjectA->GetDistance(from);
 	double DistB=ObjectB->GetDistance(from);
@@ -399,7 +398,7 @@ void Ray::Trace()
 	pColor=pColor+ColorSample;
 }
 
-const Object *Ray::RunOnce(Vec3d direction, const Object *skip)
+const Object *Ray::RunOnce(const Vec3d &direction, const Object *skip)
 {
 	uint64_t StepsTaken=0, StepsPerRunLimit=pStepsPerRunLimit;
 	Vec3d Position=pPosition;
@@ -445,13 +444,12 @@ void Sphere::SetRadius(double radius)
 	pRadius=radius;
 }
 
-double Sphere::GetDistance(Vec3d from) const
+double Sphere::GetDistance(const Vec3d &from) const
 {
-	from=from-pPosition;
-	return(from.Length()-pRadius);
+	return((from-pPosition).Length()-pRadius);
 }
 
-Vec3d Sphere::GetNormalVector(Vec3d point) const
+Vec3d Sphere::GetNormalVector(const Vec3d &point) const
 {
 	return(point-pPosition);
 }
@@ -460,19 +458,17 @@ Vec3d Sphere::GetNormalVector(Vec3d point) const
 
 Cube::Cube()
 {
-	pLength=1.0;
+	pHalfLength=0.5;
 }
 
 void Cube::SetLength(double length)
 {
-	pLength=length;
+	pHalfLength=length/2.0;
 }
 
-double Cube::GetDistance(Vec3d from) const
+double Cube::GetDistance(const Vec3d &from) const
 {
-	from=WorldToLocal(from);
-	double halfLength=pLength/2.0;
-	Vec3d d=from.Abs()-Vec3d(halfLength, halfLength, halfLength);
+	Vec3d d=WorldToLocal(from).Abs()-Vec3d(pHalfLength, pHalfLength, pHalfLength);
 	return(Vec3d::Max(d, Vec3d(0, 0, 0)).Length() + min(max(d.X, max(d.Y, d.Z)), 0.0));
 }
 
@@ -494,11 +490,11 @@ void Cylinder::SetRadius(double radius)
 	pRadius=radius;
 }
 
-double Cylinder::GetDistance(Vec3d from) const
+double Cylinder::GetDistance(const Vec3d &from) const
 {
-	from=WorldToLocal(from);
-	double dXY=Vec2d(from.X, from.Y).Length() - pRadius;
-	double dZ=abs(from.Z) - pLength / 2.0;
+	Vec3d localFrom=WorldToLocal(from);
+	double dXY=Vec2d(localFrom.X, localFrom.Y).Length() - pRadius;
+	double dZ=abs(localFrom.Z) - pLength / 2.0;
 	Vec2d d(max(dXY, dZ), max(dXY, -dZ));
 	return min(d.Length(), max(dXY, dZ));
 }
@@ -521,22 +517,21 @@ void Torus::SetRadius2(double radius)
 	pRadius2=radius;
 }
 
-double Torus::GetDistance(Vec3d from) const
+double Torus::GetDistance(const Vec3d &from) const
 {
-	from=WorldToLocal(from);
-	Vec2d d=Vec2d(Vec2d(from.X, from.Y).Length()-pRadius1, from.Z);
+	Vec3d localFrom=WorldToLocal(from);
+	Vec2d d=Vec2d(Vec2d(localFrom.X, localFrom.Y).Length()-pRadius1, localFrom.Z);
 	return(d.Length()-pRadius2);
 }
 
 // ========= PLANE ===
 
-double Plane::GetDistance(Vec3d from) const
+double Plane::GetDistance(const Vec3d &from) const
 {
-	from=from-pPosition;
-	return(from.Dot(pVForward));
+	return((from-pPosition).Dot(pVForward));
 }
 
-Vec3d Plane::GetNormalVector(Vec3d point) const
+Vec3d Plane::GetNormalVector(const Vec3d &point) const
 {
 	return(pVForward);
 }
@@ -553,11 +548,10 @@ void Gyroid::SetScale(double scale)
 	pScale=scale;
 }
 
-double Gyroid::GetDistance(Vec3d from) const
+double Gyroid::GetDistance(const Vec3d &from) const
 {
-	from=WorldToLocal(from);
-	from=from/pScale;
-	return(cos(from.X)*sin(from.Y) + cos(from.Y)*sin(from.Z) + cos(from.Z)*sin(from.X));
+	Vec3d localFrom=WorldToLocal(from)/pScale;
+	return(cos(localFrom.X)*sin(localFrom.Y) + cos(localFrom.Y)*sin(localFrom.Z) + cos(localFrom.Z)*sin(localFrom.X));
 }
 
 // ========= Schwarz primitive ===
@@ -572,9 +566,8 @@ void SchwarzPrimitive::SetScale(double scale)
 	pScale=scale;
 }
 
-double SchwarzPrimitive::GetDistance(Vec3d from) const
+double SchwarzPrimitive::GetDistance(const Vec3d &from) const
 {
-	from=WorldToLocal(from);
-	from=from/pScale;
-	return(cos(from.X) + cos(from.Y) + cos(from.Z));
+	Vec3d localFrom=WorldToLocal(from)/pScale;
+	return(cos(localFrom.X) + cos(localFrom.Y) + cos(localFrom.Z));
 }

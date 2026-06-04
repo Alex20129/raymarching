@@ -2,6 +2,7 @@
 #define SCENE_HPP
 
 #include <vector>
+#include <png++/png.hpp>
 #include "octree.hpp"
 
 #define DEFAULT_SCREEN_WIDTH	2048
@@ -17,9 +18,10 @@ class Scene
 	uint64_t pSamplesPerPixel;
 	int64_t pRenderTime;
 public:
+	vector <unsigned char> *ImageData;
+	png::image<png::rgb_pixel> RenderedResult;
 	Scene();
 	~Scene();
-	vector <unsigned char> *ImageData;
 	void RebuildSceneTree();
 	void AddObject(Object *object);
 	void Render();

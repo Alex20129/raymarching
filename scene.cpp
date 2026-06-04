@@ -169,4 +169,5 @@ void Scene::SetScreenSize(int64_t width, int64_t height)
 	pScreenWidth=width;
 	pScreenHeight=height;
 	ImageData->resize(width*height*4, 255);
+	RenderedResult.resize(width, height);
 }

@@ -56,8 +56,8 @@ public:
 	void SetOrientation(const Vec3d &orientation);
 	void SetOrientation(double x, double y, double z);
 
-	virtual double GetDistance(Vec3d from) const;
-	virtual Vec3d GetNormalVector(Vec3d point) const;
+	virtual double GetDistance(const Vec3d &from) const;
+	virtual Vec3d GetNormalVector(const Vec3d &point) const;
 };
 
 class Difference : public Object
@@ -65,7 +65,7 @@ class Difference : public Object
 	Object *ObjectA, *ObjectB;
 public:
 	Difference(Object *object_a, Object *object_b);
-	double GetDistance(Vec3d from) const;
+	double GetDistance(const Vec3d &from) const;
 };
 
 class Union : public Object
@@ -73,7 +73,7 @@ class Union : public Object
 	Object *ObjectA, *ObjectB;
 public:
 	Union(Object *object_a, Object *object_b);
-	double GetDistance(Vec3d from) const;
+	double GetDistance(const Vec3d &from) const;
 };
 
 class Intersection : public Object
@@ -81,7 +81,7 @@ class Intersection : public Object
 	Object *ObjectA, *ObjectB;
 public:
 	Intersection(Object *object_a, Object *object_b);
-	double GetDistance(Vec3d from) const;
+	double GetDistance(const Vec3d &from) const;
 };
 
 class Ray : public Object
@@ -97,7 +97,7 @@ public:
 	void SetReflectionsLimit(uint64_t limit);
 	void SetStepsPerRunLimit(uint64_t limit);
 	void Trace();
-	const Object *RunOnce(Vec3d direction, const Object *skip=nullptr);
+	const Object *RunOnce(const Vec3d &direction, const Object *skip=nullptr);
 };
 
 class Sphere : public Object
@@ -106,17 +106,17 @@ class Sphere : public Object
 public:
 	Sphere();
 	void SetRadius(double radius);
-	double GetDistance(Vec3d from) const;
-	Vec3d GetNormalVector(Vec3d point) const;
+	double GetDistance(const Vec3d &from) const;
+	Vec3d GetNormalVector(const Vec3d &point) const;
 };
 
 class Cube : public Object
 {
-	double pLength;
+	double pHalfLength;
 public:
 	Cube();
 	void SetLength(double length);
-	double GetDistance(Vec3d from) const;
+	double GetDistance(const Vec3d &from) const;
 };
 
 class Cylinder : public Object
@@ -127,7 +127,7 @@ public:
 	Cylinder();
 	void SetLength(double length);
 	void SetRadius(double radius);
-	double GetDistance(Vec3d from) const;
+	double GetDistance(const Vec3d &from) const;
 };
 
 class Torus : public Object
@@ -137,14 +137,14 @@ public:
 	Torus();
 	void SetRadius1(double radius);
 	void SetRadius2(double radius);
-	double GetDistance(Vec3d from) const;
+	double GetDistance(const Vec3d &from) const;
 };
 
 class Plane : public Object
 {
 public:
-	double GetDistance(Vec3d from) const;
-	Vec3d GetNormalVector(Vec3d point) const;
+	double GetDistance(const Vec3d &from) const;
+	Vec3d GetNormalVector(const Vec3d &point) const;
 };
 
 class Gyroid : public Object
@@ -153,7 +153,7 @@ class Gyroid : public Object
 public:
 	Gyroid();
 	void SetScale(double scale);
-	double GetDistance(Vec3d from) const;
+	double GetDistance(const Vec3d &from) const;
 };
 
 class SchwarzPrimitive : public Object
@@ -162,7 +162,7 @@ class SchwarzPrimitive : public Object
 public:
 	SchwarzPrimitive();
 	void SetScale(double scale);
-	double GetDistance(Vec3d from) const;
+	double GetDistance(const Vec3d &from) const;
 };
 
 #endif // BASICOBJECTS_HPP
