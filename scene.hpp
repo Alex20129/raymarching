@@ -18,8 +18,7 @@ class Scene
 	uint64_t pSamplesPerPixel;
 	int64_t pRenderTime;
 public:
-	vector <unsigned char> *ImageData;
-	png::image<png::rgb_pixel> RenderedResult;
+	png::image<png::rgb_pixel> RenderedImage;
 	Scene();
 	~Scene();
 	void RebuildSceneTree();

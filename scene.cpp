@@ -14,7 +14,6 @@ Scene::Scene()
 	SceneTree=new Octree;
 	SceneObjects=new vector <Object *>;
 	SceneRays=new vector <Ray *>;
-	ImageData=new vector <uint8_t>;
 	pSamplesPerPixel=1;
 
 	pRenderThreads=thread::hardware_concurrency();
@@ -99,26 +98,20 @@ void Scene::Render()
 		delete renderThreads.front();
 		renderThreads.pop();
 	}
-	for(size_t ray_id=0; ray_id<SceneRays->size(); ray_id++)
+	for(int64_t y=0; y < pScreenHeight; y++)
 	{
-		int32_t c;
-		Vec3f color=SceneRays->at(ray_id)->Color();
-
-		c=color.X/colorDiv;
-		c=std::min(c, 255);
-		ImageData->data()[ray_id*4]=c;
-
-		c=color.Y/colorDiv;
-		c=std::min(c, 255);
-		ImageData->data()[ray_id*4+1]=c;
-
-		c=color.Z/colorDiv;
-		c=std::min(c, 255);
-		ImageData->data()[ray_id*4+2]=c;
+		for(int64_t x=0; x < pScreenWidth; x++)
+		{
+			int64_t rayID=x+y*pScreenWidth;
+			Vec3f color=SceneRays->at(rayID)->Color()/colorDiv;
+			uint8_t r = min(color.X, 255.0f);
+			uint8_t g = min(color.Y, 255.0f);
+			uint8_t b = min(color.Z, 255.0f);
+			RenderedImage[y][x] = png::rgb_pixel(r, g, b);
+		}
 	}
 	finish=chrono::high_resolution_clock::now();
 	pRenderTime=(finish - start).count()/1000000;
-
 	fprintf(stdout, "SamplesPerPixel: %lu\n", pSamplesPerPixel);
 	fprintf(stdout, "RenderThreads: %lu\n", pRenderThreads);
 	fprintf(stdout, "RenderTime: %li ms\n", pRenderTime);
@@ -168,6 +161,5 @@ void Scene::SetScreenSize(int64_t width, int64_t height)
 {
 	pScreenWidth=width;
 	pScreenHeight=height;
-	ImageData->resize(width*height*4, 255);
-	RenderedResult.resize(width, height);
+	RenderedImage.resize(width, height);
 }

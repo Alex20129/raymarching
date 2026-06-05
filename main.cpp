@@ -181,9 +181,7 @@ int main(int argc, char *argv[])
 
 	NewScene->RebuildSceneTree();
 
-	png::image<png::rgb_pixel> test_image(NewScene->ScreenWidth(), NewScene->ScreenHeight());
-
-	uint32_t i, samples_per_pixel=1;
+	uint32_t i, samples_per_pixel=16;
 	for(i=0; i<10; i++, samples_per_pixel*=2)
 	{
 		// double spec=i*0.1;
@@ -193,27 +191,16 @@ int main(int argc, char *argv[])
 		// Torus1->SetOrientation(0, std::sin(i*M_PI_2/10.0), std::cos(i*M_PI_2/10.0));
 		// NewCube1->SetOrientation(std::sin(i*M_PI_2/10.0), 0, std::cos(i*M_PI_2/10.0));
 
+		// RedSphere->SetSpecularity(spec);
+		// GreenSphere->SetSpecularity(spec);
 		// BlueSphere->SetSpecularity(spec);
-		// Cylinder2->SetSpecularity(spec);
 		// Construct->SetSpecularity(spec);
 
 		NewScene->SetNumOfSamplesPerPixel(samples_per_pixel);
 		NewScene->Render();
 
-		for (size_t y = 0; y < NewScene->ScreenHeight(); ++y)
-		{
-			for (size_t x = 0; x < NewScene->ScreenWidth(); ++x)
-			{
-				uint32_t ind=(x+y*NewScene->ScreenWidth())*4;
-				uint8_t r = NewScene->ImageData->data()[ind];
-				uint8_t g = NewScene->ImageData->data()[ind+1];
-				uint8_t b = NewScene->ImageData->data()[ind+2];
-				test_image[y][x] = png::rgb_pixel(r, g, b);
-			}
-		}
-
 		string fileName=string("render_")+to_string(samples_per_pixel)+string("_spp.png");
-		test_image.write(fileName);
+		NewScene->RenderedImage.write(fileName);
 	}
 
 	return 0;
