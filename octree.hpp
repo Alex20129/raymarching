@@ -17,7 +17,7 @@ struct OctreeNode
 class Octree
 {
 	double pNodeSizeMin;
-	vector <OctreeNode *> pNodes;
+	vector <OctreeNode> pNodes;
 	struct DistancedObject
 	{
 		const Object *object;
@@ -27,11 +27,10 @@ class Octree
 	{
 		return(a.distance < b.distance);
 	};
-	int SortObjectsByDistance(const OctreeNode *node, vector <const Object *> *objects, vector<DistancedObject> &objects_by_disance);
-	void SplitNode(OctreeNode *node, vector <const Object *> *objects);
+	int SortObjectsByDistance(uint64_t node_index, vector <const Object *> *objects, vector<DistancedObject> &objects_by_disance);
+	void SplitNode(uint64_t node_index, vector <const Object *> *objects);
 public:
 	Octree();
-	~Octree();
 	void Clear();
 	void Build(vector<const Object *> *objects);
 	const OctreeNode *GetClosestLeafNode(Vec3d point) const;
