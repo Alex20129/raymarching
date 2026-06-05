@@ -5,17 +5,20 @@
 #include <png++/png.hpp>
 #include "octree.hpp"
 
-#define DEFAULT_SCREEN_WIDTH	2048
-#define DEFAULT_SCREEN_HEIGHT	1536
+static constexpr uint64_t DefaultScreenWidth=2048;
+static constexpr uint64_t DefaultScreenHeight=1536;
+static constexpr uint64_t DefaultRenderThreads=1;
+static constexpr uint64_t DefaultpSamplesPerPixel=8;
 
 class Scene
 {
 	Octree *SceneTree;
 	vector <Object *> *SceneObjects;
 	vector <Ray *> *SceneRays;
-	int64_t pScreenWidth, pScreenHeight;
-	uint64_t pRenderThreads;
-	uint64_t pSamplesPerPixel;
+	uint64_t pScreenWidth=DefaultScreenWidth;
+	uint64_t pScreenHeight=DefaultScreenHeight;
+	uint64_t pRenderThreads=DefaultRenderThreads;
+	uint64_t pSamplesPerPixel=DefaultpSamplesPerPixel;
 	int64_t pRenderTime;
 public:
 	png::image<png::rgb_pixel> RenderedImage;
@@ -24,15 +27,16 @@ public:
 	void RebuildSceneTree();
 	void AddObject(Object *object);
 	void Render();
-	int64_t ScreenWidth() const;
-	int64_t ScreenHeight() const;
+	uint64_t ScreenWidth() const;
+	uint64_t ScreenHeight() const;
 	uint64_t RenderThreads() const;
+	uint64_t SamplesPerPixel() const;
 	int64_t RenderTime() const;
-	void SetScreenWidth(int64_t width);
-	void SetScreenHeight(int64_t height);
-	void SetNumOfRenderThreads(uint64_t render_threads);
-	void SetNumOfSamplesPerPixel(uint64_t samples_per_pixel);
-	void SetScreenSize(int64_t width, int64_t height);
+	void SetScreenWidth(uint64_t width);
+	void SetScreenHeight(uint64_t height);
+	void SetScreenSize(uint64_t width, uint64_t height);
+	void SetRenderThreads(uint64_t render_threads);
+	void SetSamplesPerPixel(uint64_t samples_per_pixel);
 };
 
 #endif // SCENE_HPP

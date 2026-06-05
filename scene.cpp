@@ -8,21 +8,19 @@
 
 Scene::Scene()
 {
-	int64_t X, Y;
+	uint64_t X, Y;
 	Ray *newRay;
 
 	SceneTree=new Octree;
 	SceneObjects=new vector <Object *>;
 	SceneRays=new vector <Ray *>;
-	pSamplesPerPixel=1;
 
-	pRenderThreads=thread::hardware_concurrency();
-	if(pRenderThreads<1)
+	if(pRenderThreads<thread::hardware_concurrency())
 	{
-		pRenderThreads=1;
+		pRenderThreads=thread::hardware_concurrency();
 	}
 
-	SetScreenSize(DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT);
+	SetScreenSize(DefaultScreenWidth, DefaultScreenHeight);
 
 	for(Y=0; Y<pScreenHeight; ++Y)
 	{
@@ -98,9 +96,9 @@ void Scene::Render()
 		delete renderThreads.front();
 		renderThreads.pop();
 	}
-	for(int64_t y=0; y < pScreenHeight; y++)
+	for(uint64_t y=0; y < pScreenHeight; y++)
 	{
-		for(int64_t x=0; x < pScreenWidth; x++)
+		for(uint64_t x=0; x < pScreenWidth; x++)
 		{
 			int64_t rayID=x+y*pScreenWidth;
 			Vec3f color=SceneRays->at(rayID)->Color()/colorDiv;
@@ -117,12 +115,12 @@ void Scene::Render()
 	fprintf(stdout, "RenderTime: %li ms\n", pRenderTime);
 }
 
-int64_t Scene::ScreenWidth() const
+uint64_t Scene::ScreenWidth() const
 {
 	return(pScreenWidth);
 }
 
-int64_t Scene::ScreenHeight() const
+uint64_t Scene::ScreenHeight() const
 {
 	return(pScreenHeight);
 }
@@ -132,34 +130,39 @@ uint64_t Scene::RenderThreads() const
 	return(pRenderThreads);
 }
 
+uint64_t Scene::SamplesPerPixel() const
+{
+	return(pSamplesPerPixel);
+}
+
 int64_t Scene::RenderTime() const
 {
 	return(pRenderTime);
 }
 
-void Scene::SetScreenWidth(int64_t width)
+void Scene::SetScreenWidth(uint64_t width)
 {
 	SetScreenSize(width, pScreenHeight);
 }
 
-void Scene::SetScreenHeight(int64_t height)
+void Scene::SetScreenHeight(uint64_t height)
 {
 	SetScreenSize(pScreenWidth, height);
 }
 
-void Scene::SetNumOfRenderThreads(uint64_t render_threads)
-{
-	pRenderThreads=render_threads;
-}
-
-void Scene::SetNumOfSamplesPerPixel(uint64_t samples_per_pixel)
-{
-	pSamplesPerPixel=samples_per_pixel;
-}
-
-void Scene::SetScreenSize(int64_t width, int64_t height)
+void Scene::SetScreenSize(uint64_t width, uint64_t height)
 {
 	pScreenWidth=width;
 	pScreenHeight=height;
 	RenderedImage.resize(width, height);
+}
+
+void Scene::SetRenderThreads(uint64_t render_threads)
+{
+	pRenderThreads=render_threads;
+}
+
+void Scene::SetSamplesPerPixel(uint64_t samples_per_pixel)
+{
+	pSamplesPerPixel=samples_per_pixel;
 }

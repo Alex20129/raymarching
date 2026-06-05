@@ -47,29 +47,30 @@ int main(int argc, char *argv[])
 	Construct->SetColor(30, 130, 130);
 
 	// ======== CSG: gyroid in sphere
-	Sphere *NewSphere2=new Sphere();
-	NewSphere2->SetRadius(50);
-	NewSphere2->SetPosition(0, 50, ObjectZpos);
+	Sphere *NewSphere3=new Sphere();
+	NewSphere3->SetRadius(50);
+	NewSphere3->SetPosition(0, 50, ObjectZpos);
 
 	Gyroid *NewGyroid=new Gyroid();
 	NewGyroid->SetScale(5.0);
 	NewGyroid->SetPosition(0, 50, ObjectZpos);
 
-	Intersection *SphereGyroidIntersection=new Intersection(NewSphere2, NewGyroid);
+	Intersection *SphereGyroidIntersection=new Intersection(NewSphere3, NewGyroid);
 	SphereGyroidIntersection->SetColor(30, 130, 130);
 
 	// ======== CSG: Schwarz primitive in sphere
-	Sphere *NewSphere3=new Sphere();
-	NewSphere3->SetRadius(50);
-	NewSphere3->SetPosition(0, 50, ObjectZpos);
+	Sphere *NewSphere4=new Sphere();
+	NewSphere4->SetRadius(50);
+	NewSphere4->SetPosition(0, 50, ObjectZpos);
 
 	SchwarzPrimitive *NewSchwarzPrimitive=new SchwarzPrimitive();
 	NewSchwarzPrimitive->SetScale(5.0);
 	NewSchwarzPrimitive->SetPosition(0, 50, ObjectZpos);
 	NewSchwarzPrimitive->SetOrientation(1, 0, 1);
 
-	Intersection *SphereSchwarzIntersection=new Intersection(NewSphere2, NewSchwarzPrimitive);
+	Intersection *SphereSchwarzIntersection=new Intersection(NewSphere4, NewSchwarzPrimitive);
 	SphereSchwarzIntersection->SetColor(30, 130, 130);
+	SphereSchwarzIntersection->SetSpecularity(0.3);
 
 	// ======== primitives
 	Cylinder *Cylinder2=new Cylinder();
@@ -169,8 +170,8 @@ int main(int argc, char *argv[])
 	// NewScene->AddObject(LightSource2);
 
 	// NewScene->AddObject(Construct);
-	NewScene->AddObject(SphereGyroidIntersection);
-	// NewScene->AddObject(SphereSchwarzIntersection);
+	// NewScene->AddObject(SphereGyroidIntersection);
+	NewScene->AddObject(SphereSchwarzIntersection);
 
 	// NewScene->AddObject(BlueSphere);
 	// NewScene->AddObject(RedSphere);
@@ -189,14 +190,13 @@ int main(int argc, char *argv[])
 		// Cylinder1->SetOrientation(0, std::sin(i*M_PI_2/10.0), std::cos(i*M_PI_2/10.0));
 		// Cube2->SetOrientation(std::sin(i*M_PI_2/10.0), std::cos(i*M_PI_2/10.0), 0);
 		// Torus1->SetOrientation(0, std::sin(i*M_PI_2/10.0), std::cos(i*M_PI_2/10.0));
-		// NewCube1->SetOrientation(std::sin(i*M_PI_2/10.0), 0, std::cos(i*M_PI_2/10.0));
 
 		// RedSphere->SetSpecularity(spec);
 		// GreenSphere->SetSpecularity(spec);
 		// BlueSphere->SetSpecularity(spec);
 		// Construct->SetSpecularity(spec);
 
-		NewScene->SetNumOfSamplesPerPixel(samples_per_pixel);
+		NewScene->SetSamplesPerPixel(samples_per_pixel);
 		NewScene->Render();
 
 		string fileName=string("render_")+to_string(samples_per_pixel)+string("_spp.png");
