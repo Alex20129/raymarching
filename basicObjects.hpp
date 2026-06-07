@@ -14,18 +14,18 @@ class Object
 	uint64_t pID;
 	static uint64_t sLastKnownObjectID;
 protected:
-	double pBrightness=0.0;
-	double pSpecularity=0.0;
-	double pTransparency=0.0;
+	float pBrightness=0.0;
+	float pSpecularity=0.0;
+	float pTransparency=0.0;
 	uint64_t pDiffusionChance=UINT64_MAX;
 	uint64_t pPassthroughChance=0;
 	Vec3f pColor;
-	Vec3d pPosition;
-	Vec3d pVForward, pVRight, pVUp;
-	Vec3d WorldToLocal(const Vec3d &point) const;
-	void UpdateBasis(const Vec3d &forward);
+	Vec3f pPosition;
+	Vec3f pVForward, pVRight, pVUp;
+	Vec3f WorldToLocal(const Vec3f &point) const;
+	void UpdateBasis(const Vec3f &forward);
 public:
-	static constexpr double NORMAL_CALCULATION_DIST = 1.0/16.0;
+	static constexpr float NORMAL_CALCULATION_DIST = 1.0/16.0;
 	Octree *SceneTree=nullptr;
 	Object();
 	bool Visible() const;
@@ -35,29 +35,29 @@ public:
 	uint64_t DiffusionChance() const;
 	uint64_t PassthroughChance() const;
 
-	double Brightness() const;
-	void SetBrightness(double brightness);
+	float Brightness() const;
+	void SetBrightness(float brightness);
 
-	double Specularity() const;
-	void SetSpecularity(double specularity);
+	float Specularity() const;
+	void SetSpecularity(float specularity);
 
-	double Transparency() const;
-	void SetTransparency(double transparency);
+	float Transparency() const;
+	void SetTransparency(float transparency);
 
 	const Vec3f &Color() const;
 	void SetColor(Vec3f color);
 	void SetColor(float r, float g, float b);
 
-	const Vec3d &Position() const;
-	void SetPosition(const Vec3d &position);
-	void SetPosition(double x, double y, double z);
+	const Vec3f &Position() const;
+	void SetPosition(const Vec3f &position);
+	void SetPosition(float x, float y, float z);
 
-	const Vec3d &Orientation() const;
-	void SetOrientation(const Vec3d &orientation);
-	void SetOrientation(double x, double y, double z);
+	const Vec3f &Orientation() const;
+	void SetOrientation(const Vec3f &orientation);
+	void SetOrientation(float x, float y, float z);
 
-	virtual double GetDistance(const Vec3d &from) const;
-	virtual Vec3d GetNormalVector(const Vec3d &point) const;
+	virtual float GetDistance(const Vec3f &from) const;
+	virtual Vec3f GetNormalVector(const Vec3f &point) const;
 };
 
 class Difference : public Object
@@ -65,7 +65,7 @@ class Difference : public Object
 	Object *ObjectA, *ObjectB;
 public:
 	Difference(Object *object_a, Object *object_b);
-	double GetDistance(const Vec3d &from) const;
+	float GetDistance(const Vec3f &from) const;
 };
 
 class Union : public Object
@@ -73,7 +73,7 @@ class Union : public Object
 	Object *ObjectA, *ObjectB;
 public:
 	Union(Object *object_a, Object *object_b);
-	double GetDistance(const Vec3d &from) const;
+	float GetDistance(const Vec3f &from) const;
 };
 
 class Intersection : public Object
@@ -81,88 +81,88 @@ class Intersection : public Object
 	Object *ObjectA, *ObjectB;
 public:
 	Intersection(Object *object_a, Object *object_b);
-	double GetDistance(const Vec3d &from) const;
+	float GetDistance(const Vec3f &from) const;
 };
 
 class Ray : public Object
 {
-	Vec3d pDefaultOrientation, pFirstCollisionPoint;
+	Vec3f pDefaultOrientation, pFirstCollisionPoint;
 	uint64_t pPrngSeedValue;
 	uint64_t pReflectionsLimit;
 	uint64_t pStepsPerRunLimit;
 public:
-	static constexpr double RAY_COLLISION_DISTANCE = 1.0/16.0;
+	static constexpr float RAY_COLLISION_DISTANCE = 1.0/16.0;
 	Ray();
-	void SetDefaultOrientation(double x, double y, double z);
+	void SetDefaultOrientation(float x, float y, float z);
 	void SetReflectionsLimit(uint64_t limit);
 	void SetStepsPerRunLimit(uint64_t limit);
 	void Trace();
-	const Object *RunOnce(const Vec3d &direction, const Object *skip=nullptr);
+	const Object *RunOnce(const Vec3f &direction, const Object *skip=nullptr);
 };
 
 class Sphere : public Object
 {
-	double pRadius;
+	float pRadius;
 public:
 	Sphere();
-	void SetRadius(double radius);
-	double GetDistance(const Vec3d &from) const;
-	Vec3d GetNormalVector(const Vec3d &point) const;
+	void SetRadius(float radius);
+	float GetDistance(const Vec3f &from) const;
+	Vec3f GetNormalVector(const Vec3f &point) const;
 };
 
 class Cube : public Object
 {
-	double pHalfLength;
+	float pHalfLength;
 public:
 	Cube();
-	void SetLength(double length);
-	double GetDistance(const Vec3d &from) const;
+	void SetLength(float length);
+	float GetDistance(const Vec3f &from) const;
 };
 
 class Cylinder : public Object
 {
-	double pLength;
-	double pRadius;
+	float pLength;
+	float pRadius;
 public:
 	Cylinder();
-	void SetLength(double length);
-	void SetRadius(double radius);
-	double GetDistance(const Vec3d &from) const;
+	void SetLength(float length);
+	void SetRadius(float radius);
+	float GetDistance(const Vec3f &from) const;
 };
 
 class Torus : public Object
 {
-	double pRadius1, pRadius2;
+	float pRadius1, pRadius2;
 public:
 	Torus();
-	void SetRadius1(double radius);
-	void SetRadius2(double radius);
-	double GetDistance(const Vec3d &from) const;
+	void SetRadius1(float radius);
+	void SetRadius2(float radius);
+	float GetDistance(const Vec3f &from) const;
 };
 
 class Plane : public Object
 {
 public:
-	double GetDistance(const Vec3d &from) const;
-	Vec3d GetNormalVector(const Vec3d &point) const;
+	float GetDistance(const Vec3f &from) const;
+	Vec3f GetNormalVector(const Vec3f &point) const;
 };
 
 class Gyroid : public Object
 {
-	double pScale;
+	float pScale;
 public:
 	Gyroid();
-	void SetScale(double scale);
-	double GetDistance(const Vec3d &from) const;
+	void SetScale(float scale);
+	float GetDistance(const Vec3f &from) const;
 };
 
 class SchwarzPrimitive : public Object
 {
-	double pScale;
+	float pScale;
 public:
 	SchwarzPrimitive();
-	void SetScale(double scale);
-	double GetDistance(const Vec3d &from) const;
+	void SetScale(float scale);
+	float GetDistance(const Vec3f &from) const;
 };
 
 #endif // BASICOBJECTS_HPP

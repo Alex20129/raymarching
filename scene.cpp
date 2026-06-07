@@ -102,9 +102,9 @@ void Scene::Render()
 		{
 			int64_t rayID=x+y*pScreenWidth;
 			Vec3f color=SceneRays->at(rayID)->Color()/colorDiv;
-			uint8_t r = min(color.X, 255.0f);
-			uint8_t g = min(color.Y, 255.0f);
-			uint8_t b = min(color.Z, 255.0f);
+			uint8_t r = fmin(color.X, 255.0f);
+			uint8_t g = fmin(color.Y, 255.0f);
+			uint8_t b = fmin(color.Z, 255.0f);
 			RenderedImage[y][x] = png::rgb_pixel(r, g, b);
 		}
 	}

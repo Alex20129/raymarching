@@ -8,19 +8,19 @@ struct OctreeNode
 {
 	uint64_t index=0;
 	uint64_t branch[8]={0, 0, 0, 0, 0, 0, 0, 0};
-	Vec3d center;
-	double halfSize=0.0;
+	Vec3f center;
+	float halfSize=0.0;
 	const Object *objects[4]={nullptr, nullptr, nullptr, nullptr};
 };
 
 class Octree
 {
-	double pNodeSizeMin;
+	float pNodeSizeMin;
 	vector <OctreeNode> pNodes;
 	struct DistancedObject
 	{
 		const Object *object;
-		double distance;
+		float distance;
 	};
 	static bool ObjectDistanceComparator(const DistancedObject &a, const DistancedObject &b)
 	{
@@ -32,7 +32,7 @@ public:
 	Octree();
 	void Clear();
 	void Build(vector<const Object *> *objects);
-	const OctreeNode *GetClosestLeafNode(Vec3d point) const;
+	const OctreeNode *GetClosestLeafNode(Vec3f point) const;
 };
 
 #endif // OCTREE_HPP

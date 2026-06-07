@@ -7,7 +7,7 @@ Scene *NewScene;
 
 int main(int argc, char *argv[])
 {
-	double ObjectZpos=320;
+	float ObjectZpos=320;
 	NewScene=new Scene;
 
 	// ======== CSG
@@ -184,7 +184,7 @@ int main(int argc, char *argv[])
 	uint32_t i, samples_per_pixel=16;
 	for(i=0; i<10; i++, samples_per_pixel*=2)
 	{
-		// double spec=i*0.1;
+		// float spec=i*0.1;
 
 		// Cylinder1->SetOrientation(0, std::sin(i*M_PI_2/10.0), std::cos(i*M_PI_2/10.0));
 		// Cube2->SetOrientation(std::sin(i*M_PI_2/10.0), std::cos(i*M_PI_2/10.0), 0);
