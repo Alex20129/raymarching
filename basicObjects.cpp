@@ -419,11 +419,11 @@ const Object *Ray::RunOnce(const Vec3f &direction, const Object *skip)
 				minDistance=Distance;
 				ClosestObject=Node->objects[obj];
 			}
-		}
-		if(minDistance<RAY_COLLISION_DISTANCE)
-		{
-			pPosition=Position;
-			return(ClosestObject);
+			if(minDistance<RAY_COLLISION_DISTANCE)
+			{
+				pPosition=Position;
+				return(ClosestObject);
+			}
 		}
 		StepsTaken++;
 		Position=Position+direction*minDistance;
