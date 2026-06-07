@@ -70,7 +70,6 @@ int main(int argc, char *argv[])
 
 	Intersection *SphereSchwarzIntersection=new Intersection(NewSphere4, NewSchwarzPrimitive);
 	SphereSchwarzIntersection->SetColor(30, 130, 130);
-	SphereSchwarzIntersection->SetSpecularity(0.3);
 
 	// ======== primitives
 	Cylinder *Cylinder2=new Cylinder();
@@ -170,8 +169,8 @@ int main(int argc, char *argv[])
 	// NewScene->AddObject(LightSource2);
 
 	// NewScene->AddObject(Construct);
-	// NewScene->AddObject(SphereGyroidIntersection);
-	NewScene->AddObject(SphereSchwarzIntersection);
+	NewScene->AddObject(SphereGyroidIntersection);
+	// NewScene->AddObject(SphereSchwarzIntersection);
 
 	// NewScene->AddObject(BlueSphere);
 	// NewScene->AddObject(RedSphere);

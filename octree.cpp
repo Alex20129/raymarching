@@ -3,12 +3,6 @@
 #include <algorithm>
 #include "octree.hpp"
 
-bool OctreeNode::IsLeaf() const
-{
-	return(!branch[0] && !branch[1] && !branch[2] && !branch[3] &&
-		!branch[4] && !branch[5] && !branch[6] && !branch[7]);
-}
-
 int Octree::SortObjectsByDistance(uint64_t node_index, vector <const Object *> *objects, vector <DistancedObject> &objects_by_disance)
 {
 	if(objects->empty())
@@ -132,19 +126,19 @@ void Octree::Build(vector<const Object *> *objects)
 
 const OctreeNode *Octree::GetClosestLeafNode(Vec3d point) const
 {
-	uint64_t NodeIndex=0;
-	while(!pNodes[NodeIndex].IsLeaf())
+	uint64_t NodeIndex=0, OctantIndex;
+	while(pNodes[NodeIndex].branch[0])
 	{
-		int OctantIndex=0;
-		if(point.X >= pNodes[NodeIndex].center.X)
+		OctantIndex=0;
+		if(point.X > pNodes[NodeIndex].center.X)
 		{
 			OctantIndex |= 1;
 		}
-		if(point.Y >= pNodes[NodeIndex].center.Y)
+		if(point.Y > pNodes[NodeIndex].center.Y)
 		{
 			OctantIndex |= 2;
 		}
-		if(point.Z >= pNodes[NodeIndex].center.Z)
+		if(point.Z > pNodes[NodeIndex].center.Z)
 		{
 			OctantIndex |= 4;
 		}

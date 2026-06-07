@@ -11,7 +11,6 @@ struct OctreeNode
 	Vec3d center;
 	double halfSize=0.0;
 	const Object *objects[4]={nullptr, nullptr, nullptr, nullptr};
-	bool IsLeaf() const;
 };
 
 class Octree
