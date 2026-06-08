@@ -8,7 +8,7 @@ SET(CMAKE_CXX_STANDARD 11)
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # SET(CMAKE_CXX_FLAGS "-O0 -Wall -Wextra -Wpedantic")
-SET(CMAKE_CXX_FLAGS "-O3 -ffast-math")
+SET(CMAKE_CXX_FLAGS "-O3 -ffast-math -march=native")
 
 LINK_LIBRARIES(pthread png)
 

@@ -322,6 +322,37 @@ void Ray::SetStepsPerRunLimit(uint64_t limit)
 	pStepsPerRunLimit=limit;
 }
 
+static inline void ui64toVec3f(uint64_t uval, Vec3f &result)
+{
+	union fpConverter
+	{
+		uint32_t uv;
+		float fpv;
+	} rn;
+
+	rn.uv=(uval & 0xFFFFF)<<3;
+	rn.uv=rn.uv | 0x3F800000;
+	rn.fpv=rn.fpv-1.0;
+	rn.uv|=(uval & 0x100000)<<11;
+	result.X=rn.fpv;
+
+	uval=uval>>21;
+
+	rn.uv=(uval & 0xFFFFF)<<3;
+	rn.uv=rn.uv | 0x3F800000;
+	rn.fpv=rn.fpv-1.0;
+	rn.uv|=(uval & 0x100000)<<11;
+	result.Y=rn.fpv;
+
+	uval=uval>>21;
+
+	rn.uv=(uval & 0xFFFFF)<<3;
+	rn.uv=rn.uv | 0x3F800000;
+	rn.fpv=rn.fpv-1.0;
+	rn.uv|=(uval & 0x100000)<<11;
+	result.Z=rn.fpv;
+}
+
 void Ray::Trace()
 {
 	uint64_t ReflectionsHappened=0, ReflectionsLimit=pReflectionsLimit;
@@ -343,14 +374,11 @@ void Ray::Trace()
 
 	while(ReflectionsHappened++<ReflectionsLimit)
 	{
-		StackLocalPRNG.generate_xorshift_star();
-
 		const Object *Obstacle=RunOnce(Direction, TransparentObject);
 		if(Obstacle==nullptr)
 		{
 			break;
 		}
-
 		if(Obstacle->Brightness()>0.0)
 		{
 			ColorSample=ColorSample * Obstacle->Color() * Obstacle->Brightness();
@@ -360,7 +388,7 @@ void Ray::Trace()
 		{
 			ColorSample=ColorSample * Obstacle->Color() / 255.0;
 		}
-
+		StackLocalPRNG.generate_xorshift_star();
 		if(StackLocalPRNG.get_rn_uint()<Obstacle->PassthroughChance())
 		{
 			TransparentObject=Obstacle;
@@ -377,12 +405,8 @@ void Ray::Trace()
 			Vec3f randomVector;
 			do
 			{
-				randomVector.X=StackLocalPRNG.get_rn_fp();
-				StackLocalPRNG.generate_xorshift();
-				randomVector.Y=StackLocalPRNG.get_rn_fp();
-				StackLocalPRNG.generate_xorshift();
-				randomVector.Z=StackLocalPRNG.get_rn_fp();
-				StackLocalPRNG.generate_xorshift();
+				ui64toVec3f(StackLocalPRNG.get_rn_uint(), randomVector);
+				StackLocalPRNG.generate_xorshift_star();
 			}
 			while(randomVector.LengthSquared()>1.0);
 			Direction=SurfaceNormalVec + randomVector;

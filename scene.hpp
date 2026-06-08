@@ -8,7 +8,7 @@
 static constexpr uint64_t DefaultScreenWidth=2048;
 static constexpr uint64_t DefaultScreenHeight=1536;
 static constexpr uint64_t DefaultRenderThreads=1;
-static constexpr uint64_t DefaultpSamplesPerPixel=8;
+static constexpr uint64_t DefaultSamplesPerPixel=8;
 
 class Scene
 {
@@ -18,7 +18,7 @@ class Scene
 	uint64_t pScreenWidth=DefaultScreenWidth;
 	uint64_t pScreenHeight=DefaultScreenHeight;
 	uint64_t pRenderThreads=DefaultRenderThreads;
-	uint64_t pSamplesPerPixel=DefaultpSamplesPerPixel;
+	uint64_t pSamplesPerPixel=DefaultSamplesPerPixel;
 	int64_t pRenderTime;
 public:
 	png::image<png::rgb_pixel> RenderedImage;
