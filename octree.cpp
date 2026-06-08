@@ -106,7 +106,7 @@ void Octree::Build(vector<const Object *> *objects)
 	fprintf(stderr, "Root node size: %f\n", pNodes[0].halfSize*2.0);
 }
 
-const OctreeNode *Octree::GetClosestLeafNode(Vec3f point) const
+const OctreeNode *Octree::GetClosestLeafNode(const Vec3f &point) const
 {
 	uint32_t NodeIndex=0, OctantIndex;
 	while(pNodes[NodeIndex].branch[0])
