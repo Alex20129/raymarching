@@ -3,7 +3,7 @@
 #include <algorithm>
 #include "octree.hpp"
 
-int Octree::SortObjectsByDistance(uint64_t node_index, vector <const Object *> *objects, vector <DistancedObject> &objects_by_disance)
+int Octree::SortObjectsByDistance(uint32_t node_index, vector <const Object *> *objects, vector <DistancedObject> &objects_by_disance)
 {
 	if(objects->empty())
 	{
@@ -33,40 +33,30 @@ int Octree::SortObjectsByDistance(uint64_t node_index, vector <const Object *> *
 	return(ObjectsInTouch);
 }
 
-void Octree::SplitNode(uint64_t node_index, vector <const Object *> *objects)
+void Octree::SplitNode(uint32_t node_index, vector <const Object *> *objects)
 {
 	float SubNodeHalfSize=pNodes[node_index].halfSize/2.0;
-	if(pNodeSizeMin>pNodes[node_index].halfSize)
-	{
-		pNodeSizeMin=pNodes[node_index].halfSize;
-	}
 	pNodes.reserve(pNodes.size()+9);
 	for(int n=0; n<8; n++)
 	{
 		OctreeNode newSubNode;
 		newSubNode.halfSize=SubNodeHalfSize;
 		newSubNode.index=pNodes.size();
-
 		float dx=(n & 1) ? SubNodeHalfSize : -SubNodeHalfSize;
 		float dy=(n & 2) ? SubNodeHalfSize : -SubNodeHalfSize;
 		float dz=(n & 4) ? SubNodeHalfSize : -SubNodeHalfSize;
-
 		newSubNode.center=Vec3f(
-				pNodes[node_index].center.X + dx,
-				pNodes[node_index].center.Y + dy,
-				pNodes[node_index].center.Z + dz);
-
+			pNodes[node_index].center.X + dx,
+			pNodes[node_index].center.Y + dy,
+			pNodes[node_index].center.Z + dz);
 		pNodes.push_back(newSubNode);
 		pNodes[node_index].branch[n]=newSubNode.index;
-
 		std::vector <DistancedObject> ObjectsOrdered;
 		int ObjectsInTouch=SortObjectsByDistance(newSubNode.index, objects, ObjectsOrdered);
-
 		for(int obj=0; obj<4; obj++)
 		{
 			pNodes[newSubNode.index].objects[obj]=ObjectsOrdered.at(obj).object;
 		}
-
 		if(ObjectsInTouch>1 && SubNodeHalfSize>2.0)
 		{
 			SplitNode(newSubNode.index, objects);
@@ -76,24 +66,19 @@ void Octree::SplitNode(uint64_t node_index, vector <const Object *> *objects)
 
 Octree::Octree()
 {
-	pNodeSizeMin=0.0;
 	pNodes.push_back(OctreeNode());
 }
 
 void Octree::Clear()
 {
-	pNodeSizeMin=0.0;
 	pNodes.clear();
 	pNodes.push_back(OctreeNode());
 }
 
 void Octree::Build(vector<const Object *> *objects)
 {
-	fprintf(stderr, "Octree::Build\n");
 	Vec3f globalMaxPos;
-
 	Clear();
-
 	if(objects->empty())
 	{
 		return;
@@ -115,18 +100,15 @@ void Octree::Build(vector<const Object *> *objects)
 	}
 
 	pNodes[0].halfSize=globalMaxPos.Length();
-	pNodeSizeMin=pNodes[0].halfSize*2.0;
-
-	SplitNode(0UL, objects);
+	SplitNode(0, objects);
 
 	fprintf(stderr, "%lu nodes total\n", pNodes.size());
 	fprintf(stderr, "Root node size: %f\n", pNodes[0].halfSize*2.0);
-	fprintf(stderr, "Smallest node size: %f\n", pNodeSizeMin);
 }
 
 const OctreeNode *Octree::GetClosestLeafNode(Vec3f point) const
 {
-	uint64_t NodeIndex=0, OctantIndex;
+	uint32_t NodeIndex=0, OctantIndex;
 	while(pNodes[NodeIndex].branch[0])
 	{
 		OctantIndex=0;

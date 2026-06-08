@@ -6,8 +6,8 @@
 
 struct OctreeNode
 {
-	uint64_t index=0;
-	uint64_t branch[8]={0, 0, 0, 0, 0, 0, 0, 0};
+	uint32_t branch[8]={0, 0, 0, 0, 0, 0, 0, 0};
+	uint32_t index=0;
 	Vec3f center;
 	float halfSize=0.0;
 	const Object *objects[4]={nullptr, nullptr, nullptr, nullptr};
@@ -15,7 +15,6 @@ struct OctreeNode
 
 class Octree
 {
-	float pNodeSizeMin;
 	vector <OctreeNode> pNodes;
 	struct DistancedObject
 	{
@@ -26,8 +25,8 @@ class Octree
 	{
 		return(a.distance < b.distance);
 	};
-	int SortObjectsByDistance(uint64_t node_index, vector <const Object *> *objects, vector<DistancedObject> &objects_by_disance);
-	void SplitNode(uint64_t node_index, vector <const Object *> *objects);
+	int SortObjectsByDistance(uint32_t node_index, vector <const Object *> *objects, vector<DistancedObject> &objects_by_disance);
+	void SplitNode(uint32_t node_index, vector <const Object *> *objects);
 public:
 	Octree();
 	void Clear();
