@@ -35,13 +35,6 @@ uint32_t prng32::get_rn_uint() const
 	return(pSeed);
 }
 
-void prng32::generate_xorshift()
-{
-	pSeed ^= pSeed << 13;
-	pSeed ^= pSeed >> 17;
-	pSeed ^= pSeed << 5;
-}
-
 void prng32::generate_xorshift_star()
 {
 	pSeed ^= pSeed >> 13;
@@ -77,13 +70,6 @@ double prng64::get_rn_fp() const
 uint64_t prng64::get_rn_uint() const
 {
 	return(pSeed);
-}
-
-void prng64::generate_xorshift()
-{
-	pSeed ^= pSeed << 13;
-	pSeed ^= pSeed >> 7;
-	pSeed ^= pSeed << 17;
 }
 
 void prng64::generate_xorshift_star()
