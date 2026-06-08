@@ -500,13 +500,13 @@ float Cube::GetDistance(const Vec3f &from) const
 
 Cylinder::Cylinder()
 {
-	pLength=1.0;
+	pHalfLength=0.5;
 	pRadius=1.0;
 }
 
 void Cylinder::SetLength(float length)
 {
-	pLength=length;
+	pHalfLength=length/2.0;
 }
 
 void Cylinder::SetRadius(float radius)
@@ -518,7 +518,7 @@ float Cylinder::GetDistance(const Vec3f &from) const
 {
 	Vec3f localFrom=WorldToLocal(from);
 	float dXY=Vec2f(localFrom.X, localFrom.Y).Length() - pRadius;
-	float dZ=abs(localFrom.Z) - pLength / 2.0;
+	float dZ=abs(localFrom.Z) - pHalfLength;
 	Vec2f d(fmax(dXY, dZ), fmax(dXY, -dZ));
 	return fmin(d.Length(), fmax(dXY, dZ));
 }

@@ -121,7 +121,7 @@ public:
 
 class Cylinder : public Object
 {
-	float pLength;
+	float pHalfLength;
 	float pRadius;
 public:
 	Cylinder();
