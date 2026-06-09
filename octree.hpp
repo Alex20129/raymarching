@@ -6,11 +6,12 @@
 
 struct OctreeNode
 {
+	static constexpr uint32_t OBJECTS_PER_NODE=4u;
 	uint32_t branch[8]={0, 0, 0, 0, 0, 0, 0, 0};
 	uint32_t index=0;
 	Vec3f center;
 	float halfSize=0.0;
-	const Object *objects[4]={nullptr, nullptr, nullptr, nullptr};
+	const Object *objects[OBJECTS_PER_NODE]={nullptr, nullptr, nullptr, nullptr};
 };
 
 class Octree

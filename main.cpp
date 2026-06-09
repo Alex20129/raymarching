@@ -94,24 +94,24 @@ int main(int argc, char *argv[])
 
 	Sphere *BlueSphere=new Sphere();
 	BlueSphere->SetRadius(32);
-	BlueSphere->SetPosition(-80, 60, ObjectZpos);
+	BlueSphere->SetPosition(-80, 50, ObjectZpos);
 	BlueSphere->SetSpecularity(1.0);
 	BlueSphere->SetColor(52, 52, 255);
-	BlueSphere->SetTransparency(0.5);
+	// BlueSphere->SetTransparency(0.5);
 
 	Sphere *GreenSphere=new Sphere();
 	GreenSphere->SetRadius(32);
-	GreenSphere->SetPosition(0, 60, ObjectZpos);
+	GreenSphere->SetPosition(0, 50, ObjectZpos);
 	GreenSphere->SetSpecularity(1.0);
 	GreenSphere->SetColor(52, 255, 52);
-	GreenSphere->SetTransparency(0.5);
+	// GreenSphere->SetTransparency(0.5);
 
 	Sphere *RedSphere=new Sphere();
 	RedSphere->SetRadius(32);
-	RedSphere->SetPosition(80, 60, ObjectZpos);
+	RedSphere->SetPosition(80, 50, ObjectZpos);
 	RedSphere->SetSpecularity(1.0);
 	RedSphere->SetColor(255, 52, 52);
-	RedSphere->SetTransparency(0.5);
+	// RedSphere->SetTransparency(0.5);
 
 	// ======== box
 	Cube *Cube3=new Cube();

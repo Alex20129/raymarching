@@ -53,7 +53,7 @@ void Octree::SplitNode(uint32_t node_index, vector <const Object *> *objects)
 		pNodes[node_index].branch[n]=newSubNode.index;
 		std::vector <DistancedObject> ObjectsOrdered;
 		int ObjectsInTouch=SortObjectsByDistance(newSubNode.index, objects, ObjectsOrdered);
-		for(int obj=0; obj<4; obj++)
+		for(uint32_t obj=0; obj<OctreeNode::OBJECTS_PER_NODE; obj++)
 		{
 			pNodes[newSubNode.index].objects[obj]=ObjectsOrdered.at(obj).object;
 		}

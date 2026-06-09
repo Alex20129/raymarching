@@ -88,16 +88,14 @@ class Ray : public Object
 {
 	Vec3f pDefaultOrientation, pFirstCollisionPoint;
 	uint64_t pPrngSeedValue;
-	uint64_t pReflectionsLimit;
-	uint64_t pStepsPerRunLimit;
 public:
-	static constexpr float RAY_COLLISION_DISTANCE = 1.0/16.0;
+	static constexpr float COLLISION_DISTANCE = 1.0f/16.0f;
+	static constexpr uint32_t STEPS_PER_RUN_LIMIT = 1024u;
+	static constexpr uint32_t REFLECTIONS_LIMIT = 7u;
 	Ray();
 	void SetDefaultOrientation(float x, float y, float z);
-	void SetReflectionsLimit(uint64_t limit);
-	void SetStepsPerRunLimit(uint64_t limit);
 	void Trace();
-	const Object *RunOnce(const Vec3f &direction, const Object *skip=nullptr);
+	const Object *RunOnce(Vec3f &position, Vec3f direction, const Object *skip);
 };
 
 class Sphere : public Object

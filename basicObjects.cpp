@@ -301,8 +301,6 @@ Ray::Ray()
 {
 	prng64 tempPRNG;
 	pPrngSeedValue=tempPRNG.get_rn_uint()+this->ID();
-	pReflectionsLimit=7;
-	pStepsPerRunLimit=1024;
 }
 
 void Ray::SetDefaultOrientation(float x, float y, float z)
@@ -310,16 +308,6 @@ void Ray::SetDefaultOrientation(float x, float y, float z)
 	Vec3f newDefaultOrientation(x, y, z);
 	newDefaultOrientation.Normalize();
 	pDefaultOrientation=newDefaultOrientation;
-}
-
-void Ray::SetReflectionsLimit(uint64_t limit)
-{
-	pReflectionsLimit=limit;
-}
-
-void Ray::SetStepsPerRunLimit(uint64_t limit)
-{
-	pStepsPerRunLimit=limit;
 }
 
 static inline void ui64toVec3f(uint64_t uval, Vec3f &result)
@@ -332,7 +320,7 @@ static inline void ui64toVec3f(uint64_t uval, Vec3f &result)
 
 	rn.uv=(uval & 0xFFFFF)<<3;
 	rn.uv=rn.uv | 0x3F800000;
-	rn.fpv=rn.fpv-1.0;
+	rn.fpv=rn.fpv-1.0f;
 	rn.uv|=(uval & 0x100000)<<11;
 	result.X=rn.fpv;
 
@@ -340,7 +328,7 @@ static inline void ui64toVec3f(uint64_t uval, Vec3f &result)
 
 	rn.uv=(uval & 0xFFFFF)<<3;
 	rn.uv=rn.uv | 0x3F800000;
-	rn.fpv=rn.fpv-1.0;
+	rn.fpv=rn.fpv-1.0f;
 	rn.uv|=(uval & 0x100000)<<11;
 	result.Y=rn.fpv;
 
@@ -348,14 +336,13 @@ static inline void ui64toVec3f(uint64_t uval, Vec3f &result)
 
 	rn.uv=(uval & 0xFFFFF)<<3;
 	rn.uv=rn.uv | 0x3F800000;
-	rn.fpv=rn.fpv-1.0;
+	rn.fpv=rn.fpv-1.0f;
 	rn.uv|=(uval & 0x100000)<<11;
 	result.Z=rn.fpv;
 }
 
 void Ray::Trace()
 {
-	uint64_t ReflectionsHappened=0, ReflectionsLimit=pReflectionsLimit;
 	Vec3f ColorSample(1.0, 1.0, 1.0);
 	prng64 StackLocalPRNG;
 	StackLocalPRNG.set_seed_value(pPrngSeedValue);
@@ -368,13 +355,14 @@ void Ray::Trace()
 
 	if(pFirstCollisionPoint.X==0 && pFirstCollisionPoint.Y==0 && pFirstCollisionPoint.Z==0)
 	{
-		RunOnce(Direction);
+		RunOnce(pPosition, Direction, nullptr);
 		pFirstCollisionPoint=pPosition;
 	}
 
-	while(ReflectionsHappened++<ReflectionsLimit)
+	uint32_t ReflectionsHappened=0;
+	while(ReflectionsHappened++<REFLECTIONS_LIMIT)
 	{
-		const Object *Obstacle=RunOnce(Direction, TransparentObject);
+		const Object *Obstacle=RunOnce(pPosition, Direction, TransparentObject);
 		if(Obstacle==nullptr)
 		{
 			break;
@@ -422,37 +410,35 @@ void Ray::Trace()
 	pColor=pColor+ColorSample;
 }
 
-const Object *Ray::RunOnce(const Vec3f &direction, const Object *skip)
+const Object *Ray::RunOnce(Vec3f &position, Vec3f direction, const Object *skip)
 {
-	uint64_t StepsTaken=0, StepsPerRunLimit=pStepsPerRunLimit;
-	Vec3f Position=pPosition;
-	while(StepsTaken<StepsPerRunLimit)
+	uint32_t StepsTaken=0;
+	while(StepsTaken++<STEPS_PER_RUN_LIMIT)
 	{
 		float minDistance=FLT_MAX, Distance;
 		const Object *ClosestObject=nullptr;
-		const OctreeNode *Node=SceneTree->GetClosestLeafNode(Position);
-		for(int obj=0; Node->objects[obj] && obj<4; obj++)
+		const OctreeNode *Node=SceneTree->GetClosestLeafNode(position);
+		uint32_t obj=0;
+		while(obj<OctreeNode::OBJECTS_PER_NODE)
 		{
-			if(Node->objects[obj]==skip)
+			if(skip==Node->objects[obj])
 			{
 				continue;
 			}
-			Distance=Node->objects[obj]->GetDistance(Position);
+			Distance=Node->objects[obj]->GetDistance(position);
 			if(minDistance>Distance)
 			{
 				minDistance=Distance;
 				ClosestObject=Node->objects[obj];
 			}
-			if(minDistance<RAY_COLLISION_DISTANCE)
+			obj++;
+			if(minDistance<COLLISION_DISTANCE)
 			{
-				pPosition=Position;
 				return(ClosestObject);
 			}
 		}
-		StepsTaken++;
-		Position=Position+direction*minDistance;
+		position=position+direction*minDistance;
 	}
-	pPosition=Position;
 	return(nullptr);
 }
 
