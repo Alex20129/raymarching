@@ -360,7 +360,7 @@ void Ray::Trace()
 	}
 
 	uint32_t ReflectionsHappened=0;
-	while(ReflectionsHappened++<REFLECTIONS_LIMIT)
+	while(ReflectionsHappened++<Ray::REFLECTIONS_LIMIT)
 	{
 		const Object *Obstacle=RunOnce(pPosition, Direction, TransparentObject);
 		if(Obstacle==nullptr)
@@ -413,7 +413,7 @@ void Ray::Trace()
 const Object *Ray::RunOnce(Vec3f &position, Vec3f direction, const Object *skip)
 {
 	uint32_t StepsTaken=0;
-	while(StepsTaken++<STEPS_PER_RUN_LIMIT)
+	while(StepsTaken++<Ray::STEPS_PER_RUN_LIMIT)
 	{
 		float minDistance=FLT_MAX, Distance;
 		const Object *ClosestObject=nullptr;
