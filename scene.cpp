@@ -9,11 +9,10 @@
 Scene::Scene()
 {
 	uint64_t X, Y;
-	Ray *newRay;
+	uint64_t RayPRNGSeedValue=(uint64_t)(this);
 
 	SceneTree=new Octree;
 	SceneObjects=new vector <Object *>;
-	SceneRays=new vector <Ray *>;
 
 	if(pRenderThreads<thread::hardware_concurrency())
 	{
@@ -22,14 +21,16 @@ Scene::Scene()
 
 	SetScreenSize(DefaultScreenWidth, DefaultScreenHeight);
 
+	SceneRays.reserve(pScreenHeight*pScreenWidth+1);
+
 	for(Y=0; Y<pScreenHeight; ++Y)
 	{
 		for(X=0; X<pScreenWidth; ++X)
 		{
-			newRay=new Ray();
-			newRay->SetDefaultOrientation(X-pScreenWidth/2.0, Y-pScreenHeight/2.0, pScreenWidth);
-			newRay->SceneTree=this->SceneTree;
-			SceneRays->push_back(newRay);
+			SceneRays.push_back(Ray());
+			SceneRays.back().SetDefaultDirection(X-pScreenWidth/2.0, Y-pScreenHeight/2.0, pScreenWidth);
+			SceneRays.back().SceneTree=this->SceneTree;
+			SceneRays.back().PRNGSeedValue=RayPRNGSeedValue++;
 		}
 	}
 }
@@ -41,12 +42,6 @@ Scene::~Scene()
 		Object *object=SceneObjects->back();
 		SceneObjects->pop_back();
 		delete object;
-	}
-	while(!SceneRays->empty())
-	{
-		Ray *ray=SceneRays->back();
-		SceneRays->pop_back();
-		delete ray;
 	}
 }
 
@@ -61,16 +56,15 @@ void Scene::AddObject(Object *object)
 	object->SceneTree=this->SceneTree;
 }
 
-static void RayRunningWrapper(const vector <Ray *> *rays, uint64_t thread_id, uint64_t rays_per_thread, uint64_t samples_per_pixel)
+static void RayRunningWrapper(vector <Ray> *rays, uint64_t thread_id, uint64_t rays_per_thread, uint64_t samples_per_pixel)
 {
 	uint64_t rayid, sample;
 	for(rayid=thread_id*rays_per_thread; rayid<(thread_id+1)*rays_per_thread; rayid++)
 	{
-		Ray *rayPtr=(*rays)[rayid];
-		rayPtr->SetColor(0, 0, 0);
+		(*rays)[rayid].Color=Vec3f(0, 0, 0);
 		for(sample=0; sample<samples_per_pixel; sample++)
 		{
-			rayPtr->Trace();
+			(*rays)[rayid].Trace();
 		}
 	}
 }
@@ -87,7 +81,7 @@ void Scene::Render()
 
 	for(threadid=0; threadid<pRenderThreads; threadid++)
 	{
-		renderThread=new thread(RayRunningWrapper, SceneRays, threadid, SceneRays->size()/pRenderThreads, pSamplesPerPixel);
+		renderThread=new thread(RayRunningWrapper, &SceneRays, threadid, SceneRays.size()/pRenderThreads, pSamplesPerPixel);
 		renderThreads.push(renderThread);
 	}
 	while(!renderThreads.empty())
@@ -101,7 +95,7 @@ void Scene::Render()
 		for(uint64_t x=0; x < pScreenWidth; x++)
 		{
 			int64_t rayID=x+y*pScreenWidth;
-			Vec3f color=SceneRays->at(rayID)->Color()/colorDiv;
+			Vec3f color=SceneRays.at(rayID).Color/colorDiv;
 			uint8_t r = fmin(color.X, 255.0f);
 			uint8_t g = fmin(color.Y, 255.0f);
 			uint8_t b = fmin(color.Z, 255.0f);

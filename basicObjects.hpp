@@ -84,20 +84,6 @@ public:
 	float GetDistance(const Vec3f &from) const;
 };
 
-class Ray : public Object
-{
-	Vec3f pDefaultOrientation, pFirstCollisionPoint;
-	uint64_t pPrngSeedValue;
-public:
-	static constexpr float COLLISION_DISTANCE = 1.0f/16.0f;
-	static constexpr uint32_t STEPS_PER_RUN_LIMIT = 1024u;
-	static constexpr uint32_t REFLECTIONS_LIMIT = 7u;
-	Ray();
-	void SetDefaultOrientation(float x, float y, float z);
-	void Trace();
-	const Object *RunOnce(Vec3f &position, Vec3f direction, const Object *skip);
-};
-
 class Sphere : public Object
 {
 	float pRadius;
@@ -161,6 +147,23 @@ public:
 	SchwarzPrimitive();
 	void SetScale(float scale);
 	float GetDistance(const Vec3f &from) const;
+};
+
+class Ray
+{
+	Vec3f pDefaultDirection;
+	Vec3f pFirstCollisionPoint;
+	Vec3f pPosition;
+public:
+	Vec3f Color;
+	Octree *SceneTree=nullptr;
+	uint64_t PRNGSeedValue=0;
+	static constexpr float COLLISION_DISTANCE = 1.0f/16.0f;
+	static constexpr uint32_t STEPS_PER_RUN_LIMIT = 1024u;
+	static constexpr uint32_t REFLECTIONS_LIMIT = 7u;
+	void SetDefaultDirection(float x, float y, float z);
+	void Trace();
+	const Object *RunOnce(Vec3f &position, Vec3f direction, const Object *skip);
 };
 
 #endif // BASICOBJECTS_HPP

@@ -295,153 +295,6 @@ float Intersection::GetDistance(const Vec3f &from) const
 	return(fmax(DistA, DistB));
 }
 
-// ========= RAY ===
-
-Ray::Ray()
-{
-	prng64 tempPRNG;
-	pPrngSeedValue=tempPRNG.get_rn_uint()+this->ID();
-}
-
-void Ray::SetDefaultOrientation(float x, float y, float z)
-{
-	Vec3f newDefaultOrientation(x, y, z);
-	newDefaultOrientation.Normalize();
-	pDefaultOrientation=newDefaultOrientation;
-}
-
-static inline void ui64toVec3f(uint64_t uval, Vec3f &result)
-{
-	union fpConverter
-	{
-		uint32_t uv;
-		float fpv;
-	} rn;
-
-	rn.uv=(uval & 0xFFFFF)<<3;
-	rn.uv=rn.uv | 0x3F800000;
-	rn.fpv=rn.fpv-1.0f;
-	rn.uv|=(uval & 0x100000)<<11;
-	result.X=rn.fpv;
-
-	uval=uval>>21;
-
-	rn.uv=(uval & 0xFFFFF)<<3;
-	rn.uv=rn.uv | 0x3F800000;
-	rn.fpv=rn.fpv-1.0f;
-	rn.uv|=(uval & 0x100000)<<11;
-	result.Y=rn.fpv;
-
-	uval=uval>>21;
-
-	rn.uv=(uval & 0xFFFFF)<<3;
-	rn.uv=rn.uv | 0x3F800000;
-	rn.fpv=rn.fpv-1.0f;
-	rn.uv|=(uval & 0x100000)<<11;
-	result.Z=rn.fpv;
-}
-
-void Ray::Trace()
-{
-	Vec3f ColorSample(1.0, 1.0, 1.0);
-	prng64 StackLocalPRNG;
-	StackLocalPRNG.set_seed_value(pPrngSeedValue);
-
-	SetPosition(pFirstCollisionPoint);
-	SetOrientation(pDefaultOrientation);
-
-	const Object *TransparentObject=nullptr;
-	Vec3f Direction=pVForward;
-
-	if(pFirstCollisionPoint.X==0 && pFirstCollisionPoint.Y==0 && pFirstCollisionPoint.Z==0)
-	{
-		RunOnce(pPosition, Direction, nullptr);
-		pFirstCollisionPoint=pPosition;
-	}
-
-	uint32_t ReflectionsHappened=0;
-	while(ReflectionsHappened++<Ray::REFLECTIONS_LIMIT)
-	{
-		const Object *Obstacle=RunOnce(pPosition, Direction, TransparentObject);
-		if(Obstacle==nullptr)
-		{
-			break;
-		}
-		if(Obstacle->Brightness()>0.0)
-		{
-			ColorSample=ColorSample * Obstacle->Color() * Obstacle->Brightness();
-			break;
-		}
-		else
-		{
-			ColorSample=ColorSample * Obstacle->Color() / 255.0;
-		}
-		StackLocalPRNG.generate_xorshift_star();
-		if(StackLocalPRNG.get_rn_uint()<Obstacle->PassthroughChance())
-		{
-			TransparentObject=Obstacle;
-			continue;
-		}
-		else
-		{
-			TransparentObject=nullptr;
-		}
-		Vec3f SurfaceNormalVec=Obstacle->GetNormalVector(pPosition);
-		SurfaceNormalVec.Normalize();
-		if(StackLocalPRNG.get_rn_uint()<Obstacle->DiffusionChance())
-		{
-			Vec3f randomVector;
-			do
-			{
-				ui64toVec3f(StackLocalPRNG.get_rn_uint(), randomVector);
-				StackLocalPRNG.generate_xorshift_star();
-			}
-			while(randomVector.LengthSquared()>1.0);
-			Direction=SurfaceNormalVec + randomVector;
-		}
-		else
-		{
-			Direction=Direction - (SurfaceNormalVec*2.0) * SurfaceNormalVec.Dot(Direction);
-		}
-		Direction.Normalize();
-		pPosition=pPosition+Direction;
-	}
-	pPrngSeedValue=StackLocalPRNG.get_rn_uint();
-	pColor=pColor+ColorSample;
-}
-
-const Object *Ray::RunOnce(Vec3f &position, Vec3f direction, const Object *skip)
-{
-	uint32_t StepsTaken=0;
-	while(StepsTaken++<Ray::STEPS_PER_RUN_LIMIT)
-	{
-		float minDistance=FLT_MAX, Distance;
-		const Object *ClosestObject=nullptr;
-		const OctreeNode *Node=SceneTree->GetClosestLeafNode(position);
-		uint32_t obj=0;
-		while(obj<OctreeNode::OBJECTS_PER_NODE)
-		{
-			if(skip==Node->objects[obj])
-			{
-				continue;
-			}
-			Distance=Node->objects[obj]->GetDistance(position);
-			if(minDistance>Distance)
-			{
-				minDistance=Distance;
-				ClosestObject=Node->objects[obj];
-			}
-			obj++;
-			if(minDistance<COLLISION_DISTANCE)
-			{
-				return(ClosestObject);
-			}
-		}
-		position=position+direction*minDistance;
-	}
-	return(nullptr);
-}
-
 // ========= SPHERE ===
 
 Sphere::Sphere()
@@ -580,4 +433,145 @@ float SchwarzPrimitive::GetDistance(const Vec3f &from) const
 {
 	Vec3f localFrom=WorldToLocal(from)/pScale;
 	return(cos(localFrom.X) + cos(localFrom.Y) + cos(localFrom.Z));
+}
+
+// ========= RAY ===
+
+void Ray::SetDefaultDirection(float x, float y, float z)
+{
+	Vec3f newDefaultOrientation(x, y, z);
+	newDefaultOrientation.Normalize();
+	pDefaultDirection=newDefaultOrientation;
+}
+
+static inline void ui64toVec3f(uint64_t uval, Vec3f &result)
+{
+	union fpConverter
+	{
+		uint32_t uv;
+		float fpv;
+	} rn;
+
+	rn.uv=(uval & 0xFFFFF)<<3;
+	rn.uv=rn.uv | 0x3F800000;
+	rn.fpv=rn.fpv-1.0f;
+	rn.uv|=(uval & 0x100000)<<11;
+	result.X=rn.fpv;
+
+	uval=uval>>21;
+
+	rn.uv=(uval & 0xFFFFF)<<3;
+	rn.uv=rn.uv | 0x3F800000;
+	rn.fpv=rn.fpv-1.0f;
+	rn.uv|=(uval & 0x100000)<<11;
+	result.Y=rn.fpv;
+
+	uval=uval>>21;
+
+	rn.uv=(uval & 0xFFFFF)<<3;
+	rn.uv=rn.uv | 0x3F800000;
+	rn.fpv=rn.fpv-1.0f;
+	rn.uv|=(uval & 0x100000)<<11;
+	result.Z=rn.fpv;
+}
+
+void Ray::Trace()
+{
+	Vec3f ColorSample(1.0, 1.0, 1.0);
+	prng64 StackLocalPRNG;
+	StackLocalPRNG.set_seed_value(PRNGSeedValue);
+
+	pPosition=pFirstCollisionPoint;
+
+	const Object *TransparentObject=nullptr;
+	Vec3f Direction=pDefaultDirection;
+
+	if(pFirstCollisionPoint.X==0 && pFirstCollisionPoint.Y==0 && pFirstCollisionPoint.Z==0)
+	{
+		RunOnce(pPosition, Direction, nullptr);
+		pFirstCollisionPoint=pPosition;
+	}
+
+	uint32_t ReflectionsHappened=0;
+	while(ReflectionsHappened++<Ray::REFLECTIONS_LIMIT)
+	{
+		const Object *Obstacle=RunOnce(pPosition, Direction, TransparentObject);
+		if(Obstacle==nullptr)
+		{
+			break;
+		}
+		if(Obstacle->Brightness()>0.0)
+		{
+			ColorSample=ColorSample * Obstacle->Color() * Obstacle->Brightness();
+			break;
+		}
+		else
+		{
+			ColorSample=ColorSample * Obstacle->Color() / 255.0;
+		}
+		StackLocalPRNG.generate_xorshift_star();
+		if(StackLocalPRNG.get_rn_uint()<Obstacle->PassthroughChance())
+		{
+			TransparentObject=Obstacle;
+			continue;
+		}
+		else
+		{
+			TransparentObject=nullptr;
+		}
+		Vec3f SurfaceNormalVec=Obstacle->GetNormalVector(pPosition);
+		SurfaceNormalVec.Normalize();
+		if(StackLocalPRNG.get_rn_uint()<Obstacle->DiffusionChance())
+		{
+			Vec3f randomVector;
+			do
+			{
+				ui64toVec3f(StackLocalPRNG.get_rn_uint(), randomVector);
+				StackLocalPRNG.generate_xorshift_star();
+			}
+			while(randomVector.LengthSquared()>1.0);
+			Direction=SurfaceNormalVec + randomVector;
+		}
+		else
+		{
+			Direction=Direction - (SurfaceNormalVec*2.0) * SurfaceNormalVec.Dot(Direction);
+		}
+		Direction.Normalize();
+		pPosition=pPosition+Direction;
+	}
+	PRNGSeedValue=StackLocalPRNG.get_rn_uint();
+	Color=Color+ColorSample;
+}
+
+const Object *Ray::RunOnce(Vec3f &position, Vec3f direction, const Object *skip)
+{
+	uint32_t StepsTaken=0;
+	while(StepsTaken++<Ray::STEPS_PER_RUN_LIMIT)
+	{
+		float minDistance=FLT_MAX, Distance;
+		const Object *ClosestObject=nullptr;
+		const OctreeNode *Node=SceneTree->GetClosestLeafNode(position);
+		uint32_t obj=0;
+		while(obj<OctreeNode::OBJECTS_PER_NODE)
+		{
+			if(skip==Node->objects[obj])
+			{
+				obj++;
+				continue;
+			}
+			Distance=Node->objects[obj]->GetDistance(position);
+			if(minDistance>Distance)
+			{
+				minDistance=Distance;
+				ClosestObject=Node->objects[obj];
+			}
+			obj++;
+			if(minDistance<COLLISION_DISTANCE)
+			{
+				return(ClosestObject);
+			}
+		}
+		position=position+direction*minDistance;
+	}
+	return(nullptr);
 }

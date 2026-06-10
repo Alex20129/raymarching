@@ -13,8 +13,8 @@ static constexpr uint64_t DefaultSamplesPerPixel=8;
 class Scene
 {
 	Octree *SceneTree;
+	vector <Ray> SceneRays;
 	vector <Object *> *SceneObjects;
-	vector <Ray *> *SceneRays;
 	uint64_t pScreenWidth=DefaultScreenWidth;
 	uint64_t pScreenHeight=DefaultScreenHeight;
 	uint64_t pRenderThreads=DefaultRenderThreads;
