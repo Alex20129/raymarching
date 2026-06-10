@@ -115,8 +115,8 @@ int main(int argc, char *argv[])
 
 	// ======== box
 	Cube *Cube3=new Cube();
-	Cube3->SetLength(90);
-	Cube3->SetPosition(0, -144, ObjectZpos);
+	Cube3->SetLength(80);
+	Cube3->SetPosition(0, -139, ObjectZpos);
 
 	Plane *Plane1=new Plane();
 	Plane1->SetPosition(0, -100, 0);
@@ -147,10 +147,10 @@ int main(int argc, char *argv[])
 
 	// ======== lights
 	Cube *LightSource1=new Cube();
-	LightSource1->SetLength(90);
-	LightSource1->SetPosition(0, -155, ObjectZpos);
+	LightSource1->SetLength(80);
+	LightSource1->SetPosition(0, -150, ObjectZpos);
 	LightSource1->SetColor(255, 255, 255);
-	LightSource1->SetBrightness(9.0);
+	LightSource1->SetBrightness(11.5);
 
 	Sphere *LightSource2=new Sphere();
 	LightSource2->SetRadius(10);
