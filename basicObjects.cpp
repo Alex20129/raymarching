@@ -488,8 +488,10 @@ void Ray::Trace()
 
 	if(pFirstCollisionPoint.X==0 && pFirstCollisionPoint.Y==0 && pFirstCollisionPoint.Z==0)
 	{
-		RunOnce(pPosition, Direction, nullptr);
-		pFirstCollisionPoint=pPosition;
+		if(RunOnce(pPosition, Direction, nullptr))
+		{
+			pFirstCollisionPoint=pPosition;
+		}
 	}
 
 	uint32_t ReflectionsHappened=0;
