@@ -560,16 +560,14 @@ const Object *Ray::RunOnce(Vec3f &position, Vec3f direction, const Object *skip)
 		uint32_t obj=0;
 		while(obj<OctreeNode::OBJECTS_PER_NODE)
 		{
-			if(skip==Node->objects[obj])
+			if(skip!=Node->objects[obj])
 			{
-				obj++;
-				continue;
-			}
-			Distance=Node->objects[obj]->GetDistance(position);
-			if(minDistance>Distance)
-			{
-				minDistance=Distance;
-				ClosestObject=Node->objects[obj];
+				Distance=Node->objects[obj]->GetDistance(position);
+				if(minDistance>Distance)
+				{
+					minDistance=Distance;
+					ClosestObject=Node->objects[obj];
+				}
 			}
 			obj++;
 			if(minDistance<COLLISION_DISTANCE)
