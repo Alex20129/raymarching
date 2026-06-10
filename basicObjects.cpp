@@ -548,11 +548,15 @@ void Ray::Trace()
 const Object *Ray::RunOnce(Vec3f &position, Vec3f direction, const Object *skip)
 {
 	uint32_t StepsTaken=0;
+	const OctreeNode *Node=SceneTree->GetClosestLeafNode(position);
 	while(StepsTaken++<Ray::STEPS_PER_RUN_LIMIT)
 	{
 		float minDistance=FLT_MAX, Distance;
 		const Object *ClosestObject=nullptr;
-		const OctreeNode *Node=SceneTree->GetClosestLeafNode(position);
+		if(!Node->Contains(position))
+		{
+			Node=SceneTree->GetClosestLeafNode(position);
+		}
 		uint32_t obj=0;
 		while(obj<OctreeNode::OBJECTS_PER_NODE)
 		{

@@ -3,6 +3,13 @@
 #include <algorithm>
 #include "octree.hpp"
 
+bool OctreeNode::Contains(const Vec3f &point) const
+{
+	return(fabs(point.X - center.X) < halfSize &&
+		fabs(point.Y - center.Y) < halfSize &&
+		fabs(point.Z - center.Z) < halfSize);
+}
+
 int Octree::SortObjectsByDistance(uint32_t node_index, vector <const Object *> *objects, vector <DistancedObject> &objects_by_disance)
 {
 	if(objects->empty())

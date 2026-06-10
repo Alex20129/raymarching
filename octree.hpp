@@ -12,6 +12,7 @@ struct OctreeNode
 	Vec3f center;
 	float halfSize=0.0;
 	const Object *objects[OBJECTS_PER_NODE]={nullptr, nullptr, nullptr, nullptr};
+	bool Contains(const Vec3f &point) const;
 };
 
 class Octree
