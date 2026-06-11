@@ -8,9 +8,6 @@
 
 Scene::Scene()
 {
-	uint64_t X, Y;
-	uint64_t RayPRNGSeedValue=(uint64_t)(this);
-
 	SceneTree=new Octree;
 	SceneObjects=new vector <Object *>;
 
@@ -23,6 +20,7 @@ Scene::Scene()
 
 	SceneRays.reserve(pScreenHeight*pScreenWidth+1);
 
+	uint64_t X, Y;
 	for(Y=0; Y<pScreenHeight; ++Y)
 	{
 		for(X=0; X<pScreenWidth; ++X)
@@ -30,7 +28,7 @@ Scene::Scene()
 			SceneRays.push_back(Ray());
 			SceneRays.back().SetDefaultDirection(X-pScreenWidth/2.0, Y-pScreenHeight/2.0, pScreenWidth);
 			SceneRays.back().SceneTree=this->SceneTree;
-			SceneRays.back().PRNGSeedValue=RayPRNGSeedValue++;
+			SceneRays.back().PRNGSeedValue=pScreenHeight*pScreenWidth+X*X+Y*Y+X*Y;
 		}
 	}
 }

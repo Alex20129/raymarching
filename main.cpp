@@ -136,12 +136,12 @@ int main(int argc, char *argv[])
 	Plane3->SetColor(240, 240, 240);
 
 	Plane *RedWall=new Plane();
-	RedWall->SetPosition(-140, 0, 0);
+	RedWall->SetPosition(-135, 0, 0);
 	RedWall->SetOrientation(1, 0, 0);
 	RedWall->SetColor(255, 120, 120);
 
 	Plane *BlueWall=new Plane();
-	BlueWall->SetPosition(140, 0, 0);
+	BlueWall->SetPosition(135, 0, 0);
 	BlueWall->SetOrientation(-1, 0, 0);
 	BlueWall->SetColor(120, 120, 255);
 
