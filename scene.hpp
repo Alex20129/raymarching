@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <png++/png.hpp>
-#include "octree.hpp"
+#include "basicObjects.hpp"
 
 static constexpr uint64_t DefaultScreenWidth=2048;
 static constexpr uint64_t DefaultScreenHeight=1536;
@@ -12,7 +12,6 @@ static constexpr uint64_t DefaultSamplesPerPixel=8;
 
 class Scene
 {
-	Octree *SceneTree;
 	vector <Ray> SceneRays;
 	vector <Object *> *SceneObjects;
 	uint64_t pScreenWidth=DefaultScreenWidth;
@@ -24,7 +23,6 @@ public:
 	png::image<png::rgb_pixel> RenderedImage;
 	Scene();
 	~Scene();
-	void RebuildSceneTree();
 	void AddObject(Object *object);
 	void Render();
 	uint64_t ScreenWidth() const;

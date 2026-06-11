@@ -1,6 +1,7 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
+#include <cmath>
 #include "scene.hpp"
 
 Scene *NewScene;
@@ -45,6 +46,7 @@ int main(int argc, char *argv[])
 
 	Difference *Construct=new Difference(ShpereCubeIntersection, Cylinders2);
 	Construct->SetColor(30, 130, 130);
+	// Construct->SetSpecularity(0.25);
 
 	// ======== CSG: gyroid in sphere
 	Sphere *NewSphere3=new Sphere();
@@ -70,26 +72,27 @@ int main(int argc, char *argv[])
 
 	Intersection *SphereSchwarzIntersection=new Intersection(NewSphere4, NewSchwarzPrimitive);
 	SphereSchwarzIntersection->SetColor(30, 130, 130);
+	SphereSchwarzIntersection->SetSpecularity(0.25);
 
 	// ======== primitives
 	Cylinder *Cylinder2=new Cylinder();
 	Cylinder2->SetLength(56);
 	Cylinder2->SetRadius(28);
 	Cylinder2->SetPosition(80, 50, ObjectZpos);
-	Cylinder2->SetSpecularity(0.5);
+	Cylinder2->SetSpecularity(0.25);
 	Cylinder2->SetColor(240, 18, 240);
 
 	Cube *Cube2=new Cube();
 	Cube2->SetLength(56);
 	Cube2->SetPosition(80, 50, ObjectZpos);
-	Cube2->SetSpecularity(0.5);
+	Cube2->SetSpecularity(0.25);
 	Cube2->SetColor(150, 10, 150);
 
 	Torus *Torus1=new Torus();
 	Torus1->SetRadius1(34);
 	Torus1->SetRadius2(10);
 	Torus1->SetPosition(0, 50, ObjectZpos);
-	Torus1->SetSpecularity(0.5);
+	Torus1->SetSpecularity(0.25);
 	Torus1->SetColor(200, 200, 80);
 
 	Sphere *BlueSphere=new Sphere();
@@ -179,9 +182,8 @@ int main(int argc, char *argv[])
 	// NewScene->AddObject(Cube2);
 	// NewScene->AddObject(Torus1);
 
-	NewScene->RebuildSceneTree();
-
-	uint32_t i, samples_per_pixel=16;
+	char fileName[128];
+	int32_t i, samples_per_pixel=16;
 	for(i=0; i<10; i++, samples_per_pixel*=2)
 	{
 		// float spec=i*0.1;
@@ -189,6 +191,7 @@ int main(int argc, char *argv[])
 		// Cylinder1->SetOrientation(0, std::sin(i*M_PI_2/10.0), std::cos(i*M_PI_2/10.0));
 		// Cube2->SetOrientation(std::sin(i*M_PI_2/10.0), std::cos(i*M_PI_2/10.0), 0);
 		// Torus1->SetOrientation(0, std::sin(i*M_PI_2/10.0), std::cos(i*M_PI_2/10.0));
+		// NewSchwarzPrimitive->SetOrientation(std::sin(i*M_PI_2/40.0), 0, std::cos(i*M_PI_2/40.0));
 
 		// RedSphere->SetSpecularity(spec);
 		// GreenSphere->SetSpecularity(spec);
@@ -198,7 +201,7 @@ int main(int argc, char *argv[])
 		NewScene->SetSamplesPerPixel(samples_per_pixel);
 		NewScene->Render();
 
-		string fileName=string("render_")+to_string(samples_per_pixel)+string("_spp.png");
+		sprintf(fileName, "render_%02i_%i_spp.png", i, samples_per_pixel);
 		NewScene->RenderedImage.write(fileName);
 	}
 

@@ -2,9 +2,8 @@
 #define BASICOBJECTS_HPP
 
 #include <cstdint>
+#include <vector>
 #include "commonVectorFun.hpp"
-
-class Octree;
 
 using namespace std;
 
@@ -26,7 +25,6 @@ protected:
 	void UpdateBasis(const Vec3f &forward);
 public:
 	static constexpr float NORMAL_CALCULATION_DIST = 1.0/16.0;
-	Octree *SceneTree=nullptr;
 	Object();
 	bool Visible() const;
 	void SetVisible(bool visible);
@@ -156,12 +154,13 @@ class Ray
 	Vec3f pPosition;
 public:
 	Vec3f Color;
-	Octree *SceneTree=nullptr;
+	vector <Object *> *SceneObjects;
 	uint64_t PRNGSeedValue=0;
 	static constexpr float COLLISION_DISTANCE = 1.0f/16.0f;
 	static constexpr uint32_t STEPS_PER_RUN_LIMIT = 1024u;
 	static constexpr uint32_t REFLECTIONS_LIMIT = 7u;
 	void SetDefaultDirection(float x, float y, float z);
+	void Reset();
 	void Trace();
 	const Object *RunOnce(Vec3f &position, Vec3f direction, const Object *skip);
 };

@@ -8,7 +8,6 @@
 
 Scene::Scene()
 {
-	SceneTree=new Octree;
 	SceneObjects=new vector <Object *>;
 
 	if(pRenderThreads<thread::hardware_concurrency())
@@ -27,7 +26,7 @@ Scene::Scene()
 		{
 			SceneRays.push_back(Ray());
 			SceneRays.back().SetDefaultDirection(X-pScreenWidth/2.0, Y-pScreenHeight/2.0, pScreenWidth);
-			SceneRays.back().SceneTree=this->SceneTree;
+			SceneRays.back().SceneObjects=this->SceneObjects;
 			SceneRays.back().PRNGSeedValue=pScreenHeight*pScreenWidth+X*X+Y*Y+X*Y;
 		}
 	}
@@ -43,15 +42,9 @@ Scene::~Scene()
 	}
 }
 
-void Scene::RebuildSceneTree()
-{
-	SceneTree->Build((vector <const Object *> *)(SceneObjects));
-}
-
 void Scene::AddObject(Object *object)
 {
 	this->SceneObjects->push_back(object);
-	object->SceneTree=this->SceneTree;
 }
 
 static void RayRunningWrapper(vector <Ray> *rays, uint64_t thread_id, uint64_t rays_per_thread, uint64_t samples_per_pixel)
@@ -59,7 +52,7 @@ static void RayRunningWrapper(vector <Ray> *rays, uint64_t thread_id, uint64_t r
 	uint64_t rayid, sample;
 	for(rayid=thread_id*rays_per_thread; rayid<(thread_id+1)*rays_per_thread; rayid++)
 	{
-		(*rays)[rayid].Color=Vec3f(0, 0, 0);
+		(*rays)[rayid].Reset();
 		for(sample=0; sample<samples_per_pixel; sample++)
 		{
 			(*rays)[rayid].Trace();

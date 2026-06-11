@@ -1,7 +1,7 @@
 #include <cstdio>
 #include <cfloat>
 #include <cmath>
-#include "octree.hpp"
+#include "basicObjects.hpp"
 #include "prng.hpp"
 
 uint64_t Object::sLastKnownObjectID=0;
@@ -475,6 +475,16 @@ static inline void ui64toVec3f(uint64_t uval, Vec3f &result)
 	result.Z=rn.fpv;
 }
 
+void Ray::Reset()
+{
+	Color.X=
+	Color.Y=
+	Color.Z=0.0f;
+	pFirstCollisionPoint.X=
+	pFirstCollisionPoint.Y=
+	pFirstCollisionPoint.Z=0.0f;
+}
+
 void Ray::Trace()
 {
 	Vec3f ColorSample(1.0, 1.0, 1.0);
@@ -486,7 +496,7 @@ void Ray::Trace()
 	const Object *TransparentObject=nullptr;
 	Vec3f Direction=pDefaultDirection;
 
-	if(pFirstCollisionPoint.X==0 && pFirstCollisionPoint.Y==0 && pFirstCollisionPoint.Z==0)
+	if(pFirstCollisionPoint.X==0.0f && pFirstCollisionPoint.Y==0.0f && pFirstCollisionPoint.Z==0.0f)
 	{
 		if(RunOnce(pPosition, Direction, nullptr))
 		{
@@ -547,26 +557,22 @@ void Ray::Trace()
 
 const Object *Ray::RunOnce(Vec3f &position, Vec3f direction, const Object *skip)
 {
+	uint32_t obj_total=SceneObjects->size();
 	uint32_t StepsTaken=0;
-	const OctreeNode *Node=SceneTree->GetClosestLeafNode(position);
 	while(StepsTaken++<Ray::STEPS_PER_RUN_LIMIT)
 	{
 		float minDistance=FLT_MAX, Distance;
 		const Object *ClosestObject=nullptr;
-		if(!Node->Contains(position))
-		{
-			Node=SceneTree->GetClosestLeafNode(position);
-		}
 		uint32_t obj=0;
-		while(obj<OctreeNode::OBJECTS_PER_NODE)
+		while(obj<obj_total)
 		{
-			if(skip!=Node->objects[obj])
+			if(skip!=SceneObjects->at(obj) && SceneObjects->at(obj)->Visible())
 			{
-				Distance=Node->objects[obj]->GetDistance(position);
+				Distance=SceneObjects->at(obj)->GetDistance(position);
 				if(minDistance>Distance)
 				{
 					minDistance=Distance;
-					ClosestObject=Node->objects[obj];
+					ClosestObject=SceneObjects->at(obj);
 				}
 			}
 			obj++;
