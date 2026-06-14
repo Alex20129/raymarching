@@ -491,23 +491,23 @@ void Ray::Trace()
 	prng64 StackLocalPRNG;
 	StackLocalPRNG.set_seed_value(PRNGSeedValue);
 
-	pPosition=pFirstCollisionPoint;
-
 	const Object *TransparentObject=nullptr;
-	Vec3f Direction=pDefaultDirection;
+	Vec3f Position=pFirstCollisionPoint, Direction=pDefaultDirection;
 
 	if(pFirstCollisionPoint.X==0.0f && pFirstCollisionPoint.Y==0.0f && pFirstCollisionPoint.Z==0.0f)
 	{
-		if(RunOnce(pPosition, Direction, nullptr))
+		if(nullptr==RunOnce(pFirstCollisionPoint, Direction, TransparentObject))
 		{
-			pFirstCollisionPoint=pPosition;
+			pFirstCollisionPoint.X=
+			pFirstCollisionPoint.Y=
+			pFirstCollisionPoint.Z=0.0f;
 		}
 	}
 
 	uint32_t ReflectionsHappened=0;
 	while(ReflectionsHappened++<Ray::REFLECTIONS_LIMIT)
 	{
-		const Object *Obstacle=RunOnce(pPosition, Direction, TransparentObject);
+		const Object *Obstacle=RunOnce(Position, Direction, TransparentObject);
 		if(Obstacle==nullptr)
 		{
 			break;
@@ -531,7 +531,7 @@ void Ray::Trace()
 		{
 			TransparentObject=nullptr;
 		}
-		Vec3f SurfaceNormalVec=Obstacle->GetNormalVector(pPosition);
+		Vec3f SurfaceNormalVec=Obstacle->GetNormalVector(Position);
 		SurfaceNormalVec.Normalize();
 		if(StackLocalPRNG.get_rn_uint()<Obstacle->DiffusionChance())
 		{
@@ -549,7 +549,7 @@ void Ray::Trace()
 			Direction=Direction - (SurfaceNormalVec*2.0) * SurfaceNormalVec.Dot(Direction);
 		}
 		Direction.Normalize();
-		pPosition=pPosition+Direction;
+		Position=Position+Direction;
 	}
 	PRNGSeedValue=StackLocalPRNG.get_rn_uint();
 	Color=Color+ColorSample;

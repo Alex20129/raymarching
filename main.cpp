@@ -171,20 +171,21 @@ int main(int argc, char *argv[])
 	NewScene->AddObject(LightSource1);
 	// NewScene->AddObject(LightSource2);
 
-	NewScene->AddObject(Construct);
+	// NewScene->AddObject(Construct);
 	// NewScene->AddObject(SphereGyroidIntersection);
 	// NewScene->AddObject(SphereSchwarzIntersection);
 
-	// NewScene->AddObject(BlueSphere);
-	// NewScene->AddObject(RedSphere);
-	// NewScene->AddObject(GreenSphere);
+	NewScene->AddObject(BlueSphere);
+	NewScene->AddObject(RedSphere);
+	NewScene->AddObject(GreenSphere);
 	// NewScene->AddObject(Cylinder2);
 	// NewScene->AddObject(Cube2);
 	// NewScene->AddObject(Torus1);
 
 	char fileName[128];
-	int32_t i, samples_per_pixel=16;
-	for(i=0; i<10; i++, samples_per_pixel*=2)
+	int32_t i, samples_per_pixel=32;
+	for(i=0; i<8; i++, samples_per_pixel*=2)
+	// for(i=0; i<40; i++)
 	{
 		// float spec=i*0.1;
 

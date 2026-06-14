@@ -151,7 +151,6 @@ class Ray
 {
 	Vec3f pDefaultDirection;
 	Vec3f pFirstCollisionPoint;
-	Vec3f pPosition;
 public:
 	Vec3f Color;
 	vector <Object *> *SceneObjects;
