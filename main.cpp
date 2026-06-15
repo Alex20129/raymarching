@@ -66,13 +66,13 @@ int main(int argc, char *argv[])
 	NewSphere4->SetPosition(0, 50, ObjectZpos);
 
 	SchwarzPrimitive *NewSchwarzPrimitive=new SchwarzPrimitive();
-	NewSchwarzPrimitive->SetScale(5.0);
+	NewSchwarzPrimitive->SetScale(6.5);
 	NewSchwarzPrimitive->SetPosition(0, 50, ObjectZpos);
 	NewSchwarzPrimitive->SetOrientation(1, 0, 1);
 
 	Intersection *SphereSchwarzIntersection=new Intersection(NewSphere4, NewSchwarzPrimitive);
 	SphereSchwarzIntersection->SetColor(30, 130, 130);
-	SphereSchwarzIntersection->SetSpecularity(0.25);
+	// SphereSchwarzIntersection->SetSpecularity(0.25);
 
 	// ======== primitives
 	Cylinder *Cylinder2=new Cylinder();
@@ -173,11 +173,11 @@ int main(int argc, char *argv[])
 
 	// NewScene->AddObject(Construct);
 	// NewScene->AddObject(SphereGyroidIntersection);
-	// NewScene->AddObject(SphereSchwarzIntersection);
+	NewScene->AddObject(SphereSchwarzIntersection);
 
-	NewScene->AddObject(BlueSphere);
-	NewScene->AddObject(RedSphere);
-	NewScene->AddObject(GreenSphere);
+	// NewScene->AddObject(BlueSphere);
+	// NewScene->AddObject(RedSphere);
+	// NewScene->AddObject(GreenSphere);
 	// NewScene->AddObject(Cylinder2);
 	// NewScene->AddObject(Cube2);
 	// NewScene->AddObject(Torus1);
