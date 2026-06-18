@@ -185,14 +185,14 @@ int main(int argc, char *argv[])
 	char fileName[128];
 	int32_t i, samples_per_pixel=32;
 	for(i=0; i<8; i++, samples_per_pixel*=2)
-	// for(i=0; i<40; i++)
+	// for(i=0; i<50; i++)
 	{
 		// float spec=i*0.1;
 
 		// Cylinder1->SetOrientation(0, std::sin(i*M_PI_2/10.0), std::cos(i*M_PI_2/10.0));
 		// Cube2->SetOrientation(std::sin(i*M_PI_2/10.0), std::cos(i*M_PI_2/10.0), 0);
 		// Torus1->SetOrientation(0, std::sin(i*M_PI_2/10.0), std::cos(i*M_PI_2/10.0));
-		// NewSchwarzPrimitive->SetOrientation(std::sin(i*M_PI_2/40.0), 0, std::cos(i*M_PI_2/40.0));
+		// NewSchwarzPrimitive->SetOrientation(std::sin(i*M_PI_2/50.0), 0, std::cos(i*M_PI_2/50.0));
 
 		// RedSphere->SetSpecularity(spec);
 		// GreenSphere->SetSpecularity(spec);

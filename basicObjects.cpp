@@ -4,6 +4,8 @@
 #include "basicObjects.hpp"
 #include "prng.hpp"
 
+static constexpr float EPSILON = 1.0f/16.0f;
+
 uint64_t Object::sLastKnownObjectID=0;
 
 Vec3f Object::WorldToLocal(const Vec3f &point) const
@@ -203,9 +205,9 @@ float Object::GetDistance(const Vec3f &from) const
 Vec3f Object::GetNormalVector(const Vec3f &point) const
 {
 	Vec3f normalVec(
-		GetDistance(point + Vec3f(NORMAL_CALCULATION_DIST, 0, 0)) - GetDistance(point - Vec3f(NORMAL_CALCULATION_DIST, 0, 0)),
-		GetDistance(point + Vec3f(0, NORMAL_CALCULATION_DIST, 0)) - GetDistance(point - Vec3f(0, NORMAL_CALCULATION_DIST, 0)),
-		GetDistance(point + Vec3f(0, 0, NORMAL_CALCULATION_DIST)) - GetDistance(point - Vec3f(0, 0, NORMAL_CALCULATION_DIST)));
+		GetDistance(point + Vec3f(EPSILON, 0, 0)) - GetDistance(point - Vec3f(EPSILON, 0, 0)),
+		GetDistance(point + Vec3f(0, EPSILON, 0)) - GetDistance(point - Vec3f(0, EPSILON, 0)),
+		GetDistance(point + Vec3f(0, 0, EPSILON)) - GetDistance(point - Vec3f(0, 0, EPSILON)));
 	return(normalVec);
 }
 
@@ -576,7 +578,7 @@ const Object *Ray::RunOnce(Vec3f &position, Vec3f direction, const Object *skip)
 				}
 			}
 			obj++;
-			if(minDistance<COLLISION_DISTANCE)
+			if(minDistance<EPSILON)
 			{
 				return(ClosestObject);
 			}

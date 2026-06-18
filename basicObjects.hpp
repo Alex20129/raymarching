@@ -24,7 +24,6 @@ protected:
 	Vec3f WorldToLocal(const Vec3f &point) const;
 	void UpdateBasis(const Vec3f &forward);
 public:
-	static constexpr float NORMAL_CALCULATION_DIST = 1.0/16.0;
 	Object();
 	bool Visible() const;
 	void SetVisible(bool visible);
@@ -155,7 +154,6 @@ public:
 	Vec3f Color;
 	vector <Object *> *SceneObjects;
 	uint64_t PRNGSeedValue=0;
-	static constexpr float COLLISION_DISTANCE = 1.0f/16.0f;
 	static constexpr uint32_t STEPS_PER_RUN_LIMIT = 1024u;
 	static constexpr uint32_t REFLECTIONS_LIMIT = 7u;
 	void SetDefaultDirection(float x, float y, float z);
