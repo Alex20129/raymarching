@@ -9,13 +9,30 @@ using namespace std;
 
 class Object
 {
+public:
+	enum ObjectType
+	{
+		OBJECT,
+		DIFFERENCE,
+		UNION,
+		INTERSECTION,
+		SPHERE,
+		CUBE,
+		CYLINDER,
+		TORUS,
+		PLANE,
+		GYROID,
+		SCHWARZ_PRIMITIVE,
+	};
+private:
 	bool pVisible=true;
 	uint64_t pID;
-	static uint64_t sLastKnownObjectID;
-protected:
 	float pBrightness=0.0;
 	float pSpecularity=0.0;
 	float pTransparency=0.0;
+	static uint64_t sLastKnownObjectID;
+protected:
+	ObjectType pType;
 	uint64_t pDiffusionChance=UINT64_MAX;
 	uint64_t pPassthroughChance=0;
 	Vec3f pColor;
@@ -28,6 +45,7 @@ public:
 	bool Visible() const;
 	void SetVisible(bool visible);
 
+	ObjectType Type() const;
 	uint64_t ID() const;
 	uint64_t DiffusionChance() const;
 	uint64_t PassthroughChance() const;
@@ -124,6 +142,7 @@ public:
 class Plane : public Object
 {
 public:
+	Plane();
 	float GetDistance(const Vec3f &from) const;
 	Vec3f GetNormalVector(const Vec3f &point) const;
 };

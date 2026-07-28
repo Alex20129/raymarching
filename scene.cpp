@@ -8,7 +8,7 @@
 
 Scene::Scene()
 {
-	SceneObjects=new vector <Object *>;
+	pSceneObjects=new vector <Object *>;
 
 	if(pRenderThreads<thread::hardware_concurrency())
 	{
@@ -26,7 +26,7 @@ Scene::Scene()
 		{
 			SceneRays.push_back(Ray());
 			SceneRays.back().SetDefaultDirection(X-pScreenWidth/2.0, Y-pScreenHeight/2.0, pScreenWidth);
-			SceneRays.back().SceneObjects=this->SceneObjects;
+			SceneRays.back().SceneObjects=this->pSceneObjects;
 			SceneRays.back().PRNGSeedValue=pScreenHeight*pScreenWidth+X*X+Y*Y+X*Y;
 		}
 	}
@@ -34,17 +34,104 @@ Scene::Scene()
 
 Scene::~Scene()
 {
-	while(!SceneObjects->empty())
+	while(!pSceneObjects->empty())
 	{
-		Object *object=SceneObjects->back();
-		SceneObjects->pop_back();
+		Object *object=pSceneObjects->back();
+		pSceneObjects->pop_back();
 		delete object;
 	}
 }
 
 void Scene::AddObject(Object *object)
 {
-	this->SceneObjects->push_back(object);
+	this->pSceneObjects->push_back(object);
+	this->pSceneObjectsIndex[object->ID()]=object;
+}
+
+uint64_t Scene::AddObject(Object::ObjectType object_type, uint64_t parent_a, uint64_t parent_b)
+{
+	uint64_t ObjectID=UINT64_MAX;
+	switch (object_type)
+	{
+		default:
+		case Object::ObjectType::OBJECT:
+		{
+			Object *NewObject=new Object;
+			ObjectID=NewObject->ID();
+			this->pSceneObjects->push_back(NewObject);
+			this->pSceneObjectsIndex[ObjectID]=NewObject;
+			break;
+		}
+		case Object::ObjectType::DIFFERENCE:
+		{
+			break;
+		}
+		case Object::ObjectType::UNION:
+		{
+			break;
+		}
+		case Object::ObjectType::INTERSECTION:
+		{
+			break;
+		}
+		case Object::ObjectType::SPHERE:
+		{
+			Object *NewSphere=new Sphere;
+			ObjectID=NewSphere->ID();
+			this->pSceneObjects->push_back(NewSphere);
+			this->pSceneObjectsIndex[ObjectID]=NewSphere;
+			break;
+		}
+		case Object::ObjectType::CUBE:
+		{
+			Object *NewCube=new Cube;
+			ObjectID=NewCube->ID();
+			this->pSceneObjects->push_back(NewCube);
+			this->pSceneObjectsIndex[ObjectID]=NewCube;
+			break;
+		}
+		case Object::ObjectType::CYLINDER:
+		{
+			Object *NewCylinder=new Cylinder;
+			ObjectID=NewCylinder->ID();
+			this->pSceneObjects->push_back(NewCylinder);
+			this->pSceneObjectsIndex[ObjectID]=NewCylinder;
+			break;
+		}
+		case Object::ObjectType::TORUS:
+		{
+			Object *NewTorus=new Torus;
+			ObjectID=NewTorus->ID();
+			this->pSceneObjects->push_back(NewTorus);
+			this->pSceneObjectsIndex[ObjectID]=NewTorus;
+			break;
+		}
+		case Object::ObjectType::PLANE:
+		{
+			Object *NewPlane=new Plane;
+			ObjectID=NewPlane->ID();
+			this->pSceneObjects->push_back(NewPlane);
+			this->pSceneObjectsIndex[ObjectID]=NewPlane;
+			break;
+		}
+		case Object::ObjectType::GYROID:
+		{
+			Object *NewGyroid=new Gyroid;
+			ObjectID=NewGyroid->ID();
+			this->pSceneObjects->push_back(NewGyroid);
+			this->pSceneObjectsIndex[ObjectID]=NewGyroid;
+			break;
+		}
+		case Object::ObjectType::SCHWARZ_PRIMITIVE:
+		{
+			Object *NewSchwarzPrimitive=new SchwarzPrimitive;
+			ObjectID=NewSchwarzPrimitive->ID();
+			this->pSceneObjects->push_back(NewSchwarzPrimitive);
+			this->pSceneObjectsIndex[ObjectID]=NewSchwarzPrimitive;
+			break;
+		}
+	}
+	return(ObjectID);
 }
 
 static void RayRunningWrapper(vector <Ray> *rays, uint64_t thread_id, uint64_t rays_per_thread, uint64_t samples_per_pixel)

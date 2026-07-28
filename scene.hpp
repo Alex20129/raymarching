@@ -2,6 +2,7 @@
 #define SCENE_HPP
 
 #include <vector>
+#include <unordered_map>
 #include <zmq.hpp>
 #include <png++/png.hpp>
 #include "basicObjects.hpp"
@@ -14,7 +15,8 @@ static constexpr uint64_t DefaultSamplesPerPixel=8;
 class Scene
 {
 	vector <Ray> SceneRays;
-	vector <Object *> *SceneObjects;
+	vector <Object *> *pSceneObjects;
+	unordered_map <uint64_t, Object *> pSceneObjectsIndex;
 	uint64_t pScreenWidth=DefaultScreenWidth;
 	uint64_t pScreenHeight=DefaultScreenHeight;
 	uint64_t pRenderThreads=DefaultRenderThreads;
@@ -25,6 +27,7 @@ public:
 	Scene();
 	~Scene();
 	void AddObject(Object *object);
+	uint64_t AddObject(Object::ObjectType object_type, uint64_t parent_a=UINT64_MAX, uint64_t parent_b=UINT64_MAX);
 	void Render();
 	uint64_t ScreenWidth() const;
 	uint64_t ScreenHeight() const;

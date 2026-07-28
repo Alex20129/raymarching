@@ -32,6 +32,7 @@ void Object::UpdateBasis(const Vec3f &forward)
 
 Object::Object()
 {
+	pType=OBJECT;
 	pID=sLastKnownObjectID++;
 	UpdateBasis(Vec3f(0, 0, 1));
 }
@@ -44,6 +45,11 @@ bool Object::Visible() const
 void Object::SetVisible(bool visible)
 {
 	pVisible=visible;
+}
+
+Object::ObjectType Object::Type() const
+{
+	return(pType);
 }
 
 uint64_t Object::ID() const
@@ -215,6 +221,7 @@ Vec3f Object::GetNormalVector(const Vec3f &point) const
 
 Difference::Difference(Object *object_a, Object *object_b)
 {
+	pType=DIFFERENCE;
 	if(object_a==nullptr)
 	{
 		return;
@@ -227,9 +234,9 @@ Difference::Difference(Object *object_a, Object *object_b)
 	ObjectB=object_b;
 	pPosition=object_a->Position();
 	pColor=(object_a->Color()+object_b->Color())/2.0;
-	pBrightness=(object_a->Brightness()+object_b->Brightness())/2.0;
-	pSpecularity=(object_a->Specularity()+object_b->Specularity())/2.0;
-	pTransparency=(object_a->Transparency()+object_b->Transparency())/2.0;
+	SetBrightness((object_a->Brightness()+object_b->Brightness())/2.0);
+	SetSpecularity((object_a->Specularity()+object_b->Specularity())/2.0);
+	SetTransparency((object_a->Transparency()+object_b->Transparency())/2.0);
 	object_a->SetVisible(false);
 	object_b->SetVisible(false);
 }
@@ -243,6 +250,7 @@ float Difference::GetDistance(const Vec3f &from) const
 
 Union::Union(Object *object_a, Object *object_b)
 {
+	pType=UNION;
 	if(object_a==nullptr)
 	{
 		return;
@@ -255,9 +263,9 @@ Union::Union(Object *object_a, Object *object_b)
 	ObjectB=object_b;
 	pPosition=(object_a->Position()+object_b->Position())/2.0;
 	pColor=(object_a->Color()+object_b->Color())/2.0;
-	pBrightness=(object_a->Brightness()+object_b->Brightness())/2.0;
-	pSpecularity=(object_a->Specularity()+object_b->Specularity())/2.0;
-	pTransparency=(object_a->Transparency()+object_b->Transparency())/2.0;
+	SetBrightness((object_a->Brightness()+object_b->Brightness())/2.0);
+	SetSpecularity((object_a->Specularity()+object_b->Specularity())/2.0);
+	SetTransparency((object_a->Transparency()+object_b->Transparency())/2.0);
 	object_a->SetVisible(false);
 	object_b->SetVisible(false);
 }
@@ -271,6 +279,7 @@ float Union::GetDistance(const Vec3f &from) const
 
 Intersection::Intersection(Object *object_a, Object *object_b)
 {
+	pType=INTERSECTION;
 	if(object_a==nullptr)
 	{
 		return;
@@ -283,9 +292,9 @@ Intersection::Intersection(Object *object_a, Object *object_b)
 	ObjectB=object_b;
 	pPosition=(object_a->Position()+object_b->Position())/2.0;
 	pColor=(object_a->Color()+object_b->Color())/2.0;
-	pBrightness=(object_a->Brightness()+object_b->Brightness())/2.0;
-	pSpecularity=(object_a->Specularity()+object_b->Specularity())/2.0;
-	pTransparency=(object_a->Transparency()+object_b->Transparency())/2.0;
+	SetBrightness((object_a->Brightness()+object_b->Brightness())/2.0);
+	SetSpecularity((object_a->Specularity()+object_b->Specularity())/2.0);
+	SetTransparency((object_a->Transparency()+object_b->Transparency())/2.0);
 	object_a->SetVisible(false);
 	object_b->SetVisible(false);
 }
@@ -301,6 +310,7 @@ float Intersection::GetDistance(const Vec3f &from) const
 
 Sphere::Sphere()
 {
+	pType=SPHERE;
 	pRadius=1.0;
 }
 
@@ -323,6 +333,7 @@ Vec3f Sphere::GetNormalVector(const Vec3f &point) const
 
 Cube::Cube()
 {
+	pType=CUBE;
 	pHalfLength=0.5;
 }
 
@@ -341,6 +352,7 @@ float Cube::GetDistance(const Vec3f &from) const
 
 Cylinder::Cylinder()
 {
+	pType=CYLINDER;
 	pHalfLength=0.5;
 	pRadius=1.0;
 }
@@ -368,6 +380,7 @@ float Cylinder::GetDistance(const Vec3f &from) const
 
 Torus::Torus()
 {
+	pType=TORUS;
 	pRadius1=2.0;
 	pRadius2=1.0;
 }
@@ -391,6 +404,11 @@ float Torus::GetDistance(const Vec3f &from) const
 
 // ========= PLANE ===
 
+Plane::Plane()
+{
+	pType=PLANE;
+}
+
 float Plane::GetDistance(const Vec3f &from) const
 {
 	return((from-pPosition).Dot(pVForward));
@@ -405,6 +423,7 @@ Vec3f Plane::GetNormalVector(const Vec3f &point) const
 
 Gyroid::Gyroid()
 {
+	pType=GYROID;
 	pScale=1.0;
 }
 
@@ -423,6 +442,7 @@ float Gyroid::GetDistance(const Vec3f &from) const
 
 SchwarzPrimitive::SchwarzPrimitive()
 {
+	pType=SCHWARZ_PRIMITIVE;
 	pScale=1.0;
 }
 
