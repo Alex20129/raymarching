@@ -18,8 +18,6 @@ ADD_EXECUTABLE(${CMAKE_PROJECT_NAME}
 	basicObjects.hpp
 	commonVectorFun.cpp
 	commonVectorFun.hpp
-	octree.cpp
-	octree.hpp
 	prng.cpp
 	prng.hpp
 	scene.cpp

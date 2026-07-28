@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
 
 	Intersection *SphereSchwarzIntersection=new Intersection(NewSphere4, NewSchwarzPrimitive);
 	SphereSchwarzIntersection->SetColor(30, 130, 130);
-	// SphereSchwarzIntersection->SetSpecularity(0.25);
+	SphereSchwarzIntersection->SetSpecularity(0.25);
 
 	// ======== primitives
 	Cylinder *Cylinder2=new Cylinder();
@@ -183,9 +183,9 @@ int main(int argc, char *argv[])
 	// NewScene->AddObject(Torus1);
 
 	char fileName[128];
-	int32_t i, samples_per_pixel=32;
-	for(i=0; i<8; i++, samples_per_pixel*=2)
-	// for(i=0; i<50; i++)
+	int32_t i, samples_per_pixel=256;
+	// for(i=0; i<8; i++, samples_per_pixel*=2)
+	for(i=0; i<10; i++)
 	{
 		// float spec=i*0.1;
 
@@ -199,10 +199,12 @@ int main(int argc, char *argv[])
 		// BlueSphere->SetSpecularity(spec);
 		// Construct->SetSpecularity(spec);
 
+		Ray::REFLECTIONS_LIMIT+=1;
+
 		NewScene->SetSamplesPerPixel(samples_per_pixel);
 		NewScene->Render();
 
-		sprintf(fileName, "render_%02i_%i_spp.png", i, samples_per_pixel);
+		sprintf(fileName, "render_%02i_%ispp.png", i, samples_per_pixel);
 		NewScene->RenderedImage.write(fileName);
 	}
 

@@ -439,6 +439,9 @@ float SchwarzPrimitive::GetDistance(const Vec3f &from) const
 
 // ========= RAY ===
 
+uint32_t Ray::STEPS_PER_RUN_LIMIT = 1024u;
+uint32_t Ray::REFLECTIONS_LIMIT = 1u;
+
 void Ray::SetDefaultDirection(float x, float y, float z)
 {
 	Vec3f newDefaultOrientation(x, y, z);
@@ -489,7 +492,9 @@ void Ray::Reset()
 
 void Ray::Trace()
 {
+	uint32_t ReflectionsLimit=Ray::REFLECTIONS_LIMIT;
 	Vec3f ColorSample(1.0, 1.0, 1.0);
+
 	prng64 StackLocalPRNG;
 	StackLocalPRNG.set_seed_value(PRNGSeedValue);
 
@@ -506,8 +511,7 @@ void Ray::Trace()
 		}
 	}
 
-	uint32_t ReflectionsHappened=0;
-	while(ReflectionsHappened++<Ray::REFLECTIONS_LIMIT)
+	for(uint32_t ReflectionsHappened=0; ReflectionsHappened<ReflectionsLimit; ReflectionsHappened++)
 	{
 		const Object *Obstacle=RunOnce(Position, Direction, TransparentObject);
 		if(Obstacle==nullptr)
@@ -559,9 +563,9 @@ void Ray::Trace()
 
 const Object *Ray::RunOnce(Vec3f &position, Vec3f direction, const Object *skip)
 {
+	uint32_t StepsPerRunLimit=Ray::STEPS_PER_RUN_LIMIT;
 	uint32_t obj_total=SceneObjects->size();
-	uint32_t StepsTaken=0;
-	while(StepsTaken++<Ray::STEPS_PER_RUN_LIMIT)
+	for(uint32_t StepsTaken=0; StepsTaken<StepsPerRunLimit; StepsTaken++)
 	{
 		float minDistance=FLT_MAX, Distance;
 		const Object *ClosestObject=nullptr;

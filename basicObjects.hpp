@@ -151,11 +151,11 @@ class Ray
 	Vec3f pDefaultDirection;
 	Vec3f pFirstCollisionPoint;
 public:
+	static uint32_t STEPS_PER_RUN_LIMIT;
+	static uint32_t REFLECTIONS_LIMIT;
 	Vec3f Color;
 	vector <Object *> *SceneObjects;
 	uint64_t PRNGSeedValue=0;
-	static constexpr uint32_t STEPS_PER_RUN_LIMIT = 1024u;
-	static constexpr uint32_t REFLECTIONS_LIMIT = 7u;
 	void SetDefaultDirection(float x, float y, float z);
 	void Reset();
 	void Trace();
