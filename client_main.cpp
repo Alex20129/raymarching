@@ -1,7 +1,6 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
-#include <cmath>
 #include "scene.hpp"
 
 Scene *NewScene;

@@ -10,10 +10,13 @@ SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 # SET(CMAKE_CXX_FLAGS "-O0 -Wall -Wextra -Wpedantic")
 SET(CMAKE_CXX_FLAGS "-O3 -ffast-math -march=native")
 
-LINK_LIBRARIES(pthread png)
+LINK_LIBRARIES(pthread png zmq)
 
-ADD_EXECUTABLE(${CMAKE_PROJECT_NAME}
-	main.cpp
+SET(SERVER_EXECUTABLE_NAME "${CMAKE_PROJECT_NAME}_server")
+SET(CLIENT_EXECUTABLE_NAME "${CMAKE_PROJECT_NAME}_client")
+
+ADD_EXECUTABLE(${SERVER_EXECUTABLE_NAME}
+	server_main.cpp
 	basicObjects.cpp
 	basicObjects.hpp
 	commonVectorFun.cpp
@@ -23,4 +26,15 @@ ADD_EXECUTABLE(${CMAKE_PROJECT_NAME}
 	scene.cpp
 	scene.hpp)
 
-SET_PROPERTY(TARGET ${CMAKE_PROJECT_NAME} PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+ADD_EXECUTABLE(${CLIENT_EXECUTABLE_NAME}
+	client_main.cpp
+	basicObjects.cpp
+	basicObjects.hpp
+	commonVectorFun.cpp
+	commonVectorFun.hpp
+	prng.cpp
+	prng.hpp
+	scene.cpp
+	scene.hpp)
+
+SET_PROPERTY(TARGET ${CLIENT_EXECUTABLE_NAME} PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)

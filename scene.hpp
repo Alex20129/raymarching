@@ -2,6 +2,7 @@
 #define SCENE_HPP
 
 #include <vector>
+#include <zmq.hpp>
 #include <png++/png.hpp>
 #include "basicObjects.hpp"
 
