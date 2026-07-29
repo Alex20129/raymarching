@@ -4,7 +4,165 @@
 #include <thread>
 #include <queue>
 #include <chrono>
+#include "prng.hpp"
 #include "scene.hpp"
+
+// ========= RAY ===
+
+uint32_t Ray::STEPS_PER_RUN_LIMIT = 1024u;
+uint32_t Ray::REFLECTIONS_LIMIT = 1u;
+
+void Ray::SetDefaultDirection(float x, float y, float z)
+{
+	Vec3f newDefaultOrientation(x, y, z);
+	newDefaultOrientation.Normalize();
+	pDefaultDirection=newDefaultOrientation;
+}
+
+static inline void ui64toVec3f(uint64_t uval, Vec3f &result)
+{
+	union fpConverter
+	{
+		uint32_t uv;
+		float fpv;
+	} rn;
+
+	rn.uv=(uval & 0xFFFFF)<<3;
+	rn.uv=rn.uv | 0x3F800000;
+	rn.fpv=rn.fpv-1.0f;
+	rn.uv|=(uval & 0x100000)<<11;
+	result.X=rn.fpv;
+
+	uval=uval>>21;
+
+	rn.uv=(uval & 0xFFFFF)<<3;
+	rn.uv=rn.uv | 0x3F800000;
+	rn.fpv=rn.fpv-1.0f;
+	rn.uv|=(uval & 0x100000)<<11;
+	result.Y=rn.fpv;
+
+	uval=uval>>21;
+
+	rn.uv=(uval & 0xFFFFF)<<3;
+	rn.uv=rn.uv | 0x3F800000;
+	rn.fpv=rn.fpv-1.0f;
+	rn.uv|=(uval & 0x100000)<<11;
+	result.Z=rn.fpv;
+}
+
+void Ray::Reset()
+{
+	Color.X=
+	Color.Y=
+	Color.Z=0.0f;
+	pFirstCollisionPoint.X=
+	pFirstCollisionPoint.Y=
+	pFirstCollisionPoint.Z=0.0f;
+}
+
+void Ray::Trace()
+{
+	uint32_t ReflectionsLimit=Ray::REFLECTIONS_LIMIT;
+	Vec3f ColorSample(1.0, 1.0, 1.0);
+
+	prng64 StackLocalPRNG;
+	StackLocalPRNG.set_seed_value(PRNGSeedValue);
+
+	const Object *TransparentObject=nullptr;
+	Vec3f Position=pFirstCollisionPoint, Direction=pDefaultDirection;
+
+	if(pFirstCollisionPoint.X==0.0f && pFirstCollisionPoint.Y==0.0f && pFirstCollisionPoint.Z==0.0f)
+	{
+		if(nullptr==RunOnce(pFirstCollisionPoint, Direction, TransparentObject))
+		{
+			pFirstCollisionPoint.X=
+			pFirstCollisionPoint.Y=
+			pFirstCollisionPoint.Z=0.0f;
+		}
+	}
+
+	for(uint32_t ReflectionsHappened=0; ReflectionsHappened<ReflectionsLimit; ReflectionsHappened++)
+	{
+		const Object *Obstacle=RunOnce(Position, Direction, TransparentObject);
+		if(Obstacle==nullptr)
+		{
+			break;
+		}
+		if(Obstacle->Brightness()>0.0)
+		{
+			ColorSample=ColorSample * Obstacle->Color() * Obstacle->Brightness();
+			break;
+		}
+		else
+		{
+			ColorSample=ColorSample * Obstacle->Color() / 255.0;
+		}
+		StackLocalPRNG.generate_xorshift_star();
+		if(StackLocalPRNG.get_rn_uint()<Obstacle->PassthroughChance())
+		{
+			TransparentObject=Obstacle;
+			continue;
+		}
+		else
+		{
+			TransparentObject=nullptr;
+		}
+		Vec3f SurfaceNormalVec=Obstacle->GetNormalVector(Position);
+		SurfaceNormalVec.Normalize();
+		if(StackLocalPRNG.get_rn_uint()<Obstacle->DiffusionChance())
+		{
+			Vec3f randomVector;
+			do
+			{
+				ui64toVec3f(StackLocalPRNG.get_rn_uint(), randomVector);
+				StackLocalPRNG.generate_xorshift_star();
+			}
+			while(randomVector.LengthSquared()>1.0);
+			Direction=SurfaceNormalVec + randomVector;
+		}
+		else
+		{
+			Direction=Direction - (SurfaceNormalVec*2.0) * SurfaceNormalVec.Dot(Direction);
+		}
+		Direction.Normalize();
+		Position=Position+Direction;
+	}
+	PRNGSeedValue=StackLocalPRNG.get_rn_uint();
+	Color=Color+ColorSample;
+}
+
+const Object *Ray::RunOnce(Vec3f &position, Vec3f direction, const Object *skip)
+{
+	uint32_t StepsPerRunLimit=Ray::STEPS_PER_RUN_LIMIT;
+	uint32_t obj_total=SceneObjects->size();
+	for(uint32_t StepsTaken=0; StepsTaken<StepsPerRunLimit; StepsTaken++)
+	{
+		float minDistance=FLT_MAX, Distance;
+		const Object *ClosestObject=nullptr;
+		uint32_t obj=0;
+		while(obj<obj_total)
+		{
+			if(skip!=SceneObjects->at(obj) && SceneObjects->at(obj)->Visibility())
+			{
+				Distance=SceneObjects->at(obj)->GetDistance(position);
+				if(minDistance>Distance)
+				{
+					minDistance=Distance;
+					ClosestObject=SceneObjects->at(obj);
+				}
+			}
+			obj++;
+			if(minDistance<EPSILON)
+			{
+				return (ClosestObject);
+			}
+		}
+		position=position+direction*minDistance;
+	}
+	return (nullptr);
+}
+
+// ========= SCENE ===
 
 Scene::Scene()
 {
@@ -42,96 +200,99 @@ Scene::~Scene()
 	}
 }
 
-void Scene::AddObject(Object *object)
+uint32_t Scene::AddObject(Object *object)
 {
-	this->pSceneObjects->push_back(object);
-	this->pSceneObjectsIndex[object->ID()]=object;
+	uint32_t ObjectID=UINT32_MAX;
+	if(nullptr!=object)
+	{
+		ObjectID=pSceneObjects->size();
+		pSceneObjects->push_back(object);
+	}
+	return (ObjectID);
 }
 
-uint64_t Scene::AddObject(Object::ObjectType object_type, uint64_t parent_a, uint64_t parent_b)
+uint32_t Scene::AddObject(Object::ObjectType object_type, uint32_t parent_a_id, uint32_t parent_b_id)
 {
-	uint64_t ObjectID=UINT64_MAX;
+	uint32_t ObjectID=UINT32_MAX;
 	switch (object_type)
 	{
 		default:
 		case Object::ObjectType::OBJECT:
 		{
-			Object *NewObject=new Object;
-			ObjectID=NewObject->ID();
-			this->pSceneObjects->push_back(NewObject);
-			this->pSceneObjectsIndex[ObjectID]=NewObject;
-			break;
+			return (AddObject(new Object));
 		}
 		case Object::ObjectType::DIFFERENCE:
 		{
-			break;
+			if(parent_a_id==UINT32_MAX)
+			{
+				break;
+			}
+			if(parent_b_id==UINT32_MAX)
+			{
+				break;
+			}
+			Object *ParentObjectA=(*pSceneObjects)[parent_a_id];
+			Object *ParentObjectB=(*pSceneObjects)[parent_b_id];
+			return (AddObject(new Difference(ParentObjectA, ParentObjectB)));
 		}
 		case Object::ObjectType::UNION:
 		{
-			break;
+			if(parent_a_id==UINT32_MAX)
+			{
+				break;
+			}
+			if(parent_b_id==UINT32_MAX)
+			{
+				break;
+			}
+			Object *ParentObjectA=(*pSceneObjects)[parent_a_id];
+			Object *ParentObjectB=(*pSceneObjects)[parent_b_id];
+			return (AddObject(new Union(ParentObjectA, ParentObjectB)));
 		}
 		case Object::ObjectType::INTERSECTION:
 		{
-			break;
+			if(parent_a_id==UINT32_MAX)
+			{
+				break;
+			}
+			if(parent_b_id==UINT32_MAX)
+			{
+				break;
+			}
+			Object *ParentObjectA=(*pSceneObjects)[parent_a_id];
+			Object *ParentObjectB=(*pSceneObjects)[parent_b_id];
+			return (AddObject(new Intersection(ParentObjectA, ParentObjectB)));
 		}
 		case Object::ObjectType::SPHERE:
 		{
-			Object *NewSphere=new Sphere;
-			ObjectID=NewSphere->ID();
-			this->pSceneObjects->push_back(NewSphere);
-			this->pSceneObjectsIndex[ObjectID]=NewSphere;
-			break;
+			return (AddObject(new Sphere));
 		}
 		case Object::ObjectType::CUBE:
 		{
-			Object *NewCube=new Cube;
-			ObjectID=NewCube->ID();
-			this->pSceneObjects->push_back(NewCube);
-			this->pSceneObjectsIndex[ObjectID]=NewCube;
-			break;
+			return (AddObject(new Cube));
 		}
 		case Object::ObjectType::CYLINDER:
 		{
-			Object *NewCylinder=new Cylinder;
-			ObjectID=NewCylinder->ID();
-			this->pSceneObjects->push_back(NewCylinder);
-			this->pSceneObjectsIndex[ObjectID]=NewCylinder;
-			break;
+			return (AddObject(new Cylinder));
 		}
 		case Object::ObjectType::TORUS:
 		{
-			Object *NewTorus=new Torus;
-			ObjectID=NewTorus->ID();
-			this->pSceneObjects->push_back(NewTorus);
-			this->pSceneObjectsIndex[ObjectID]=NewTorus;
-			break;
+			return (AddObject(new Torus));
 		}
 		case Object::ObjectType::PLANE:
 		{
-			Object *NewPlane=new Plane;
-			ObjectID=NewPlane->ID();
-			this->pSceneObjects->push_back(NewPlane);
-			this->pSceneObjectsIndex[ObjectID]=NewPlane;
-			break;
+			return (AddObject(new Plane));
 		}
 		case Object::ObjectType::GYROID:
 		{
-			Object *NewGyroid=new Gyroid;
-			ObjectID=NewGyroid->ID();
-			this->pSceneObjects->push_back(NewGyroid);
-			this->pSceneObjectsIndex[ObjectID]=NewGyroid;
-			break;
+			return (AddObject(new Gyroid));
 		}
 		case Object::ObjectType::SCHWARZ_PRIMITIVE:
 		{
-			Object *NewSchwarzPrimitive=new SchwarzPrimitive;
-			ObjectID=NewSchwarzPrimitive->ID();
-			this->pSceneObjects->push_back(NewSchwarzPrimitive);
-			this->pSceneObjectsIndex[ObjectID]=NewSchwarzPrimitive;
-			break;
+			return (AddObject(new SchwarzPrimitive));
 		}
 	}
-	return(ObjectID);
+	return (ObjectID);
 }
 
 static void RayRunningWrapper(vector <Ray> *rays, uint64_t thread_id, uint64_t rays_per_thread, uint64_t samples_per_pixel)
@@ -189,27 +350,27 @@ void Scene::Render()
 
 uint64_t Scene::ScreenWidth() const
 {
-	return(pScreenWidth);
+	return (pScreenWidth);
 }
 
 uint64_t Scene::ScreenHeight() const
 {
-	return(pScreenHeight);
+	return (pScreenHeight);
 }
 
 uint64_t Scene::RenderThreads() const
 {
-	return(pRenderThreads);
+	return (pRenderThreads);
 }
 
 uint64_t Scene::SamplesPerPixel() const
 {
-	return(pSamplesPerPixel);
+	return (pSamplesPerPixel);
 }
 
 int64_t Scene::RenderTime() const
 {
-	return(pRenderTime);
+	return (pRenderTime);
 }
 
 void Scene::SetScreenWidth(uint64_t width)

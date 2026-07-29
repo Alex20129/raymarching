@@ -2,10 +2,9 @@
 #define BASICOBJECTS_HPP
 
 #include <cstdint>
-#include <vector>
 #include "commonVectorFun.hpp"
 
-using namespace std;
+static constexpr float EPSILON = 1.0f/16.0f;
 
 class Object
 {
@@ -25,16 +24,15 @@ public:
 		SCHWARZ_PRIMITIVE,
 	};
 private:
-	bool pVisible=true;
-	uint64_t pID;
+	bool pVisibility=true;
 	float pBrightness=0.0;
 	float pSpecularity=0.0;
 	float pTransparency=0.0;
-	static uint64_t sLastKnownObjectID;
-protected:
-	ObjectType pType;
 	uint64_t pDiffusionChance=UINT64_MAX;
 	uint64_t pPassthroughChance=0;
+protected:
+	ObjectType pType;
+	float pProperties[4];
 	Vec3f pColor;
 	Vec3f pPosition;
 	Vec3f pVForward, pVRight, pVUp;
@@ -42,13 +40,13 @@ protected:
 	void UpdateBasis(const Vec3f &forward);
 public:
 	Object();
-	bool Visible() const;
-	void SetVisible(bool visible);
 
 	ObjectType Type() const;
-	uint64_t ID() const;
 	uint64_t DiffusionChance() const;
 	uint64_t PassthroughChance() const;
+
+	bool Visibility() const;
+	void SetVisibility(bool visible);
 
 	float Brightness() const;
 	void SetBrightness(float brightness);
@@ -70,6 +68,9 @@ public:
 	const Vec3f &Orientation() const;
 	void SetOrientation(const Vec3f &orientation);
 	void SetOrientation(float x, float y, float z);
+
+	float Property(uint32_t property) const;
+	void SetProperty(uint32_t property, float value);
 
 	virtual float GetDistance(const Vec3f &from) const;
 	virtual Vec3f GetNormalVector(const Vec3f &point) const;
@@ -101,7 +102,6 @@ public:
 
 class Sphere : public Object
 {
-	float pRadius;
 public:
 	Sphere();
 	void SetRadius(float radius);
@@ -111,7 +111,6 @@ public:
 
 class Cube : public Object
 {
-	float pHalfLength;
 public:
 	Cube();
 	void SetLength(float length);
@@ -120,18 +119,15 @@ public:
 
 class Cylinder : public Object
 {
-	float pHalfLength;
-	float pRadius;
 public:
 	Cylinder();
-	void SetLength(float length);
 	void SetRadius(float radius);
+	void SetLength(float length);
 	float GetDistance(const Vec3f &from) const;
 };
 
 class Torus : public Object
 {
-	float pRadius1, pRadius2;
 public:
 	Torus();
 	void SetRadius1(float radius);
@@ -149,7 +145,6 @@ public:
 
 class Gyroid : public Object
 {
-	float pScale;
 public:
 	Gyroid();
 	void SetScale(float scale);
@@ -158,27 +153,10 @@ public:
 
 class SchwarzPrimitive : public Object
 {
-	float pScale;
 public:
 	SchwarzPrimitive();
 	void SetScale(float scale);
 	float GetDistance(const Vec3f &from) const;
-};
-
-class Ray
-{
-	Vec3f pDefaultDirection;
-	Vec3f pFirstCollisionPoint;
-public:
-	static uint32_t STEPS_PER_RUN_LIMIT;
-	static uint32_t REFLECTIONS_LIMIT;
-	Vec3f Color;
-	vector <Object *> *SceneObjects;
-	uint64_t PRNGSeedValue=0;
-	void SetDefaultDirection(float x, float y, float z);
-	void Reset();
-	void Trace();
-	const Object *RunOnce(Vec3f &position, Vec3f direction, const Object *skip);
 };
 
 #endif // BASICOBJECTS_HPP

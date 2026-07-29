@@ -27,12 +27,12 @@ float prng32::get_rn_fp() const
 	rn.uv=0x3F800000 | (pSeed & 0x7FFFFF);
 	rn.fpv=rn.fpv-1.0;
 	rn.uv|=(pSeed & 0x80000000);
-	return(rn.fpv);
+	return (rn.fpv);
 }
 
 uint32_t prng32::get_rn_uint() const
 {
-	return(pSeed);
+	return (pSeed);
 }
 
 void prng32::generate_xorshift_star()
@@ -64,12 +64,12 @@ double prng64::get_rn_fp() const
 	rn.uv=0x3FF0000000000000 | (pSeed & 0x000FFFFFFFFFFFFF);
 	rn.fpv=rn.fpv-1.0;
 	rn.uv|=(pSeed & 0x8000000000000000);
-	return(rn.fpv);
+	return (rn.fpv);
 }
 
 uint64_t prng64::get_rn_uint() const
 {
-	return(pSeed);
+	return (pSeed);
 }
 
 void prng64::generate_xorshift_star()

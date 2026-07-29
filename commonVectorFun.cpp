@@ -44,31 +44,31 @@ void Vec2d::Normalize()
 Vec2d Vec2d::Abs() const
 {
 	Vec2d res(std::fabs(X), std::fabs(Y));
-	return(res);
+	return (res);
 }
 
 double Vec2d::Length() const
 {
 	double res=std::sqrt(X*X+Y*Y);
-	return(res);
+	return (res);
 }
 
 double Vec2d::LengthSquared() const
 {
 	double res=X*X+Y*Y;
-	return(res);
+	return (res);
 }
 
 double Vec2d::Dot(const Vec2d &other) const
 {
 	double res=this->X*other.X+this->Y*other.Y;
-	return(res);
+	return (res);
 }
 
 double Vec2d::Cross(const Vec2d &other) const
 {
 	double res=this->X*other.Y-this->Y*other.X;
-	return(res);
+	return (res);
 }
 
 Vec2d Vec2d::Min(const Vec2d &va, const Vec2d &vb)
@@ -76,7 +76,7 @@ Vec2d Vec2d::Min(const Vec2d &va, const Vec2d &vb)
 	Vec2d res(
 		std::fmin(va.X, vb.X),
 		std::fmin(va.Y, vb.Y));
-	return(res);
+	return (res);
 }
 
 Vec2d Vec2d::Max(const Vec2d &va, const Vec2d &vb)
@@ -84,20 +84,20 @@ Vec2d Vec2d::Max(const Vec2d &va, const Vec2d &vb)
 	Vec2d res(
 		std::fmax(va.X, vb.X),
 		std::fmax(va.Y, vb.Y));
-	return(res);
+	return (res);
 }
 
 Vec2d Vec2d::operator=(const Vec2d &other)
 {
 	this->X=other.X;
 	this->Y=other.Y;
-	return(*this);
+	return (*this);
 }
 
 Vec2d Vec2d::operator+(const Vec2d &other) const
 {
 	Vec2d res(this->X+other.X, this->Y+other.Y);
-	return(res);
+	return (res);
 }
 
 void Vec2d::operator+=(const Vec2d &other)
@@ -111,19 +111,19 @@ Vec2d Vec2d::operator-(const Vec2d &other) const
 	Vec2d res(this);
 	res.X-=other.X;
 	res.Y-=other.Y;
-	return(res);
+	return (res);
 }
 
 Vec2d Vec2d::operator-() const
 {
 	Vec2d res(-X, -Y);
-	return(res);
+	return (res);
 }
 
 Vec2d Vec2d::operator/(double d) const
 {
 	Vec2d res(X/d, Y/d);
-	return(res);
+	return (res);
 }
 
 Vec2d Vec2d::operator*(const Vec2d &other) const
@@ -134,12 +134,12 @@ Vec2d Vec2d::operator*(const Vec2d &other) const
 
 Vec2d operator*(const Vec2d &vec, const double m)
 {
-	return(Vec2d(vec.X*m, vec.Y*m));
+	return (Vec2d(vec.X*m, vec.Y*m));
 }
 
 Vec2d operator*(const double m, const Vec2d &vec)
 {
-	return(Vec2d(vec.X*m, vec.Y*m));
+	return (Vec2d(vec.X*m, vec.Y*m));
 }
 
 //=== Vec3 double
@@ -186,25 +186,25 @@ void Vec3d::Normalize()
 Vec3d Vec3d::Abs() const
 {
 	Vec3d res(std::fabs(X), std::fabs(Y), std::fabs(Z));
-	return(res);
+	return (res);
 }
 
 double Vec3d::Length() const
 {
 	double res=std::sqrt(X*X+Y*Y+Z*Z);
-	return(res);
+	return (res);
 }
 
 double Vec3d::LengthSquared() const
 {
 	double res=X*X+Y*Y+Z*Z;
-	return(res);
+	return (res);
 }
 
 double Vec3d::Dot(const Vec3d &other) const
 {
 	double res=this->X*other.X+this->Y*other.Y+this->Z*other.Z;
-	return(res);
+	return (res);
 }
 
 Vec3d Vec3d::Cross(const Vec3d &other) const
@@ -213,7 +213,7 @@ Vec3d Vec3d::Cross(const Vec3d &other) const
 		this->Y*other.Z-this->Z*other.Y,
 		this->Z*other.X-this->X*other.Z,
 		this->X*other.Y-this->Y*other.X);
-	return(res);
+	return (res);
 }
 
 Vec3d Vec3d::Min(const Vec3d &va, const Vec3d &vb)
@@ -222,7 +222,7 @@ Vec3d Vec3d::Min(const Vec3d &va, const Vec3d &vb)
 		std::fmin(va.X, vb.X),
 		std::fmin(va.Y, vb.Y),
 		std::fmin(va.Z, vb.Z));
-	return(res);
+	return (res);
 }
 
 Vec3d Vec3d::Max(const Vec3d &va, const Vec3d &vb)
@@ -231,7 +231,7 @@ Vec3d Vec3d::Max(const Vec3d &va, const Vec3d &vb)
 		std::fmax(va.X, vb.X),
 		std::fmax(va.Y, vb.Y),
 		std::fmax(va.Z, vb.Z));
-	return(res);
+	return (res);
 }
 
 Vec3d Vec3d::operator=(const Vec3d &other)
@@ -239,13 +239,13 @@ Vec3d Vec3d::operator=(const Vec3d &other)
 	this->X=other.X;
 	this->Y=other.Y;
 	this->Z=other.Z;
-	return(*this);
+	return (*this);
 }
 
 Vec3d Vec3d::operator+(const Vec3d &other) const
 {
 	Vec3d res(this->X+other.X, this->Y+other.Y, this->Z+other.Z);
-	return(res);
+	return (res);
 }
 
 void Vec3d::operator+=(const Vec3d &other)
@@ -261,35 +261,35 @@ Vec3d Vec3d::operator-(const Vec3d &other) const
 	res.X-=other.X;
 	res.Y-=other.Y;
 	res.Z-=other.Z;
-	return(res);
+	return (res);
 }
 
 Vec3d Vec3d::operator-() const
 {
 	Vec3d res(-X, -Y, -Z);
-	return(res);
+	return (res);
 }
 
 Vec3d Vec3d::operator/(double d) const
 {
 	Vec3d res(X/d, Y/d, Z/d);
-	return(res);
+	return (res);
 }
 
 Vec3d Vec3d::operator*(const Vec3d &other) const
 {
 	Vec3d res(this->X*other.X, this->Y*other.Y, this->Z*other.Z);
-	return(res);
+	return (res);
 }
 
 Vec3d operator*(const Vec3d &vec, const double m)
 {
-	return(Vec3d(vec.X*m, vec.Y*m, vec.Z*m));
+	return (Vec3d(vec.X*m, vec.Y*m, vec.Z*m));
 }
 
 Vec3d operator*(const double m, const Vec3d &vec)
 {
-	return(Vec3d(vec.X*m, vec.Y*m, vec.Z*m));
+	return (Vec3d(vec.X*m, vec.Y*m, vec.Z*m));
 }
 
 //=== Vec2 float
@@ -335,31 +335,31 @@ void Vec2f::Normalize()
 Vec2f Vec2f::Abs() const
 {
 	Vec2f res(std::fabs(X), std::fabs(Y));
-	return(res);
+	return (res);
 }
 
 float Vec2f::Length() const
 {
 	float res=std::sqrt(X*X+Y*Y);
-	return(res);
+	return (res);
 }
 
 float Vec2f::LengthSquared() const
 {
 	float res=X*X+Y*Y;
-	return(res);
+	return (res);
 }
 
 float Vec2f::Dot(const Vec2f &other) const
 {
 	float res=this->X*other.X+this->Y*other.Y;
-	return(res);
+	return (res);
 }
 
 float Vec2f::Cross(const Vec2f &other) const
 {
 	float res=this->X*other.Y-this->Y*other.X;
-	return(res);
+	return (res);
 }
 
 Vec2f Vec2f::Min(const Vec2f &va, const Vec2f &vb)
@@ -367,7 +367,7 @@ Vec2f Vec2f::Min(const Vec2f &va, const Vec2f &vb)
 	Vec2f res(
 		std::fmin(va.X, vb.X),
 		std::fmin(va.Y, vb.Y));
-	return(res);
+	return (res);
 }
 
 Vec2f Vec2f::Max(const Vec2f &va, const Vec2f &vb)
@@ -375,20 +375,20 @@ Vec2f Vec2f::Max(const Vec2f &va, const Vec2f &vb)
 	Vec2f res(
 		std::fmax(va.X, vb.X),
 		std::fmax(va.Y, vb.Y));
-	return(res);
+	return (res);
 }
 
 Vec2f Vec2f::operator=(const Vec2f &other)
 {
 	this->X=other.X;
 	this->Y=other.Y;
-	return(*this);
+	return (*this);
 }
 
 Vec2f Vec2f::operator+(const Vec2f &other) const
 {
 	Vec2f res(this->X+other.X, this->Y+other.Y);
-	return(res);
+	return (res);
 }
 
 void Vec2f::operator+=(const Vec2f &other)
@@ -402,19 +402,19 @@ Vec2f Vec2f::operator-(const Vec2f &other) const
 	Vec2f res(this);
 	res.X-=other.X;
 	res.Y-=other.Y;
-	return(res);
+	return (res);
 }
 
 Vec2f Vec2f::operator-() const
 {
 	Vec2f res(-X, -Y);
-	return(res);
+	return (res);
 }
 
 Vec2f Vec2f::operator/(float d) const
 {
 	Vec2f res(X/d, Y/d);
-	return(res);
+	return (res);
 }
 
 Vec2f Vec2f::operator*(const Vec2f &other) const
@@ -425,12 +425,12 @@ Vec2f Vec2f::operator*(const Vec2f &other) const
 
 Vec2f operator*(const Vec2f &vec, const float m)
 {
-	return(Vec2f(vec.X*m, vec.Y*m));
+	return (Vec2f(vec.X*m, vec.Y*m));
 }
 
 Vec2f operator*(const float m, const Vec2f &vec)
 {
-	return(Vec2f(vec.X*m, vec.Y*m));
+	return (Vec2f(vec.X*m, vec.Y*m));
 }
 
 //=== Vec3 float
@@ -477,25 +477,25 @@ void Vec3f::Normalize()
 Vec3f Vec3f::Abs() const
 {
 	Vec3f res(std::fabs(X), std::fabs(Y), std::fabs(Z));
-	return(res);
+	return (res);
 }
 
 float Vec3f::Length() const
 {
 	float res=std::sqrt(X*X+Y*Y+Z*Z);
-	return(res);
+	return (res);
 }
 
 float Vec3f::LengthSquared() const
 {
 	float res=X*X+Y*Y+Z*Z;
-	return(res);
+	return (res);
 }
 
 float Vec3f::Dot(const Vec3f &other) const
 {
 	float res=this->X*other.X+this->Y*other.Y+this->Z*other.Z;
-	return(res);
+	return (res);
 }
 
 Vec3f Vec3f::Cross(const Vec3f &other) const
@@ -504,7 +504,7 @@ Vec3f Vec3f::Cross(const Vec3f &other) const
 		this->Y*other.Z-this->Z*other.Y,
 		this->Z*other.X-this->X*other.Z,
 		this->X*other.Y-this->Y*other.X);
-	return(res);
+	return (res);
 }
 
 Vec3f Vec3f::Min(const Vec3f &va, const Vec3f &vb)
@@ -513,7 +513,7 @@ Vec3f Vec3f::Min(const Vec3f &va, const Vec3f &vb)
 		std::fmin(va.X, vb.X),
 		std::fmin(va.Y, vb.Y),
 		std::fmin(va.Z, vb.Z));
-	return(res);
+	return (res);
 }
 
 Vec3f Vec3f::Max(const Vec3f &va, const Vec3f &vb)
@@ -522,7 +522,7 @@ Vec3f Vec3f::Max(const Vec3f &va, const Vec3f &vb)
 		std::fmax(va.X, vb.X),
 		std::fmax(va.Y, vb.Y),
 		std::fmax(va.Z, vb.Z));
-	return(res);
+	return (res);
 }
 
 Vec3f Vec3f::operator=(const Vec3f &other)
@@ -530,13 +530,13 @@ Vec3f Vec3f::operator=(const Vec3f &other)
 	this->X=other.X;
 	this->Y=other.Y;
 	this->Z=other.Z;
-	return(*this);
+	return (*this);
 }
 
 Vec3f Vec3f::operator+(const Vec3f &other) const
 {
 	Vec3f res(this->X+other.X, this->Y+other.Y, this->Z+other.Z);
-	return(res);
+	return (res);
 }
 
 void Vec3f::operator+=(const Vec3f &other)
@@ -558,27 +558,27 @@ Vec3f Vec3f::operator-(const Vec3f &other) const
 Vec3f Vec3f::operator-() const
 {
 	Vec3f res(-X, -Y, -Z);
-	return(res);
+	return (res);
 }
 
 Vec3f Vec3f::operator/(float d) const
 {
 	Vec3f res(X/d, Y/d, Z/d);
-	return(res);
+	return (res);
 }
 
 Vec3f Vec3f::operator*(const Vec3f &other) const
 {
 	Vec3f res(this->X*other.X, this->Y*other.Y, this->Z*other.Z);
-	return(res);
+	return (res);
 }
 
 Vec3f operator*(const Vec3f &vec, const float m)
 {
-	return(Vec3f(vec.X*m, vec.Y*m, vec.Z*m));
+	return (Vec3f(vec.X*m, vec.Y*m, vec.Z*m));
 }
 
 Vec3f operator*(const float m, const Vec3f &vec)
 {
-	return(Vec3f(vec.X*m, vec.Y*m, vec.Z*m));
+	return (Vec3f(vec.X*m, vec.Y*m, vec.Z*m));
 }

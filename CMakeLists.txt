@@ -17,8 +17,8 @@ SET(CLIENT_EXECUTABLE_NAME "${CMAKE_PROJECT_NAME}_client")
 
 ADD_EXECUTABLE(${SERVER_EXECUTABLE_NAME}
 	server_main.cpp
-	basicObjects.cpp
-	basicObjects.hpp
+	basic_objects.cpp
+	basic_objects.hpp
 	commonVectorFun.cpp
 	commonVectorFun.hpp
 	prng.cpp
@@ -28,8 +28,8 @@ ADD_EXECUTABLE(${SERVER_EXECUTABLE_NAME}
 
 ADD_EXECUTABLE(${CLIENT_EXECUTABLE_NAME}
 	client_main.cpp
-	basicObjects.cpp
-	basicObjects.hpp
+	basic_objects.cpp
+	basic_objects.hpp
 	commonVectorFun.cpp
 	commonVectorFun.hpp
 	prng.cpp
