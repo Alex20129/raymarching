@@ -18,10 +18,18 @@ public:
 		SPHERE,
 		CUBE,
 		CYLINDER,
+		INFINITE_CYLINDER,
 		TORUS,
 		PLANE,
 		GYROID,
 		SCHWARZ_PRIMITIVE,
+	};
+	enum ObjectProperty
+	{
+		RADIUS_1,
+		RADIUS_2,
+		LENGTH,
+		SCALE,
 	};
 private:
 	bool pVisibility=true;
@@ -123,6 +131,14 @@ public:
 	Cylinder();
 	void SetRadius(float radius);
 	void SetLength(float length);
+	float GetDistance(const Vec3f &from) const;
+};
+
+class InfiniteCylinder : public Object
+{
+public:
+	InfiniteCylinder();
+	void SetRadius(float radius);
 	float GetDistance(const Vec3f &from) const;
 };
 

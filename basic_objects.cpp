@@ -351,6 +351,25 @@ float Cylinder::GetDistance(const Vec3f &from) const
 	return fmin(d.Length(), fmax(dXY, dZ));
 }
 
+// ========= INFINITE CYLINDER ===
+
+InfiniteCylinder::InfiniteCylinder()
+{
+	pType=INFINITE_CYLINDER;
+	pProperties[0]=1.0; // Radius
+}
+
+void InfiniteCylinder::SetRadius(float radius)
+{
+	pProperties[0]=radius;
+}
+
+float InfiniteCylinder::GetDistance(const Vec3f &from) const
+{
+	Vec3f localFrom=WorldToLocal(from);
+	return (Vec2f(localFrom.X, localFrom.Y).Length() - pProperties[0]);
+}
+
 // ========= TORUS ===
 
 Torus::Torus()

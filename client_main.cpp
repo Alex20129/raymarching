@@ -4,12 +4,12 @@
 #include <zmq.hpp>
 #include "scene.hpp"
 
-Scene *NewScene;
+Scene *gScene;
 
 int main(int argc, char *argv[])
 {
 	float ObjectZpos=320;
-	NewScene=new Scene;
+	gScene=new Scene;
 
 	// ======== CSG
 	Sphere *NewSphere1=new Sphere();
@@ -49,19 +49,16 @@ int main(int argc, char *argv[])
 	// Construct->SetSpecularity(0.25);
 
 	// ======== CSG: gyroid in sphere
-	Sphere *NewSphere3=new Sphere();
-	NewSphere3->SetRadius(50);
-	NewSphere3->SetPosition(0, 50, ObjectZpos);
+	// uint32_t Sphere2ObjectID=gScene->AddObject(Object::SPHERE);
+	// gScene->SetObjectProperty(Sphere2ObjectID, 0, 50.0);
+	// gScene->SetObjectPosition(Sphere2ObjectID, 0, 50, ObjectZpos);
 
-	Gyroid *NewGyroid=new Gyroid();
-	NewGyroid->SetScale(5.0);
-	NewGyroid->SetPosition(0, 50, ObjectZpos);
+	// uint32_t GyroidObjectID=gScene->AddObject(Object::GYROID);
+	// gScene->SetObjectProperty(GyroidObjectID, 0, 5.0);
+	// gScene->SetObjectPosition(GyroidObjectID, 0, 50, ObjectZpos);
 
-	Intersection *SphereGyroidIntersection=new Intersection(NewSphere3, NewGyroid);
-	SphereGyroidIntersection->SetColor(30, 130, 130);
-
-	// uint32_t SphereID=NewScene->AddObject(Object::SPHERE);
-	// uint32_t GyroidID=NewScene->AddObject(Object::GYROID);
+	// uint32_t IntersectionObjectID=gScene->AddObject(Object::INTERSECTION, Sphere2ObjectID, GyroidObjectID);
+	// gScene->SetObjectColor(IntersectionObjectID, 30, 130, 130);
 
 	// ======== CSG: Schwarz primitive in sphere
 	Sphere *NewSphere4=new Sphere();
@@ -119,6 +116,12 @@ int main(int argc, char *argv[])
 	RedSphere->SetColor(255, 52, 52);
 	// RedSphere->SetTransparency(0.5);
 
+	InfiniteCylinder *NewInfiniteCylinder1=new InfiniteCylinder();
+	NewInfiniteCylinder1->SetRadius(20);
+	NewInfiniteCylinder1->SetPosition(0, 50, ObjectZpos);
+	NewInfiniteCylinder1->SetOrientation({1, 0, 0}, 0);
+	NewInfiniteCylinder1->SetColor(30, 130, 130);
+
 	// ======== box
 	Cube *Cube3=new Cube();
 	Cube3->SetLength(80);
@@ -165,25 +168,25 @@ int main(int argc, char *argv[])
 	LightSource2->SetBrightness(9.0);
 
 	// ========
-	NewScene->AddObject(Ceiling);
-	NewScene->AddObject(Floor);
-	NewScene->AddObject(Plane3);
-	NewScene->AddObject(RedWall);
-	NewScene->AddObject(BlueWall);
+	gScene->AddObject(Ceiling);
+	gScene->AddObject(Floor);
+	gScene->AddObject(Plane3);
+	gScene->AddObject(RedWall);
+	gScene->AddObject(BlueWall);
 
-	NewScene->AddObject(LightSource1);
-	// NewScene->AddObject(LightSource2);
+	gScene->AddObject(LightSource1);
+	// gScene->AddObject(LightSource2);
 
-	// NewScene->AddObject(Construct);
-	// NewScene->AddObject(SphereGyroidIntersection);
-	NewScene->AddObject(SphereSchwarzIntersection);
+	// gScene->AddObject(Construct);
+	// gScene->AddObject(SphereGyroidIntersection);
+	// gScene->AddObject(SphereSchwarzIntersection);
 
-	// NewScene->AddObject(BlueSphere);
-	// NewScene->AddObject(RedSphere);
-	// NewScene->AddObject(GreenSphere);
-	// NewScene->AddObject(Cylinder2);
-	// NewScene->AddObject(Cube2);
-	// NewScene->AddObject(Torus1);
+	// gScene->AddObject(BlueSphere);
+	// gScene->AddObject(GreenSphere);
+	// gScene->AddObject(RedSphere);
+	gScene->AddObject(NewInfiniteCylinder1);
+	// gScene->AddObject(Cube2);
+	// gScene->AddObject(Torus1);
 
 	char fileName[128];
 	int32_t i, samples_per_pixel=256;
@@ -204,11 +207,11 @@ int main(int argc, char *argv[])
 
 		Ray::REFLECTIONS_LIMIT+=1;
 
-		NewScene->SetSamplesPerPixel(samples_per_pixel);
-		NewScene->Render();
+		gScene->SetSamplesPerPixel(samples_per_pixel);
+		gScene->Render();
 
 		sprintf(fileName, "render_%02i_%ispp.png", i, samples_per_pixel);
-		NewScene->RenderedImage.write(fileName);
+		gScene->RenderedImage.write(fileName);
 	}
 
 	return 0;

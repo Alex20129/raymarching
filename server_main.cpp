@@ -4,11 +4,11 @@
 #include <zmq.hpp>
 #include "scene.hpp"
 
-Scene *NewScene;
+Scene *gScene;
 
 int main(int argc, char *argv[])
 {
-	NewScene=new Scene;
+	gScene=new Scene;
 
 	char fileName[128];
 	int32_t i, samples_per_pixel=256;
@@ -19,11 +19,11 @@ int main(int argc, char *argv[])
 
 		Ray::REFLECTIONS_LIMIT+=1;
 
-		NewScene->SetSamplesPerPixel(samples_per_pixel);
-		NewScene->Render();
+		gScene->SetSamplesPerPixel(samples_per_pixel);
+		gScene->Render();
 
 		sprintf(fileName, "render_%02i_%ispp.png", i, samples_per_pixel);
-		NewScene->RenderedImage.write(fileName);
+		gScene->RenderedImage.write(fileName);
 	}
 
 	return 0;
