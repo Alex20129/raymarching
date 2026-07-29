@@ -9,8 +9,11 @@ Vec3f Object::WorldToLocal(const Vec3f &point) const
 	return Vec3f(dir.Dot(pVRight), dir.Dot(pVUp), dir.Dot(pVForward));
 }
 
-void Object::UpdateBasis(const Vec3f &forward)
+void Object::UpdateBasis(const Vec3f &forward, float roll)
 {
+	uint32_t WIP;
+	// the roll is not taken into account.
+	// need to fix it
 	pVForward=forward;
 	pVForward.Normalize();
 	if(fabs(pVForward.X) < 1.0)
@@ -28,7 +31,7 @@ void Object::UpdateBasis(const Vec3f &forward)
 Object::Object()
 {
 	pType=OBJECT;
-	UpdateBasis(Vec3f(0, 0, 1));
+	UpdateBasis({0, 0, 1}, 0.0F);
 }
 
 Object::ObjectType Object::Type() const
@@ -51,9 +54,9 @@ bool Object::Visibility() const
 	return (pVisibility);
 }
 
-void Object::SetVisibility(bool visible)
+void Object::SetVisibility(bool visibility)
 {
-	pVisibility=visible;
+	pVisibility=visibility;
 }
 
 float Object::Brightness() const
@@ -125,42 +128,14 @@ const Vec3f &Object::Color() const
 	return (pColor);
 }
 
-void Object::SetColor(Vec3f color)
+void Object::SetColor(const Vec3f &color)
 {
-	if(color.X>255.0F)
-	{
-		color.X=255.0F;
-	}
-	if(color.Y>255.0F)
-	{
-		color.Y=255.0F;
-	}
-	if(color.Z>255.0F)
-	{
-		color.Z=255.0F;
-	}
-	pColor.X=color.X;
-	pColor.Y=color.Y;
-	pColor.Z=color.Z;
+	pColor=Vec3f::Min(color, {255.0F, 255.0F, 255.0F});
 }
 
 void Object::SetColor(float r, float g, float b)
 {
-	if(r>255.0F)
-	{
-		r=255.0F;
-	}
-	if(g>255.0F)
-	{
-		g=255.0F;
-	}
-	if(b>255.0F)
-	{
-		b=255.0F;
-	}
-	pColor.X=r;
-	pColor.Y=g;
-	pColor.Z=b;
+	pColor=Vec3f::Min({r, g, b}, {255.0F, 255.0F, 255.0F});
 }
 
 const Vec3f &Object::Position() const
@@ -175,9 +150,7 @@ void Object::SetPosition(const Vec3f &position)
 
 void Object::SetPosition(float x, float y, float z)
 {
-	pPosition.X=x;
-	pPosition.Y=y;
-	pPosition.Z=z;
+	pPosition={x, y, z};
 }
 
 const Vec3f &Object::Orientation() const
@@ -185,14 +158,14 @@ const Vec3f &Object::Orientation() const
 	return (pVForward);
 }
 
-void Object::SetOrientation(const Vec3f &orientation)
+void Object::SetOrientation(const Vec3f &orientation, float roll)
 {
-	UpdateBasis(orientation);
+	UpdateBasis(orientation, roll);
 }
 
-void Object::SetOrientation(float x, float y, float z)
+void Object::SetOrientation(float x, float y, float z, float roll)
 {
-	UpdateBasis(Vec3f(x, y, z));
+	UpdateBasis({x, y, z}, roll);
 }
 
 float Object::Property(uint32_t property) const

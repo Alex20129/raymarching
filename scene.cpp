@@ -399,3 +399,105 @@ void Scene::SetSamplesPerPixel(uint64_t samples_per_pixel)
 {
 	pSamplesPerPixel=samples_per_pixel;
 }
+
+// ========= OBJECT MANIPULATION ===
+
+Object::ObjectType Scene::GetObjectType(uint32_t object_id) const
+{
+	return ((*pSceneObjects)[object_id]->Type());
+}
+
+bool Scene::GetObjectVisibility(uint32_t object_id) const
+{
+	return ((*pSceneObjects)[object_id]->Visibility());
+}
+
+void Scene::SetObjectVisibility(uint32_t object_id, bool visibility)
+{
+	(*pSceneObjects)[object_id]->SetVisibility(visibility);
+}
+
+float Scene::GetObjectBrightness(uint32_t object_id) const
+{
+	return ((*pSceneObjects)[object_id]->Brightness());
+}
+
+void Scene::SetObjectBrightness(uint32_t object_id, float brightness)
+{
+	(*pSceneObjects)[object_id]->SetBrightness(brightness);
+}
+
+float Scene::GetObjectSpecularity(uint32_t object_id) const
+{
+	return ((*pSceneObjects)[object_id]->Specularity());
+}
+
+void Scene::SetObjectSpecularity(uint32_t object_id, float specularity)
+{
+	(*pSceneObjects)[object_id]->SetSpecularity(specularity);
+}
+
+float Scene::GetObjectTransparency(uint32_t object_id) const
+{
+	return ((*pSceneObjects)[object_id]->Transparency());
+}
+
+void Scene::SetObjectTransparency(uint32_t object_id, float transparency)
+{
+	(*pSceneObjects)[object_id]->SetTransparency(transparency);
+}
+
+const Vec3f &Scene::GetObjectColor(uint32_t object_id) const
+{
+	return ((*pSceneObjects)[object_id]->Color());
+}
+
+void Scene::SetObjectColor(uint32_t object_id, const Vec3f &color)
+{
+	(*pSceneObjects)[object_id]->SetColor(color);
+}
+
+void Scene::SetObjectColor(uint32_t object_id, float r, float g, float b)
+{
+	(*pSceneObjects)[object_id]->SetColor(r, g, b);
+}
+
+const Vec3f &Scene::GetObjectPosition(uint32_t object_id) const
+{
+	return ((*pSceneObjects)[object_id]->Position());
+}
+
+void Scene::SetObjectPosition(uint32_t object_id, const Vec3f &position)
+{
+	(*pSceneObjects)[object_id]->SetPosition(position);
+}
+
+void Scene::SetObjectPosition(uint32_t object_id, float x, float y, float z)
+{
+	(*pSceneObjects)[object_id]->SetPosition(x, y, z);
+}
+
+const Vec3f &Scene::GetObjectOrientation(uint32_t object_id) const
+{
+	return ((*pSceneObjects)[object_id]->Orientation());
+}
+
+void Scene::SetObjectOrientation(uint32_t object_id, const Vec3f &orientation, float roll)
+{
+	(*pSceneObjects)[object_id]->SetOrientation(orientation, roll);
+}
+
+void Scene::SetObjectOrientation(uint32_t object_id, float x, float y, float z, float roll)
+{
+	(*pSceneObjects)[object_id]->SetOrientation(x, y, z, roll);
+}
+
+float Scene::GetObjectProperty(uint32_t object_id, uint32_t property) const
+{
+	return ((*pSceneObjects)[object_id]->Property(property));
+}
+
+void Scene::SetObjectProperty(uint32_t object_id, uint32_t property, float value)
+{
+	(*pSceneObjects)[object_id]->SetProperty(property, value);
+}

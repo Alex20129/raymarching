@@ -55,31 +55,33 @@ public:
 	void SetRenderThreads(uint64_t render_threads);
 	void SetSamplesPerPixel(uint64_t samples_per_pixel);
 
+	// ========= OBJECT MANIPULATION ===
+
 	Object::ObjectType GetObjectType(uint32_t object_id) const;
 
 	bool GetObjectVisibility(uint32_t object_id) const;
-	void SetObjectVisibility(bool visible);
+	void SetObjectVisibility(uint32_t object_id, bool visibility);
 
 	float GetObjectBrightness(uint32_t object_id) const;
-	void SetObjectBrightness(float brightness);
+	void SetObjectBrightness(uint32_t object_id, float brightness);
 
 	float GetObjectSpecularity(uint32_t object_id) const;
-	void SetObjectSpecularity(float specularity);
+	void SetObjectSpecularity(uint32_t object_id, float specularity);
 
 	float GetObjectTransparency(uint32_t object_id) const;
-	void SetObjectTransparency(float transparency);
+	void SetObjectTransparency(uint32_t object_id, float transparency);
 
 	const Vec3f &GetObjectColor(uint32_t object_id) const;
-	void SetObjectColor(Vec3f color);
-	void SetObjectColor(float r, float g, float b);
+	void SetObjectColor(uint32_t object_id, const Vec3f &color);
+	void SetObjectColor(uint32_t object_id, float r, float g, float b);
 
 	const Vec3f &GetObjectPosition(uint32_t object_id) const;
-	void SetObjectPosition(const Vec3f &position);
-	void SetObjectPosition(float x, float y, float z);
+	void SetObjectPosition(uint32_t object_id, const Vec3f &position);
+	void SetObjectPosition(uint32_t object_id, float x, float y, float z);
 
 	const Vec3f &GetObjectOrientation(uint32_t object_id) const;
-	void SetObjectOrientation(const Vec3f &orientation);
-	void SetObjectOrientation(float x, float y, float z);
+	void SetObjectOrientation(uint32_t object_id, const Vec3f &orientation, float roll=0.0F);
+	void SetObjectOrientation(uint32_t object_id, float x, float y, float z, float roll=0.0F);
 
 	float GetObjectProperty(uint32_t object_id, uint32_t property) const;
 	void SetObjectProperty(uint32_t object_id, uint32_t property, float value);

@@ -37,7 +37,7 @@ protected:
 	Vec3f pPosition;
 	Vec3f pVForward, pVRight, pVUp;
 	Vec3f WorldToLocal(const Vec3f &point) const;
-	void UpdateBasis(const Vec3f &forward);
+	void UpdateBasis(const Vec3f &forward, float roll=0.0F);
 public:
 	Object();
 
@@ -46,7 +46,7 @@ public:
 	uint64_t PassthroughChance() const;
 
 	bool Visibility() const;
-	void SetVisibility(bool visible);
+	void SetVisibility(bool visibility);
 
 	float Brightness() const;
 	void SetBrightness(float brightness);
@@ -58,7 +58,7 @@ public:
 	void SetTransparency(float transparency);
 
 	const Vec3f &Color() const;
-	void SetColor(Vec3f color);
+	void SetColor(const Vec3f &color);
 	void SetColor(float r, float g, float b);
 
 	const Vec3f &Position() const;
@@ -66,8 +66,8 @@ public:
 	void SetPosition(float x, float y, float z);
 
 	const Vec3f &Orientation() const;
-	void SetOrientation(const Vec3f &orientation);
-	void SetOrientation(float x, float y, float z);
+	void SetOrientation(const Vec3f &orientation, float roll=0.0F);
+	void SetOrientation(float x, float y, float z, float roll=0.0F);
 
 	float Property(uint32_t property) const;
 	void SetProperty(uint32_t property, float value);

@@ -60,6 +60,9 @@ int main(int argc, char *argv[])
 	Intersection *SphereGyroidIntersection=new Intersection(NewSphere3, NewGyroid);
 	SphereGyroidIntersection->SetColor(30, 130, 130);
 
+	// uint32_t SphereID=NewScene->AddObject(Object::SPHERE);
+	// uint32_t GyroidID=NewScene->AddObject(Object::GYROID);
+
 	// ======== CSG: Schwarz primitive in sphere
 	Sphere *NewSphere4=new Sphere();
 	NewSphere4->SetRadius(50);
