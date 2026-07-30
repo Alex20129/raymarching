@@ -170,12 +170,12 @@ void Object::SetOrientation(float x, float y, float z, float roll)
 
 float Object::Property(uint32_t property) const
 {
-	return (pProperties[property]);
+	return (pProperties[property]*2.0);
 }
 
 void Object::SetProperty(uint32_t property, float value)
 {
-	pProperties[property]=value;
+	pProperties[property]=value/2.0;
 }
 
 float Object::GetDistance(const Vec3f &from) const
@@ -208,7 +208,7 @@ Difference::Difference(Object *object_a, Object *object_b)
 	}
 	ObjectB=object_b;
 	pPosition=object_a->Position();
-	pColor=(object_a->Color()+object_b->Color())/2.0;
+	SetColor((object_a->Color()+object_b->Color())/2.0);
 	SetBrightness((object_a->Brightness()+object_b->Brightness())/2.0);
 	SetSpecularity((object_a->Specularity()+object_b->Specularity())/2.0);
 	SetTransparency((object_a->Transparency()+object_b->Transparency())/2.0);
@@ -237,7 +237,7 @@ Union::Union(Object *object_a, Object *object_b)
 	}
 	ObjectB=object_b;
 	pPosition=(object_a->Position()+object_b->Position())/2.0;
-	pColor=(object_a->Color()+object_b->Color())/2.0;
+	SetColor((object_a->Color()+object_b->Color())/2.0);
 	SetBrightness((object_a->Brightness()+object_b->Brightness())/2.0);
 	SetSpecularity((object_a->Specularity()+object_b->Specularity())/2.0);
 	SetTransparency((object_a->Transparency()+object_b->Transparency())/2.0);
@@ -266,7 +266,7 @@ Intersection::Intersection(Object *object_a, Object *object_b)
 	}
 	ObjectB=object_b;
 	pPosition=(object_a->Position()+object_b->Position())/2.0;
-	pColor=(object_a->Color()+object_b->Color())/2.0;
+	SetColor((object_a->Color()+object_b->Color())/2.0);
 	SetBrightness((object_a->Brightness()+object_b->Brightness())/2.0);
 	SetSpecularity((object_a->Specularity()+object_b->Specularity())/2.0);
 	SetTransparency((object_a->Transparency()+object_b->Transparency())/2.0);
@@ -286,17 +286,17 @@ float Intersection::GetDistance(const Vec3f &from) const
 Sphere::Sphere()
 {
 	pType=SPHERE;
-	pProperties[0]=1.0; // Radius
+	pProperties[ObjectProperty::DIAMETER]=0.5;
 }
 
-void Sphere::SetRadius(float radius)
+void Sphere::SetDiameter(float diameter)
 {
-	pProperties[0]=radius;
+	pProperties[ObjectProperty::DIAMETER]=diameter/2.0;
 }
 
 float Sphere::GetDistance(const Vec3f &from) const
 {
-	return ((from-pPosition).Length()-pProperties[0]);
+	return ((from-pPosition).Length()-pProperties[ObjectProperty::DIAMETER]);
 }
 
 Vec3f Sphere::GetNormalVector(const Vec3f &point) const
@@ -309,18 +309,49 @@ Vec3f Sphere::GetNormalVector(const Vec3f &point) const
 Cube::Cube()
 {
 	pType=CUBE;
-	pProperties[0]=0.5; // HalfLength
+	pProperties[ObjectProperty::LENGTH]=0.5;
 }
 
 void Cube::SetLength(float length)
 {
-	pProperties[0]=length/2.0;
+	pProperties[ObjectProperty::LENGTH]=length/2.0;
 }
 
 float Cube::GetDistance(const Vec3f &from) const
 {
-	Vec3f d=WorldToLocal(from).Abs()-Vec3f(pProperties[0], pProperties[0], pProperties[0]);
-	return (Vec3f::Max(d, Vec3f(0, 0, 0)).Length() + fmin(fmax(d.X, fmax(d.Y, d.Z)), 0.0));
+	Vec3f d = WorldToLocal(from).Abs() - Vec3f(pProperties[ObjectProperty::LENGTH], pProperties[ObjectProperty::LENGTH], pProperties[ObjectProperty::LENGTH]);
+	return (Vec3f::Max(d, Vec3f(0.0F, 0.0F, 0.0F)).Length() + fmin(fmax(d.X, fmax(d.Y, d.Z)), 0.0F));
+}
+
+// ========= CUBOID ===
+
+Cuboid::Cuboid()
+{
+	pType=CUBOID;
+	pProperties[ObjectProperty::LENGTH_X]=0.5;
+	pProperties[ObjectProperty::LENGTH_Y]=0.5;
+	pProperties[ObjectProperty::LENGTH_Z]=0.5;
+}
+
+void Cuboid::SetLengthX(float length)
+{
+	pProperties[ObjectProperty::LENGTH_X]=length/2.0;
+}
+
+void Cuboid::SetLengthY(float length)
+{
+	pProperties[ObjectProperty::LENGTH_Y]=length/2.0;
+}
+
+void Cuboid::SetLengthZ(float length)
+{
+	pProperties[ObjectProperty::LENGTH_Z]=length/2.0;
+}
+
+float Cuboid::GetDistance(const Vec3f &from) const
+{
+	Vec3f d = WorldToLocal(from).Abs() - Vec3f(pProperties[ObjectProperty::LENGTH_X], pProperties[ObjectProperty::LENGTH_Y], pProperties[ObjectProperty::LENGTH_Z]);
+	return (Vec3f::Max(d, Vec3f(0.0F, 0.0F, 0.0F)).Length() + fmin(fmax(d.X, fmax(d.Y, d.Z)), 0.0F));
 }
 
 // ========= CYLINDER ===
@@ -328,25 +359,25 @@ float Cube::GetDistance(const Vec3f &from) const
 Cylinder::Cylinder()
 {
 	pType=CYLINDER;
-	pProperties[0]=1.0; // Radius
-	pProperties[1]=0.5; // HalfLength
+	pProperties[ObjectProperty::DIAMETER]=0.5;
+	pProperties[ObjectProperty::LENGTH]=0.5;
 }
 
-void Cylinder::SetRadius(float radius)
+void Cylinder::SetDiameter(float diameter)
 {
-	pProperties[0]=radius;
+	pProperties[ObjectProperty::DIAMETER]=diameter/2.0;
 }
 
 void Cylinder::SetLength(float length)
 {
-	pProperties[1]=length/2.0;
+	pProperties[ObjectProperty::LENGTH]=length/2.0;
 }
 
 float Cylinder::GetDistance(const Vec3f &from) const
 {
 	Vec3f localFrom=WorldToLocal(from);
-	float dXY=Vec2f(localFrom.X, localFrom.Y).Length() - pProperties[0];
-	float dZ=fabs(localFrom.Z) - pProperties[1];
+	float dXY=Vec2f(localFrom.X, localFrom.Y).Length() - pProperties[ObjectProperty::DIAMETER];
+	float dZ=fabs(localFrom.Z) - pProperties[ObjectProperty::LENGTH];
 	Vec2f d(fmax(dXY, dZ), fmax(dXY, -dZ));
 	return fmin(d.Length(), fmax(dXY, dZ));
 }
@@ -356,18 +387,18 @@ float Cylinder::GetDistance(const Vec3f &from) const
 InfiniteCylinder::InfiniteCylinder()
 {
 	pType=INFINITE_CYLINDER;
-	pProperties[0]=1.0; // Radius
+	pProperties[ObjectProperty::DIAMETER]=0.5;
 }
 
-void InfiniteCylinder::SetRadius(float radius)
+void InfiniteCylinder::SetDiameter(float diameter)
 {
-	pProperties[0]=radius;
+	pProperties[ObjectProperty::DIAMETER]=diameter/2.0;
 }
 
 float InfiniteCylinder::GetDistance(const Vec3f &from) const
 {
 	Vec3f localFrom=WorldToLocal(from);
-	return (Vec2f(localFrom.X, localFrom.Y).Length() - pProperties[0]);
+	return (Vec2f(localFrom.X, localFrom.Y).Length() - pProperties[ObjectProperty::DIAMETER]);
 }
 
 // ========= TORUS ===
@@ -375,25 +406,25 @@ float InfiniteCylinder::GetDistance(const Vec3f &from) const
 Torus::Torus()
 {
 	pType=TORUS;
-	pProperties[0]=2.0; // Radius1
-	pProperties[1]=1.0; // Radius2
+	pProperties[ObjectProperty::DIAMETER_1]=0.5;
+	pProperties[ObjectProperty::DIAMETER_2]=1.0;
 }
 
-void Torus::SetRadius1(float radius)
+void Torus::SetDiameter1(float diameter)
 {
-	pProperties[0]=radius;
+	pProperties[ObjectProperty::DIAMETER_1]=diameter/2.0;
 }
 
-void Torus::SetRadius2(float radius)
+void Torus::SetDiameter2(float diameter)
 {
-	pProperties[1]=radius;
+	pProperties[ObjectProperty::DIAMETER_2]=diameter/2.0;
 }
 
 float Torus::GetDistance(const Vec3f &from) const
 {
 	Vec3f localFrom=WorldToLocal(from);
-	Vec2f d=Vec2f(Vec2f(localFrom.X, localFrom.Y).Length()-pProperties[0], localFrom.Z);
-	return (d.Length()-pProperties[1]);
+	Vec2f d=Vec2f(Vec2f(localFrom.X, localFrom.Y).Length()-pProperties[ObjectProperty::DIAMETER_2], localFrom.Z);
+	return (d.Length()-pProperties[ObjectProperty::DIAMETER_1]);
 }
 
 // ========= PLANE ===
@@ -418,35 +449,35 @@ Vec3f Plane::GetNormalVector(const Vec3f &point) const
 Gyroid::Gyroid()
 {
 	pType=GYROID;
-	pProperties[0]=1.0;  // Scale
+	pProperties[ObjectProperty::SCALE]=1.0;
 }
 
 void Gyroid::SetScale(float scale)
 {
-	pProperties[0]=scale;
+	pProperties[ObjectProperty::SCALE]=scale/2.0;
 }
 
 float Gyroid::GetDistance(const Vec3f &from) const
 {
-	Vec3f localFrom=WorldToLocal(from)/pProperties[0];
+	Vec3f localFrom=WorldToLocal(from)/pProperties[ObjectProperty::SCALE];
 	return (cos(localFrom.X)*sin(localFrom.Y) + cos(localFrom.Y)*sin(localFrom.Z) + cos(localFrom.Z)*sin(localFrom.X));
 }
 
-// ========= Schwarz primitive ===
+// ========= SCHWARZ PRIMITIVE ===
 
 SchwarzPrimitive::SchwarzPrimitive()
 {
 	pType=SCHWARZ_PRIMITIVE;
-	pProperties[0]=1.0; // Scale
+	pProperties[ObjectProperty::SCALE]=1.0;
 }
 
 void SchwarzPrimitive::SetScale(float scale)
 {
-	pProperties[0]=scale;
+	pProperties[ObjectProperty::SCALE]=scale/2.0;
 }
 
 float SchwarzPrimitive::GetDistance(const Vec3f &from) const
 {
-	Vec3f localFrom=WorldToLocal(from)/pProperties[0];
+	Vec3f localFrom=WorldToLocal(from)/pProperties[ObjectProperty::SCALE];
 	return (cos(localFrom.X) + cos(localFrom.Y) + cos(localFrom.Z));
 }

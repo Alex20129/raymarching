@@ -8,7 +8,6 @@
 static constexpr uint64_t DefaultScreenWidth=2048;
 static constexpr uint64_t DefaultScreenHeight=1536;
 static constexpr uint64_t DefaultRenderThreads=1;
-static constexpr uint64_t DefaultSamplesPerPixel=8;
 
 using namespace std;
 
@@ -16,28 +15,29 @@ class Ray
 {
 	Vec3f pDefaultDirection;
 	Vec3f pFirstCollisionPoint;
+	const Object *RunOnce(Vec3f &position, Vec3f direction, const Object *skip);
 public:
 	static uint32_t STEPS_PER_RUN_LIMIT;
 	static uint32_t REFLECTIONS_LIMIT;
+	vector <const Object *> *VisibleObjects;
 	Vec3f Color;
-	vector <Object *> *SceneObjects;
 	uint64_t PRNGSeedValue=0;
 	void SetDefaultDirection(float x, float y, float z);
 	void Reset();
 	void Trace();
-	const Object *RunOnce(Vec3f &position, Vec3f direction, const Object *skip);
 };
 
 class Scene
 {
 	vector <Ray> SceneRays;
 	vector <Object *> *pSceneObjects;
+	vector <const Object *> *pVisibleObjects;
 	uint64_t pScreenWidth=DefaultScreenWidth;
 	uint64_t pScreenHeight=DefaultScreenHeight;
 	uint64_t pRenderThreads=DefaultRenderThreads;
-	uint64_t pSamplesPerPixel=DefaultSamplesPerPixel;
 	int64_t pRenderTime;
 public:
+	static uint64_t SAMPLES_PER_PIXEL;
 	png::image<png::rgb_pixel> RenderedImage;
 	Scene();
 	~Scene();
@@ -47,13 +47,11 @@ public:
 	uint64_t ScreenWidth() const;
 	uint64_t ScreenHeight() const;
 	uint64_t RenderThreads() const;
-	uint64_t SamplesPerPixel() const;
 	int64_t RenderTime() const;
 	void SetScreenWidth(uint64_t width);
 	void SetScreenHeight(uint64_t height);
 	void SetScreenSize(uint64_t width, uint64_t height);
 	void SetRenderThreads(uint64_t render_threads);
-	void SetSamplesPerPixel(uint64_t samples_per_pixel);
 
 	// ========= OBJECT MANIPULATION ===
 

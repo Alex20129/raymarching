@@ -10,7 +10,7 @@
 // ========= RAY ===
 
 uint32_t Ray::STEPS_PER_RUN_LIMIT = 1024u;
-uint32_t Ray::REFLECTIONS_LIMIT = 1u;
+uint32_t Ray::REFLECTIONS_LIMIT = 4u;
 
 void Ray::SetDefaultDirection(float x, float y, float z)
 {
@@ -133,28 +133,24 @@ void Ray::Trace()
 
 const Object *Ray::RunOnce(Vec3f &position, Vec3f direction, const Object *skip)
 {
+	vector <const Object *> *Objects=this->VisibleObjects;
 	uint32_t StepsPerRunLimit=Ray::STEPS_PER_RUN_LIMIT;
-	uint32_t obj_total=SceneObjects->size();
-	for(uint32_t StepsTaken=0; StepsTaken<StepsPerRunLimit; StepsTaken++)
+	for (uint32_t StepsTaken=0; StepsTaken<StepsPerRunLimit; StepsTaken++)
 	{
 		float minDistance=FLT_MAX, Distance;
-		const Object *ClosestObject=nullptr;
-		uint32_t obj=0;
-		while(obj<obj_total)
+		for (const Object *ThisObject : *Objects)
 		{
-			if(skip!=SceneObjects->at(obj) && SceneObjects->at(obj)->Visibility())
+			if (skip!=ThisObject)
 			{
-				Distance=SceneObjects->at(obj)->GetDistance(position);
-				if(minDistance>Distance)
+				Distance=ThisObject->GetDistance(position);
+				if (minDistance>Distance)
 				{
 					minDistance=Distance;
-					ClosestObject=SceneObjects->at(obj);
 				}
 			}
-			obj++;
-			if(minDistance<EPSILON)
+			if (minDistance<EPSILON)
 			{
-				return (ClosestObject);
+				return (ThisObject);
 			}
 		}
 		position=position+direction*minDistance;
@@ -164,28 +160,27 @@ const Object *Ray::RunOnce(Vec3f &position, Vec3f direction, const Object *skip)
 
 // ========= SCENE ===
 
+uint64_t Scene::SAMPLES_PER_PIXEL = 8u;
+
 Scene::Scene()
 {
 	pSceneObjects=new vector <Object *>;
-
+	pVisibleObjects=new vector <const Object *>;
 	if(pRenderThreads<thread::hardware_concurrency())
 	{
 		pRenderThreads=thread::hardware_concurrency();
 	}
-
 	SetScreenSize(DefaultScreenWidth, DefaultScreenHeight);
-
 	SceneRays.reserve(pScreenHeight*pScreenWidth+1);
-
 	uint64_t X, Y;
-	for(Y=0; Y<pScreenHeight; ++Y)
+	for(Y=0; Y<pScreenHeight; Y++)
 	{
-		for(X=0; X<pScreenWidth; ++X)
+		for(X=0; X<pScreenWidth; X++)
 		{
 			SceneRays.push_back(Ray());
 			SceneRays.back().SetDefaultDirection(X-pScreenWidth/2.0, Y-pScreenHeight/2.0, pScreenWidth);
-			SceneRays.back().SceneObjects=this->pSceneObjects;
 			SceneRays.back().PRNGSeedValue=pScreenHeight*pScreenWidth+X*X+Y*Y+X*Y;
+			SceneRays.back().VisibleObjects=pVisibleObjects;
 		}
 	}
 }
@@ -198,6 +193,8 @@ Scene::~Scene()
 		pSceneObjects->pop_back();
 		delete object;
 	}
+	delete(pVisibleObjects);
+	delete(pSceneObjects);
 }
 
 uint32_t Scene::AddObject(Object *object)
@@ -271,9 +268,17 @@ uint32_t Scene::AddObject(Object::ObjectType object_type, uint32_t parent_a_id, 
 		{
 			return (AddObject(new Cube));
 		}
+		case Object::ObjectType::CUBOID:
+		{
+			return (AddObject(new Cuboid));
+		}
 		case Object::ObjectType::CYLINDER:
 		{
 			return (AddObject(new Cylinder));
+		}
+		case Object::ObjectType::INFINITE_CYLINDER:
+		{
+			return (AddObject(new InfiniteCylinder));
 		}
 		case Object::ObjectType::TORUS:
 		{
@@ -310,17 +315,26 @@ static void RayRunningWrapper(vector <Ray> *rays, uint64_t thread_id, uint64_t r
 
 void Scene::Render()
 {
-	uint64_t threadid;
+	uint64_t threadid, samplesPerPixel=Scene::SAMPLES_PER_PIXEL;
+	float colorDiv=samplesPerPixel;
 	thread *renderThread;
-	float colorDiv=pSamplesPerPixel;
 	queue<thread *> renderThreads;
+
+	pVisibleObjects->clear();
+	for(Object *object : *pSceneObjects)
+	{
+		if(object->Visibility())
+		{
+			pVisibleObjects->push_back(object);
+		}
+	}
 
 	chrono::time_point <chrono::high_resolution_clock> finish;
 	chrono::time_point <chrono::high_resolution_clock> start=chrono::high_resolution_clock::now();
 
 	for(threadid=0; threadid<pRenderThreads; threadid++)
 	{
-		renderThread=new thread(RayRunningWrapper, &SceneRays, threadid, SceneRays.size()/pRenderThreads, pSamplesPerPixel);
+		renderThread=new thread(RayRunningWrapper, &SceneRays, threadid, SceneRays.size()/pRenderThreads, samplesPerPixel);
 		renderThreads.push(renderThread);
 	}
 	while(!renderThreads.empty())
@@ -343,7 +357,7 @@ void Scene::Render()
 	}
 	finish=chrono::high_resolution_clock::now();
 	pRenderTime=(finish - start).count()/1000000;
-	fprintf(stdout, "SamplesPerPixel: %lu\n", pSamplesPerPixel);
+	fprintf(stdout, "SamplesPerPixel: %lu\n", samplesPerPixel);
 	fprintf(stdout, "RenderThreads: %lu\n", pRenderThreads);
 	fprintf(stdout, "RenderTime: %li ms\n", pRenderTime);
 }
@@ -361,11 +375,6 @@ uint64_t Scene::ScreenHeight() const
 uint64_t Scene::RenderThreads() const
 {
 	return (pRenderThreads);
-}
-
-uint64_t Scene::SamplesPerPixel() const
-{
-	return (pSamplesPerPixel);
 }
 
 int64_t Scene::RenderTime() const
@@ -393,11 +402,6 @@ void Scene::SetScreenSize(uint64_t width, uint64_t height)
 void Scene::SetRenderThreads(uint64_t render_threads)
 {
 	pRenderThreads=render_threads;
-}
-
-void Scene::SetSamplesPerPixel(uint64_t samples_per_pixel)
-{
-	pSamplesPerPixel=samples_per_pixel;
 }
 
 // ========= OBJECT MANIPULATION ===

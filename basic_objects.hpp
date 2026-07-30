@@ -17,6 +17,7 @@ public:
 		INTERSECTION,
 		SPHERE,
 		CUBE,
+		CUBOID,
 		CYLINDER,
 		INFINITE_CYLINDER,
 		TORUS,
@@ -24,12 +25,16 @@ public:
 		GYROID,
 		SCHWARZ_PRIMITIVE,
 	};
-	enum ObjectProperty
+	struct ObjectProperty
 	{
-		RADIUS_1,
-		RADIUS_2,
-		LENGTH,
-		SCALE,
+		static constexpr uint8_t DIAMETER=0;
+		static constexpr uint8_t DIAMETER_1=0;
+		static constexpr uint8_t DIAMETER_2=1;
+		static constexpr uint8_t LENGTH=2;
+		static constexpr uint8_t LENGTH_X=2;
+		static constexpr uint8_t LENGTH_Y=3;
+		static constexpr uint8_t LENGTH_Z=4;
+		static constexpr uint8_t SCALE=5;
 	};
 private:
 	bool pVisibility=true;
@@ -38,10 +43,10 @@ private:
 	float pTransparency=0.0;
 	uint64_t pDiffusionChance=UINT64_MAX;
 	uint64_t pPassthroughChance=0;
+	Vec3f pColor;
 protected:
 	ObjectType pType;
-	float pProperties[4];
-	Vec3f pColor;
+	float pProperties[6];
 	Vec3f pPosition;
 	Vec3f pVForward, pVRight, pVUp;
 	Vec3f WorldToLocal(const Vec3f &point) const;
@@ -112,7 +117,7 @@ class Sphere : public Object
 {
 public:
 	Sphere();
-	void SetRadius(float radius);
+	void SetDiameter(float diameter);
 	float GetDistance(const Vec3f &from) const;
 	Vec3f GetNormalVector(const Vec3f &point) const;
 };
@@ -125,11 +130,21 @@ public:
 	float GetDistance(const Vec3f &from) const;
 };
 
+class Cuboid : public Object
+{
+public:
+	Cuboid();
+	void SetLengthX(float length);
+	void SetLengthY(float length);
+	void SetLengthZ(float length);
+	float GetDistance(const Vec3f &from) const;
+};
+
 class Cylinder : public Object
 {
 public:
 	Cylinder();
-	void SetRadius(float radius);
+	void SetDiameter(float diameter);
 	void SetLength(float length);
 	float GetDistance(const Vec3f &from) const;
 };
@@ -138,7 +153,7 @@ class InfiniteCylinder : public Object
 {
 public:
 	InfiniteCylinder();
-	void SetRadius(float radius);
+	void SetDiameter(float diameter);
 	float GetDistance(const Vec3f &from) const;
 };
 
@@ -146,8 +161,8 @@ class Torus : public Object
 {
 public:
 	Torus();
-	void SetRadius1(float radius);
-	void SetRadius2(float radius);
+	void SetDiameter1(float diameter);
+	void SetDiameter2(float diameter);
 	float GetDistance(const Vec3f &from) const;
 };
 
