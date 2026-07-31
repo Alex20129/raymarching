@@ -9,10 +9,9 @@ Scene *gScene;
 int main(int argc, char *argv[])
 {
 	gScene=new Scene;
-
 	char fileName[128];
+
 	int32_t i;
-	// for(i=0; i<8; i++, samples_per_pixel*=2)
 	for(i=0; i<10; i++)
 	{
 		// float spec=i*0.1;

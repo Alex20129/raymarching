@@ -10,7 +10,7 @@
 // ========= RAY ===
 
 uint32_t Ray::STEPS_PER_RUN_LIMIT = 1024u;
-uint32_t Ray::REFLECTIONS_LIMIT = 4u;
+uint32_t Ray::REFLECTIONS_LIMIT = 5u;
 
 void Ray::SetDefaultDirection(float x, float y, float z)
 {
@@ -279,6 +279,14 @@ uint32_t Scene::AddObject(Object::ObjectType object_type, uint32_t parent_a_id, 
 		case Object::ObjectType::INFINITE_CYLINDER:
 		{
 			return (AddObject(new InfiniteCylinder));
+		}
+		case Object::ObjectType::ELLIPTIC_CYLINDER:
+		{
+			return (AddObject(new EllipticCylinder));
+		}
+		case Object::ObjectType::INFINITE_ELLIPTIC_CYLINDER:
+		{
+			return (AddObject(new InfiniteEllipticCylinder));
 		}
 		case Object::ObjectType::TORUS:
 		{

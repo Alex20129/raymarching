@@ -1,6 +1,7 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
+#include <cmath>
 #include <zmq.hpp>
 #include "scene.hpp"
 
@@ -12,75 +13,65 @@ int main(int argc, char *argv[])
 	gScene=new Scene;
 
 	// ======== CSG: classic example
-	// uint32_t Sphere1ObjectID=gScene->AddObject(Object::SPHERE);
+	// uint32_t Sphere1ObjectID=gScene->AddObject(Object::ObjectType::SPHERE);
 	// gScene->SetObjectProperty(Sphere1ObjectID, Object::ObjectProperty::DIAMETER, 88.0);
 	// gScene->SetObjectPosition(Sphere1ObjectID, 0, 65, ObjectZpos);
 
-	// uint32_t Cube1ObjectID=gScene->AddObject(Object::CUBE);
+	// uint32_t Cube1ObjectID=gScene->AddObject(Object::ObjectType::CUBE);
 	// gScene->SetObjectProperty(Cube1ObjectID, Object::ObjectProperty::LENGTH, 70.0);
 	// gScene->SetObjectPosition(Cube1ObjectID, 0, 65, ObjectZpos);
 	// gScene->SetObjectOrientation(Cube1ObjectID, 1, 0, 1, 0);
 
-	// uint32_t IntersectionObjectID=gScene->AddObject(Object::INTERSECTION, Sphere1ObjectID, Cube1ObjectID);
+	// uint32_t IntersectionObjectID=gScene->AddObject(Object::ObjectType::INTERSECTION, Sphere1ObjectID, Cube1ObjectID);
 	// gScene->SetObjectColor(IntersectionObjectID, 30, 130, 130);
 
-	// uint32_t InfiniteCylinder1ObjectID=gScene->AddObject(Object::INFINITE_CYLINDER);
+	// uint32_t InfiniteCylinder1ObjectID=gScene->AddObject(Object::ObjectType::INFINITE_CYLINDER);
 	// gScene->SetObjectProperty(InfiniteCylinder1ObjectID, Object::ObjectProperty::DIAMETER, 44.0);
 	// gScene->SetObjectPosition(InfiniteCylinder1ObjectID, 0, 65, ObjectZpos);
 	// gScene->SetObjectOrientation(InfiniteCylinder1ObjectID, 1, 0, 1, 0);
 
-	// uint32_t InfiniteCylinder2ObjectID=gScene->AddObject(Object::INFINITE_CYLINDER);
+	// uint32_t InfiniteCylinder2ObjectID=gScene->AddObject(Object::ObjectType::INFINITE_CYLINDER);
 	// gScene->SetObjectProperty(InfiniteCylinder2ObjectID, Object::ObjectProperty::DIAMETER, 44.0);
 	// gScene->SetObjectPosition(InfiniteCylinder2ObjectID, 0, 65, ObjectZpos);
 	// gScene->SetObjectOrientation(InfiniteCylinder2ObjectID, 1, 0, -1, 0);
 
-	// uint32_t InfiniteCylinder3ObjectID=gScene->AddObject(Object::INFINITE_CYLINDER);
+	// uint32_t InfiniteCylinder3ObjectID=gScene->AddObject(Object::ObjectType::INFINITE_CYLINDER);
 	// gScene->SetObjectProperty(InfiniteCylinder3ObjectID, Object::ObjectProperty::DIAMETER, 44.0);
 	// gScene->SetObjectPosition(InfiniteCylinder3ObjectID, 0, 65, ObjectZpos);
 	// gScene->SetObjectOrientation(InfiniteCylinder3ObjectID, 0, 1, 0, 0);
 
-	// uint32_t Difference1ObjectID=gScene->AddObject(Object::DIFFERENCE, IntersectionObjectID, InfiniteCylinder1ObjectID);
-	// uint32_t Difference2ObjectID=gScene->AddObject(Object::DIFFERENCE, Difference1ObjectID, InfiniteCylinder2ObjectID);
+	// uint32_t Difference1ObjectID=gScene->AddObject(Object::ObjectType::DIFFERENCE, IntersectionObjectID, InfiniteCylinder1ObjectID);
+	// uint32_t Difference2ObjectID=gScene->AddObject(Object::ObjectType::DIFFERENCE, Difference1ObjectID, InfiniteCylinder2ObjectID);
 
-	// uint32_t ConstructObjectID=gScene->AddObject(Object::DIFFERENCE, Difference2ObjectID, InfiniteCylinder3ObjectID);
+	// uint32_t ConstructObjectID=gScene->AddObject(Object::ObjectType::DIFFERENCE, Difference2ObjectID, InfiniteCylinder3ObjectID);
 	// gScene->SetObjectColor(ConstructObjectID, 30, 130, 130);
 	// gScene->SetObjectSpecularity(ConstructObjectID, 0.1);
 
 	// ======== CSG: gyroid in sphere
-	uint32_t Sphere2ObjectID=gScene->AddObject(Object::SPHERE);
-	gScene->SetObjectProperty(Sphere2ObjectID, Object::ObjectProperty::DIAMETER, 100.0);
-	gScene->SetObjectPosition(Sphere2ObjectID, 0, 50, ObjectZpos);
+	// uint32_t Sphere2ObjectID=gScene->AddObject(Object::ObjectType::SPHERE);
+	// gScene->SetObjectProperty(Sphere2ObjectID, Object::ObjectProperty::DIAMETER, 100.0);
+	// gScene->SetObjectPosition(Sphere2ObjectID, 0, 50, ObjectZpos);
 
-	uint32_t GyroidObjectID=gScene->AddObject(Object::GYROID);
-	gScene->SetObjectProperty(GyroidObjectID, Object::ObjectProperty::SCALE, 10.0);
-	gScene->SetObjectPosition(GyroidObjectID, 0, 50, ObjectZpos);
+	// uint32_t GyroidObjectID=gScene->AddObject(Object::ObjectType::GYROID);
+	// gScene->SetObjectProperty(GyroidObjectID, Object::ObjectProperty::SCALE, 10.0);
+	// gScene->SetObjectPosition(GyroidObjectID, 0, 50, ObjectZpos);
 
-	uint32_t GyroidInSphereObjectID=gScene->AddObject(Object::INTERSECTION, Sphere2ObjectID, GyroidObjectID);
-	gScene->SetObjectColor(GyroidInSphereObjectID, 30, 130, 130);
-	gScene->SetObjectSpecularity(GyroidInSphereObjectID, 0.1);
+	// uint32_t GyroidInSphereObjectID=gScene->AddObject(Object::ObjectType::INTERSECTION, Sphere2ObjectID, GyroidObjectID);
+	// gScene->SetObjectColor(GyroidInSphereObjectID, 30, 130, 130);
 
 	// ======== CSG: Schwarz primitive in sphere
-	Sphere *NewSphere4=new Sphere();
-	NewSphere4->SetDiameter(100);
-	NewSphere4->SetPosition(0, 50, ObjectZpos);
+	// uint32_t Sphere3ObjectID=gScene->AddObject(Object::ObjectType::SPHERE);
+	// gScene->SetObjectProperty(Sphere3ObjectID, Object::ObjectProperty::DIAMETER, 100.0);
+	// gScene->SetObjectPosition(Sphere3ObjectID, 0, 50, ObjectZpos);
 
-	SchwarzPrimitive *NewSchwarzPrimitive=new SchwarzPrimitive();
-	NewSchwarzPrimitive->SetScale(6.5);
-	NewSchwarzPrimitive->SetPosition(0, 50, ObjectZpos);
-	NewSchwarzPrimitive->SetOrientation(1, 0, 1);
+	// uint32_t SchwarzPrimitive1ObjectID=gScene->AddObject(Object::ObjectType::SCHWARZ_PRIMITIVE);
+	// gScene->SetObjectProperty(SchwarzPrimitive1ObjectID, Object::ObjectProperty::SCALE, 13.0);
+	// gScene->SetObjectPosition(SchwarzPrimitive1ObjectID, 0, 50, ObjectZpos);
 
-	Intersection *SphereSchwarzIntersection=new Intersection(NewSphere4, NewSchwarzPrimitive);
-	SphereSchwarzIntersection->SetColor(30, 130, 130);
-	SphereSchwarzIntersection->SetSpecularity(0.25);
+	// uint32_t SchwarzPrimitiveInSphereObjectID=gScene->AddObject(Object::ObjectType::INTERSECTION, Sphere3ObjectID, SchwarzPrimitive1ObjectID);
+	// gScene->SetObjectColor(SchwarzPrimitiveInSphereObjectID, 30, 130, 130);
 
 	// ======== primitives
-	Cylinder *Cylinder2=new Cylinder();
-	Cylinder2->SetLength(56);
-	Cylinder2->SetDiameter(56);
-	Cylinder2->SetPosition(80, 50, ObjectZpos);
-	Cylinder2->SetSpecularity(0.25);
-	Cylinder2->SetColor(240, 18, 240);
-
 	Cube *Cube2=new Cube();
 	Cube2->SetLength(56);
 	Cube2->SetPosition(80, 50, ObjectZpos);
@@ -115,11 +106,27 @@ int main(int argc, char *argv[])
 	RedSphere->SetColor(255, 52, 52);
 	// RedSphere->SetTransparency(0.5);
 
-	InfiniteCylinder *NewInfiniteCylinder=new InfiniteCylinder();
-	NewInfiniteCylinder->SetDiameter(40);
-	NewInfiniteCylinder->SetPosition(0, 50, ObjectZpos);
-	NewInfiniteCylinder->SetOrientation({1, 0, 0}, 0);
-	NewInfiniteCylinder->SetColor(30, 130, 130);
+	uint32_t Cylinder1ObjectID=gScene->AddObject(Object::ObjectType::CYLINDER);
+	gScene->SetObjectProperty(Cylinder1ObjectID, Object::ObjectProperty::DIAMETER, 60);
+	gScene->SetObjectProperty(Cylinder1ObjectID, Object::ObjectProperty::LENGTH, 60);
+	gScene->SetObjectPosition(Cylinder1ObjectID, 0, 50, ObjectZpos);
+	gScene->SetObjectOrientation(Cylinder1ObjectID, 1, 0, 1, 0);
+	gScene->SetObjectColor(Cylinder1ObjectID, 120, 20, 120);
+	gScene->SetObjectSpecularity(Cylinder1ObjectID, 1.0);
+
+	// uint32_t InfiniteCylinder1ObjectID=gScene->AddObject(Object::ObjectType::INFINITE_CYLINDER);
+	// gScene->SetObjectProperty(InfiniteCylinder1ObjectID, Object::ObjectProperty::DIAMETER, 40);
+	// gScene->SetObjectPosition(InfiniteCylinder1ObjectID, 0, 50, ObjectZpos);
+	// gScene->SetObjectOrientation(InfiniteCylinder1ObjectID, 1, 0, 0, 0);
+	// gScene->SetObjectColor(InfiniteCylinder1ObjectID, 130, 30, 130);
+
+	// uint32_t EllipticCylinder1ObjectID=gScene->AddObject(Object::ObjectType::ELLIPTIC_CYLINDER);
+	// gScene->SetObjectProperty(EllipticCylinder1ObjectID, Object::ObjectProperty::DIAMETER_1, 30);
+	// gScene->SetObjectProperty(EllipticCylinder1ObjectID, Object::ObjectProperty::DIAMETER_2, 60);
+	// gScene->SetObjectProperty(EllipticCylinder1ObjectID, Object::ObjectProperty::LENGTH, 60);
+	// gScene->SetObjectPosition(EllipticCylinder1ObjectID, 0, 50, ObjectZpos);
+	// gScene->SetObjectOrientation(EllipticCylinder1ObjectID, 1, 0, 1, 0);
+	// gScene->SetObjectColor(EllipticCylinder1ObjectID, 130, 30, 130);
 
 	// ======== box
 	Cube *Cube3=new Cube();
@@ -181,23 +188,22 @@ int main(int argc, char *argv[])
 	// gScene->AddObject(BlueSphere);
 	// gScene->AddObject(GreenSphere);
 	// gScene->AddObject(RedSphere);
-	// gScene->AddObject(NewInfiniteCylinder);
 	// gScene->AddObject(Cube2);
 	// gScene->AddObject(Torus1);
 
 	char fileName[128];
 	int32_t i;
 	Ray::REFLECTIONS_LIMIT=6;
-	Scene::SAMPLES_PER_PIXEL=128;
-	// for(i=0; i<8; i++, samples_per_pixel*=2)
-	for(i=0; i<10; i++)
+	Scene::SAMPLES_PER_PIXEL=350;
+	for(i=0; i<50; i++)
 	{
 		// float spec=i*0.1;
 
-		// Cylinder1->SetOrientation(0, std::sin(i*M_PI_2/10.0), std::cos(i*M_PI_2/10.0));
 		// Cube2->SetOrientation(std::sin(i*M_PI_2/10.0), std::cos(i*M_PI_2/10.0), 0);
 		// Torus1->SetOrientation(0, std::sin(i*M_PI_2/10.0), std::cos(i*M_PI_2/10.0));
 		// NewSchwarzPrimitive->SetOrientation(std::sin(i*M_PI_2/50.0), 0, std::cos(i*M_PI_2/50.0));
+
+		gScene->SetObjectOrientation(Cylinder1ObjectID, std::sin(i*M_PI_2/50.0), 0, std::cos(i*M_PI_2/50.0), 0);
 
 		// RedSphere->SetSpecularity(spec);
 		// GreenSphere->SetSpecularity(spec);
@@ -209,7 +215,7 @@ int main(int argc, char *argv[])
 		sprintf(fileName, "render_%02i_%luspp.png", i, Scene::SAMPLES_PER_PIXEL);
 		gScene->RenderedImage.write(fileName);
 
-		Scene::SAMPLES_PER_PIXEL*=2;
+		// Scene::SAMPLES_PER_PIXEL*=2;
 	}
 
 	return 0;

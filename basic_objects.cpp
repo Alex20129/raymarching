@@ -375,11 +375,10 @@ void Cylinder::SetLength(float length)
 
 float Cylinder::GetDistance(const Vec3f &from) const
 {
-	Vec3f localFrom=WorldToLocal(from);
+	Vec3f localFrom = WorldToLocal(from);
 	float dXY=Vec2f(localFrom.X, localFrom.Y).Length() - pProperties[ObjectProperty::DIAMETER];
 	float dZ=fabs(localFrom.Z) - pProperties[ObjectProperty::LENGTH];
-	Vec2f d(fmax(dXY, dZ), fmax(dXY, -dZ));
-	return fmin(d.Length(), fmax(dXY, dZ));
+	return fmin(fmax(dXY, dZ), 0.0) + Vec2f::Max({dXY, dZ}, {0.0, 0.0}).Length();
 }
 
 // ========= INFINITE CYLINDER ===
@@ -399,6 +398,68 @@ float InfiniteCylinder::GetDistance(const Vec3f &from) const
 {
 	Vec3f localFrom=WorldToLocal(from);
 	return (Vec2f(localFrom.X, localFrom.Y).Length() - pProperties[ObjectProperty::DIAMETER]);
+}
+
+// ========= ELLIPTIC CYLINDER ===
+
+EllipticCylinder::EllipticCylinder()
+{
+	pType=ELLIPTIC_CYLINDER;
+	pProperties[ObjectProperty::DIAMETER_1]=0.5;
+	pProperties[ObjectProperty::DIAMETER_2]=1.0;
+	pProperties[ObjectProperty::LENGTH]=1.0;
+}
+
+void EllipticCylinder::SetDiameter1(float diameter)
+{
+	pProperties[ObjectProperty::DIAMETER_1]=diameter/2.0;
+}
+
+void EllipticCylinder::SetDiameter2(float diameter)
+{
+	pProperties[ObjectProperty::DIAMETER_2]=diameter/2.0;
+}
+
+void EllipticCylinder::SetLength(float length)
+{
+	pProperties[ObjectProperty::LENGTH]=length/2.0;
+}
+
+float EllipticCylinder::GetDistance(const Vec3f &from) const
+{
+	Vec3f localFrom=WorldToLocal(from);
+	float Rx=pProperties[Object::ObjectProperty::DIAMETER_1];
+	float StretchFactor=Rx/pProperties[Object::ObjectProperty::DIAMETER_2];
+	float dXY=Vec2f(localFrom.X, localFrom.Y*StretchFactor).Length() - Rx;
+	float dZ=fabs(localFrom.Z) - pProperties[ObjectProperty::LENGTH];
+	return fmin(fmax(dXY, dZ), 0.0) + Vec2f::Max({dXY, dZ}, {0.0, 0.0}).Length();
+}
+
+// ========= INFINITE ELLIPTIC CYLINDER ===
+
+InfiniteEllipticCylinder::InfiniteEllipticCylinder()
+{
+	pType=INFINITE_ELLIPTIC_CYLINDER;
+	pProperties[ObjectProperty::DIAMETER_1]=0.5;
+	pProperties[ObjectProperty::DIAMETER_2]=1.0;
+}
+
+void InfiniteEllipticCylinder::SetDiameter1(float diameter)
+{
+	pProperties[ObjectProperty::DIAMETER_1]=diameter/2.0;
+}
+
+void InfiniteEllipticCylinder::SetDiameter2(float diameter)
+{
+	pProperties[ObjectProperty::DIAMETER_2]=diameter/2.0;
+}
+
+float InfiniteEllipticCylinder::GetDistance(const Vec3f &from) const
+{
+	Vec3f localFrom=WorldToLocal(from);
+	float Rx=pProperties[Object::ObjectProperty::DIAMETER_1];
+	float StretchFactor=Rx/pProperties[Object::ObjectProperty::DIAMETER_2];
+	return (Vec2f(localFrom.X, localFrom.Y*StretchFactor).Length() - Rx);
 }
 
 // ========= TORUS ===
@@ -436,7 +497,7 @@ Plane::Plane()
 
 float Plane::GetDistance(const Vec3f &from) const
 {
-	return ((from-pPosition).Dot(pVForward));
+	return (from-pPosition).Dot(pVForward);
 }
 
 Vec3f Plane::GetNormalVector(const Vec3f &point) const

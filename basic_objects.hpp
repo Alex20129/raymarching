@@ -20,6 +20,8 @@ public:
 		CUBOID,
 		CYLINDER,
 		INFINITE_CYLINDER,
+		ELLIPTIC_CYLINDER,
+		INFINITE_ELLIPTIC_CYLINDER,
 		TORUS,
 		PLANE,
 		GYROID,
@@ -154,6 +156,25 @@ class InfiniteCylinder : public Object
 public:
 	InfiniteCylinder();
 	void SetDiameter(float diameter);
+	float GetDistance(const Vec3f &from) const;
+};
+
+class EllipticCylinder : public Object
+{
+public:
+	EllipticCylinder();
+	void SetDiameter1(float diameter);
+	void SetDiameter2(float diameter);
+	void SetLength(float length);
+	float GetDistance(const Vec3f &from) const;
+};
+
+class InfiniteEllipticCylinder : public Object
+{
+public:
+	InfiniteEllipticCylinder();
+	void SetDiameter1(float diameter);
+	void SetDiameter2(float diameter);
 	float GetDistance(const Vec3f &from) const;
 };
 
