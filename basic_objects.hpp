@@ -133,6 +133,7 @@ class Cuboid : public Object
 public:
 	Cuboid();
 	float GetDistance(const Vec3f &from) const;
+	Vec3f GetNormalVector(const Vec3f &from) const;
 };
 
 class Cylinder : public Object

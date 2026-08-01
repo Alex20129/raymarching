@@ -333,6 +333,20 @@ float Cuboid::GetDistance(const Vec3f &from) const
 	return (Vec3f::Max(d, Vec3f(0.0F, 0.0F, 0.0F)).Length() + fmin(fmax(d.X, fmax(d.Y, d.Z)), 0.0F));
 }
 
+Vec3f Cuboid::GetNormalVector(const Vec3f &from) const
+{
+	Vec3f localFrom = WorldToLocal(from);
+	float hlX = pProperties[ObjectProperty::LENGTH_X];
+	float hlY = pProperties[ObjectProperty::LENGTH_Y];
+	float hlZ = pProperties[ObjectProperty::LENGTH_Z];
+	Vec3f sPoint(
+		fmaxf(-hlX, fminf(localFrom.X, hlX)),
+		fmaxf(-hlY, fminf(localFrom.Y, hlY)),
+		fmaxf(-hlZ, fminf(localFrom.Z, hlZ)));
+	Vec3f localNormal = localFrom - sPoint;
+	return (pVRight * localNormal.X) + (pVUp * localNormal.Y) + (pVForward * localNormal.Z);
+}
+
 // ========= CYLINDER ===
 
 Cylinder::Cylinder()
