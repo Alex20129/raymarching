@@ -305,6 +305,18 @@ float Cube::GetDistance(const Vec3f &from) const
 	return (Vec3f::Max(d, Vec3f(0.0F, 0.0F, 0.0F)).Length() + fmin(fmax(d.X, fmax(d.Y, d.Z)), 0.0F));
 }
 
+Vec3f Cube::GetNormalVector(const Vec3f &from) const
+{
+	Vec3f localFrom = WorldToLocal(from);
+	float hl = pProperties[ObjectProperty::LENGTH];
+	Vec3f sPoint(
+		fmaxf(-hl, fminf(localFrom.X, hl)),
+		fmaxf(-hl, fminf(localFrom.Y, hl)),
+		fmaxf(-hl, fminf(localFrom.Z, hl)));
+	Vec3f localNormal = localFrom - sPoint;
+	return (pVRight * localNormal.X) + (pVUp * localNormal.Y) + (pVForward * localNormal.Z);
+}
+
 // ========= CUBOID ===
 
 Cuboid::Cuboid()
@@ -330,16 +342,6 @@ Cylinder::Cylinder()
 	pProperties[ObjectProperty::LENGTH]=0.5;
 }
 
-void Cylinder::SetDiameter(float diameter)
-{
-	pProperties[ObjectProperty::DIAMETER]=diameter/2.0;
-}
-
-void Cylinder::SetLength(float length)
-{
-	pProperties[ObjectProperty::LENGTH]=length/2.0;
-}
-
 float Cylinder::GetDistance(const Vec3f &from) const
 {
 	Vec3f localFrom = WorldToLocal(from);
@@ -356,11 +358,6 @@ InfiniteCylinder::InfiniteCylinder()
 	pProperties[ObjectProperty::DIAMETER]=0.5;
 }
 
-void InfiniteCylinder::SetDiameter(float diameter)
-{
-	pProperties[ObjectProperty::DIAMETER]=diameter/2.0;
-}
-
 float InfiniteCylinder::GetDistance(const Vec3f &from) const
 {
 	Vec3f localFrom=WorldToLocal(from);
@@ -375,21 +372,6 @@ EllipticCylinder::EllipticCylinder()
 	pProperties[ObjectProperty::DIAMETER_1]=0.5;
 	pProperties[ObjectProperty::DIAMETER_2]=1.0;
 	pProperties[ObjectProperty::LENGTH]=1.0;
-}
-
-void EllipticCylinder::SetDiameter1(float diameter)
-{
-	pProperties[ObjectProperty::DIAMETER_1]=diameter/2.0;
-}
-
-void EllipticCylinder::SetDiameter2(float diameter)
-{
-	pProperties[ObjectProperty::DIAMETER_2]=diameter/2.0;
-}
-
-void EllipticCylinder::SetLength(float length)
-{
-	pProperties[ObjectProperty::LENGTH]=length/2.0;
 }
 
 float EllipticCylinder::GetDistance(const Vec3f &from) const
@@ -411,16 +393,6 @@ InfiniteEllipticCylinder::InfiniteEllipticCylinder()
 	pProperties[ObjectProperty::DIAMETER_2]=1.0;
 }
 
-void InfiniteEllipticCylinder::SetDiameter1(float diameter)
-{
-	pProperties[ObjectProperty::DIAMETER_1]=diameter/2.0;
-}
-
-void InfiniteEllipticCylinder::SetDiameter2(float diameter)
-{
-	pProperties[ObjectProperty::DIAMETER_2]=diameter/2.0;
-}
-
 float InfiniteEllipticCylinder::GetDistance(const Vec3f &from) const
 {
 	Vec3f localFrom=WorldToLocal(from);
@@ -436,16 +408,6 @@ Torus::Torus()
 	pType=TORUS;
 	pProperties[ObjectProperty::DIAMETER_1]=0.5;
 	pProperties[ObjectProperty::DIAMETER_2]=1.0;
-}
-
-void Torus::SetDiameter1(float diameter)
-{
-	pProperties[ObjectProperty::DIAMETER_1]=diameter/2.0;
-}
-
-void Torus::SetDiameter2(float diameter)
-{
-	pProperties[ObjectProperty::DIAMETER_2]=diameter/2.0;
 }
 
 float Torus::GetDistance(const Vec3f &from) const
@@ -480,11 +442,6 @@ Gyroid::Gyroid()
 	pProperties[ObjectProperty::SCALE]=1.0;
 }
 
-void Gyroid::SetScale(float scale)
-{
-	pProperties[ObjectProperty::SCALE]=scale/2.0;
-}
-
 float Gyroid::GetDistance(const Vec3f &from) const
 {
 	Vec3f localFrom=WorldToLocal(from)/pProperties[ObjectProperty::SCALE];
@@ -497,11 +454,6 @@ SchwarzPrimitive::SchwarzPrimitive()
 {
 	pType=SCHWARZ_PRIMITIVE;
 	pProperties[ObjectProperty::SCALE]=1.0;
-}
-
-void SchwarzPrimitive::SetScale(float scale)
-{
-	pProperties[ObjectProperty::SCALE]=scale/2.0;
 }
 
 float SchwarzPrimitive::GetDistance(const Vec3f &from) const

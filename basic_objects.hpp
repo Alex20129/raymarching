@@ -125,6 +125,7 @@ class Cube : public Object
 public:
 	Cube();
 	float GetDistance(const Vec3f &from) const;
+	Vec3f GetNormalVector(const Vec3f &from) const;
 };
 
 class Cuboid : public Object
@@ -138,8 +139,6 @@ class Cylinder : public Object
 {
 public:
 	Cylinder();
-	void SetDiameter(float diameter);
-	void SetLength(float length);
 	float GetDistance(const Vec3f &from) const;
 };
 
@@ -147,7 +146,6 @@ class InfiniteCylinder : public Object
 {
 public:
 	InfiniteCylinder();
-	void SetDiameter(float diameter);
 	float GetDistance(const Vec3f &from) const;
 };
 
@@ -155,9 +153,6 @@ class EllipticCylinder : public Object
 {
 public:
 	EllipticCylinder();
-	void SetDiameter1(float diameter);
-	void SetDiameter2(float diameter);
-	void SetLength(float length);
 	float GetDistance(const Vec3f &from) const;
 };
 
@@ -165,8 +160,6 @@ class InfiniteEllipticCylinder : public Object
 {
 public:
 	InfiniteEllipticCylinder();
-	void SetDiameter1(float diameter);
-	void SetDiameter2(float diameter);
 	float GetDistance(const Vec3f &from) const;
 };
 
@@ -174,8 +167,6 @@ class Torus : public Object
 {
 public:
 	Torus();
-	void SetDiameter1(float diameter);
-	void SetDiameter2(float diameter);
 	float GetDistance(const Vec3f &from) const;
 };
 
@@ -191,7 +182,6 @@ class Gyroid : public Object
 {
 public:
 	Gyroid();
-	void SetScale(float scale);
 	float GetDistance(const Vec3f &from) const;
 };
 
@@ -199,7 +189,6 @@ class SchwarzPrimitive : public Object
 {
 public:
 	SchwarzPrimitive();
-	void SetScale(float scale);
 	float GetDistance(const Vec3f &from) const;
 };
 
