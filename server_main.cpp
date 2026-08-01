@@ -2,28 +2,38 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include <zmq.hpp>
+#include <string>
 #include "scene.hpp"
 
 Scene *gScene;
 
 int main(int argc, char *argv[])
 {
-	gScene=new Scene;
-	char fileName[128];
+	static const int kNumberOfThreads = 2;
+	zmq::context_t context (kNumberOfThreads);
+	zmq::socket_t socket (context, zmq::socket_type::rep);
+	socket.bind ("tcp://*:5555");
 
-	int32_t i;
-	for(i=0; i<10; i++)
+	while (true)
 	{
-		// float spec=i*0.1;
+		zmq::message_t request;
 
-		Ray::REFLECTIONS_LIMIT+=1;
-		Scene::SAMPLES_PER_PIXEL*=2;
+		//  Wait for next request from client
+		zmq::recv_result_t result = socket.recv (request, zmq::recv_flags::none);
+		if(!result)
+		{
+			continue;
+		}
+		std::cout << "Received "<< request.to_string() << std::endl;
 
-		gScene->Render();
+		//  Pretend to do some 'work'
+		sleep(1);
 
-		sprintf(fileName, "render_%02i_%luspp.png", i, Scene::SAMPLES_PER_PIXEL);
-		gScene->RenderedImage.write(fileName);
+		//  Send reply back to client
+		std::string kReplyString("ok.");
+		zmq::message_t reply (kReplyString.length());
+		memcpy (reply.data (), kReplyString.data(), kReplyString.length());
+		socket.send (reply, zmq::send_flags::none);
 	}
-
 	return 0;
 }
