@@ -9,9 +9,11 @@ Scene *gScene;
 
 int main(int argc, char *argv[])
 {
+	gScene=new Scene;
+
 	static const int kNumberOfThreads = 2;
-	zmq::context_t context (kNumberOfThreads);
-	zmq::socket_t socket (context, zmq::socket_type::rep);
+	zmq::context_t context(kNumberOfThreads);
+	zmq::socket_t socket(context, zmq::socket_type::rep);
 	socket.bind ("tcp://*:5555");
 
 	while (true)
@@ -19,7 +21,7 @@ int main(int argc, char *argv[])
 		zmq::message_t request;
 
 		//  Wait for next request from client
-		zmq::recv_result_t result = socket.recv (request, zmq::recv_flags::none);
+		zmq::recv_result_t result = socket.recv(request, zmq::recv_flags::none);
 		if(!result)
 		{
 			continue;
@@ -30,10 +32,8 @@ int main(int argc, char *argv[])
 		sleep(1);
 
 		//  Send reply back to client
-		std::string kReplyString("ok.");
-		zmq::message_t reply (kReplyString.length());
-		memcpy (reply.data (), kReplyString.data(), kReplyString.length());
-		socket.send (reply, zmq::send_flags::none);
+		zmq::message_t reply("Ok.", 3);
+		socket.send(reply, zmq::send_flags::none);
 	}
 	return 0;
 }

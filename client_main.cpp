@@ -9,6 +9,25 @@ Scene *gScene;
 
 int main(int argc, char *argv[])
 {
+	// ========
+	// zmq::context_t context(1);
+	// zmq::socket_t socket(context, zmq::socket_type::req);
+	// socket.connect("tcp://localhost:5555");
+
+	// zmq::message_t request("Hello", 5);
+	// zmq::send_result_t sResult = socket.send(request, zmq::send_flags::none);
+
+	// zmq::message_t reply;
+	// zmq::recv_result_t rResult = socket.recv(reply, zmq::recv_flags::none);
+
+	// if(rResult)
+	// {
+	// 	std::cout << "Received "<< reply.to_string() << std::endl;
+	// }
+
+	// return 42;
+	// ========
+
 	float ObjectZpos=320;
 	gScene=new Scene;
 
