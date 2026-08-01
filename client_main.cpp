@@ -48,16 +48,17 @@ int main(int argc, char *argv[])
 	// gScene->SetObjectSpecularity(ConstructObjectID, 0.1);
 
 	// ======== CSG: gyroid in sphere
-	// uint32_t Sphere2ObjectID=gScene->AddObject(Object::ObjectType::SPHERE);
-	// gScene->SetObjectProperty(Sphere2ObjectID, Object::ObjectProperty::DIAMETER, 100.0);
-	// gScene->SetObjectPosition(Sphere2ObjectID, 0, 50, ObjectZpos);
+	uint32_t Sphere2ObjectID=gScene->AddObject(Object::ObjectType::SPHERE);
+	gScene->SetObjectProperty(Sphere2ObjectID, Object::ObjectProperty::DIAMETER, 100.0);
+	gScene->SetObjectPosition(Sphere2ObjectID, 0, 50, ObjectZpos);
 
-	// uint32_t GyroidObjectID=gScene->AddObject(Object::ObjectType::GYROID);
-	// gScene->SetObjectProperty(GyroidObjectID, Object::ObjectProperty::SCALE, 10.0);
-	// gScene->SetObjectPosition(GyroidObjectID, 0, 50, ObjectZpos);
+	uint32_t GyroidObjectID=gScene->AddObject(Object::ObjectType::GYROID);
+	gScene->SetObjectProperty(GyroidObjectID, Object::ObjectProperty::SCALE, 12.0);
+	gScene->SetObjectPosition(GyroidObjectID, 0, 50, ObjectZpos);
+	gScene->SetObjectOrientation(GyroidObjectID, 1, 0, 0, 0);
 
-	// uint32_t GyroidInSphereObjectID=gScene->AddObject(Object::ObjectType::INTERSECTION, Sphere2ObjectID, GyroidObjectID);
-	// gScene->SetObjectColor(GyroidInSphereObjectID, 30, 130, 130);
+	uint32_t GyroidInSphereObjectID=gScene->AddObject(Object::ObjectType::INTERSECTION, Sphere2ObjectID, GyroidObjectID);
+	gScene->SetObjectColor(GyroidInSphereObjectID, 30, 130, 130);
 
 	// ======== CSG: Schwarz primitive in sphere
 	// uint32_t Sphere3ObjectID=gScene->AddObject(Object::ObjectType::SPHERE);
@@ -106,13 +107,13 @@ int main(int argc, char *argv[])
 	RedSphere->SetColor(255, 52, 52);
 	// RedSphere->SetTransparency(0.5);
 
-	uint32_t Cylinder1ObjectID=gScene->AddObject(Object::ObjectType::CYLINDER);
-	gScene->SetObjectProperty(Cylinder1ObjectID, Object::ObjectProperty::DIAMETER, 60);
-	gScene->SetObjectProperty(Cylinder1ObjectID, Object::ObjectProperty::LENGTH, 60);
-	gScene->SetObjectPosition(Cylinder1ObjectID, 0, 50, ObjectZpos);
-	gScene->SetObjectOrientation(Cylinder1ObjectID, 1, 0, 1, 0);
-	gScene->SetObjectColor(Cylinder1ObjectID, 120, 20, 120);
-	gScene->SetObjectSpecularity(Cylinder1ObjectID, 1.0);
+	// uint32_t Cylinder1ObjectID=gScene->AddObject(Object::ObjectType::CYLINDER);
+	// gScene->SetObjectProperty(Cylinder1ObjectID, Object::ObjectProperty::DIAMETER, 60);
+	// gScene->SetObjectProperty(Cylinder1ObjectID, Object::ObjectProperty::LENGTH, 60);
+	// gScene->SetObjectPosition(Cylinder1ObjectID, 0, 50, ObjectZpos);
+	// gScene->SetObjectOrientation(Cylinder1ObjectID, 1, 0, 1, 0);
+	// gScene->SetObjectColor(Cylinder1ObjectID, 120, 20, 120);
+	// gScene->SetObjectSpecularity(Cylinder1ObjectID, 1.0);
 
 	// uint32_t InfiniteCylinder1ObjectID=gScene->AddObject(Object::ObjectType::INFINITE_CYLINDER);
 	// gScene->SetObjectProperty(InfiniteCylinder1ObjectID, Object::ObjectProperty::DIAMETER, 40);
@@ -183,8 +184,6 @@ int main(int argc, char *argv[])
 	gScene->AddObject(LightSource1);
 	// gScene->AddObject(LightSource2);
 
-	// gScene->AddObject(SphereSchwarzIntersection);
-
 	// gScene->AddObject(BlueSphere);
 	// gScene->AddObject(GreenSphere);
 	// gScene->AddObject(RedSphere);
@@ -193,22 +192,23 @@ int main(int argc, char *argv[])
 
 	char fileName[128];
 	int32_t i;
-	Ray::REFLECTIONS_LIMIT=6;
-	Scene::SAMPLES_PER_PIXEL=350;
+	Ray::REFLECTIONS_LIMIT=7;
+	Scene::SAMPLES_PER_PIXEL=1024;
 	for(i=0; i<50; i++)
 	{
 		// float spec=i*0.1;
-
-		// Cube2->SetOrientation(std::sin(i*M_PI_2/10.0), std::cos(i*M_PI_2/10.0), 0);
-		// Torus1->SetOrientation(0, std::sin(i*M_PI_2/10.0), std::cos(i*M_PI_2/10.0));
-		// NewSchwarzPrimitive->SetOrientation(std::sin(i*M_PI_2/50.0), 0, std::cos(i*M_PI_2/50.0));
-
-		gScene->SetObjectOrientation(Cylinder1ObjectID, std::sin(i*M_PI_2/50.0), 0, std::cos(i*M_PI_2/50.0), 0);
 
 		// RedSphere->SetSpecularity(spec);
 		// GreenSphere->SetSpecularity(spec);
 		// BlueSphere->SetSpecularity(spec);
 		// Construct->SetSpecularity(spec);
+
+		// Cube2->SetOrientation(std::sin(i*M_PI_2/10.0), std::cos(i*M_PI_2/10.0), 0);
+		// Torus1->SetOrientation(0, std::sin(i*M_PI_2/10.0), std::cos(i*M_PI_2/10.0));
+
+		// gScene->SetObjectOrientation(Cylinder1ObjectID, std::sin(i*M_PI_2/50.0), 0, std::cos(i*M_PI_2/50.0), 0);
+		// gScene->SetObjectOrientation(GyroidObjectID, std::sin(i*M_PI_2/50.0), 0, std::cos(i*M_PI_2/50.0), 0);
+		gScene->SetObjectPosition(GyroidObjectID, i/2.0, 50, ObjectZpos);
 
 		gScene->Render();
 
