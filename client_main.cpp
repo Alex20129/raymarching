@@ -73,52 +73,49 @@ int main(int argc, char *argv[])
 	// gScene->SetObjectColor(SchwarzPrimitiveInSphereObjectID, 30, 130, 130);
 
 	// ======== primitives
-	Cube *Cube2=new Cube();
-	Cube2->SetLength(56);
-	Cube2->SetPosition(80, 50, ObjectZpos);
-	Cube2->SetSpecularity(0.25);
-	Cube2->SetColor(150, 10, 150);
+	// uint32_t Cube2ObjectID=gScene->AddObject(Object::ObjectType::CUBE);
+	// gScene->SetObjectProperty(Cube2ObjectID, Object::ObjectProperty::LENGTH, 56.0);
+	// gScene->SetObjectPosition(Cube2ObjectID, 80, 50, ObjectZpos);
+	// gScene->SetObjectColor(Cube2ObjectID, 150, 10, 150);
 
-	Torus *Torus1=new Torus();
-	Torus1->SetDiameter1(20);
-	Torus1->SetDiameter2(68);
-	Torus1->SetPosition(0, 50, ObjectZpos);
-	Torus1->SetSpecularity(0.25);
-	Torus1->SetColor(200, 200, 80);
+	// uint32_t Torus1ObjectID=gScene->AddObject(Object::ObjectType::TORUS);
+	// gScene->SetObjectProperty(Torus1ObjectID, Object::ObjectProperty::DIAMETER_1, 20.0);
+	// gScene->SetObjectProperty(Torus1ObjectID, Object::ObjectProperty::DIAMETER_2, 68.0);
+	// gScene->SetObjectPosition(Torus1ObjectID, 0, 50, ObjectZpos);
+	// gScene->SetObjectSpecularity(Torus1ObjectID, 0.04);
+	// gScene->SetObjectColor(Torus1ObjectID, 200, 200, 80);
 
-	Sphere *BlueSphere=new Sphere();
-	BlueSphere->SetDiameter(64);
-	BlueSphere->SetPosition(-80, 50, ObjectZpos);
-	BlueSphere->SetSpecularity(1.0);
-	BlueSphere->SetColor(52, 52, 255);
-	// BlueSphere->SetTransparency(0.5);
+	// uint32_t BlueSphereObjectID=gScene->AddObject(Object::ObjectType::SPHERE);
+	// gScene->SetObjectProperty(BlueSphereObjectID, Object::ObjectProperty::DIAMETER, 64.0);
+	// gScene->SetObjectPosition(BlueSphereObjectID, -80, 50, ObjectZpos);
+	// gScene->SetObjectSpecularity(BlueSphereObjectID, 1.0);
+	// gScene->SetObjectColor(BlueSphereObjectID, 52, 52, 255);
 
-	Sphere *GreenSphere=new Sphere();
-	GreenSphere->SetDiameter(64);
-	GreenSphere->SetPosition(0, 50, ObjectZpos);
-	GreenSphere->SetSpecularity(1.0);
-	GreenSphere->SetColor(52, 255, 52);
-	// GreenSphere->SetTransparency(0.5);
+	// uint32_t GreenSphereObjectID=gScene->AddObject(Object::ObjectType::SPHERE);
+	// gScene->SetObjectProperty(GreenSphereObjectID, Object::ObjectProperty::DIAMETER, 64.0);
+	// gScene->SetObjectPosition(GreenSphereObjectID, 0, 50, ObjectZpos);
+	// gScene->SetObjectSpecularity(GreenSphereObjectID, 1.0);
+	// gScene->SetObjectColor(GreenSphereObjectID, 52, 255, 52);
 
-	Sphere *RedSphere=new Sphere();
-	RedSphere->SetDiameter(64);
-	RedSphere->SetPosition(80, 50, ObjectZpos);
-	RedSphere->SetSpecularity(1.0);
-	RedSphere->SetColor(255, 52, 52);
-	// RedSphere->SetTransparency(0.5);
+	// uint32_t RedSphereObjectID=gScene->AddObject(Object::ObjectType::SPHERE);
+	// gScene->SetObjectProperty(RedSphereObjectID, Object::ObjectProperty::DIAMETER, 64.0);
+	// gScene->SetObjectPosition(RedSphereObjectID, 80, 50, ObjectZpos);
+	// gScene->SetObjectSpecularity(RedSphereObjectID, 1.0);
+	// gScene->SetObjectColor(RedSphereObjectID, 255, 52, 52);
 
 	// uint32_t Cylinder1ObjectID=gScene->AddObject(Object::ObjectType::CYLINDER);
 	// gScene->SetObjectProperty(Cylinder1ObjectID, Object::ObjectProperty::DIAMETER, 60);
 	// gScene->SetObjectProperty(Cylinder1ObjectID, Object::ObjectProperty::LENGTH, 60);
 	// gScene->SetObjectPosition(Cylinder1ObjectID, 0, 50, ObjectZpos);
 	// gScene->SetObjectOrientation(Cylinder1ObjectID, 1, 0, 1, 0);
-	// gScene->SetObjectColor(Cylinder1ObjectID, 120, 20, 120);
 	// gScene->SetObjectSpecularity(Cylinder1ObjectID, 1.0);
+	// gScene->SetObjectColor(Cylinder1ObjectID, 120, 20, 120);
 
 	// uint32_t InfiniteCylinder1ObjectID=gScene->AddObject(Object::ObjectType::INFINITE_CYLINDER);
 	// gScene->SetObjectProperty(InfiniteCylinder1ObjectID, Object::ObjectProperty::DIAMETER, 40);
 	// gScene->SetObjectPosition(InfiniteCylinder1ObjectID, 0, 50, ObjectZpos);
 	// gScene->SetObjectOrientation(InfiniteCylinder1ObjectID, 1, 0, 0, 0);
+	// gScene->SetObjectSpecularity(InfiniteCylinder1ObjectID, 0.04);
 	// gScene->SetObjectColor(InfiniteCylinder1ObjectID, 130, 30, 130);
 
 	// uint32_t EllipticCylinder1ObjectID=gScene->AddObject(Object::ObjectType::ELLIPTIC_CYLINDER);
@@ -127,11 +124,12 @@ int main(int argc, char *argv[])
 	// gScene->SetObjectProperty(EllipticCylinder1ObjectID, Object::ObjectProperty::LENGTH, 60);
 	// gScene->SetObjectPosition(EllipticCylinder1ObjectID, 0, 50, ObjectZpos);
 	// gScene->SetObjectOrientation(EllipticCylinder1ObjectID, 1, 0, 1, 0);
+	// gScene->SetObjectSpecularity(EllipticCylinder1ObjectID, 0.04);
 	// gScene->SetObjectColor(EllipticCylinder1ObjectID, 130, 30, 130);
 
 	// ======== box
 	Cube *Cube3=new Cube();
-	Cube3->SetLength(80);
+	Cube3->SetProperty(Object::ObjectProperty::LENGTH, 80.0);
 	Cube3->SetPosition(0, -139, ObjectZpos);
 
 	Plane *Plane1=new Plane();
@@ -163,16 +161,16 @@ int main(int argc, char *argv[])
 
 	// ======== lights
 	Cube *LightSource1=new Cube();
-	LightSource1->SetLength(80);
+	LightSource1->SetProperty(Object::ObjectProperty::LENGTH, 80.0);
+	LightSource1->SetProperty(Object::ObjectProperty::BRIGHTNESS, 11.5);
 	LightSource1->SetPosition(0, -150, ObjectZpos);
 	LightSource1->SetColor(255, 255, 255);
-	LightSource1->SetBrightness(11.5);
 
 	Sphere *LightSource2=new Sphere();
-	LightSource2->SetDiameter(20);
+	LightSource2->SetProperty(Object::ObjectProperty::DIAMETER, 20.0);
+	LightSource2->SetProperty(Object::ObjectProperty::BRIGHTNESS, 11.5);
 	LightSource2->SetPosition(80, -100, ObjectZpos);
 	LightSource2->SetColor(255, 255, 255);
-	LightSource2->SetBrightness(9.0);
 
 	// ========
 	gScene->AddObject(Ceiling);
@@ -183,12 +181,6 @@ int main(int argc, char *argv[])
 
 	gScene->AddObject(LightSource1);
 	// gScene->AddObject(LightSource2);
-
-	// gScene->AddObject(BlueSphere);
-	// gScene->AddObject(GreenSphere);
-	// gScene->AddObject(RedSphere);
-	// gScene->AddObject(Cube2);
-	// gScene->AddObject(Torus1);
 
 	char fileName[128];
 	int32_t i;

@@ -37,10 +37,10 @@ public:
 		static constexpr uint8_t LENGTH_Y=3;
 		static constexpr uint8_t LENGTH_Z=4;
 		static constexpr uint8_t SCALE=5;
+		static constexpr uint8_t VISIBILITY=6;
+		static constexpr uint8_t BRIGHTNESS=7;
 	};
 private:
-	bool pVisibility=true;
-	float pBrightness=0.0;
 	float pSpecularity=0.0;
 	float pTransparency=0.0;
 	uint64_t pDiffusionChance=UINT64_MAX;
@@ -48,7 +48,7 @@ private:
 	Vec3f pColor;
 protected:
 	ObjectType pType;
-	float pProperties[6];
+	float pProperties[8];
 	Vec3f pPosition;
 	Vec3f pVForward, pVRight, pVUp;
 	Vec3f WorldToLocal(const Vec3f &point) const;
@@ -61,10 +61,7 @@ public:
 	uint64_t PassthroughChance() const;
 
 	bool Visibility() const;
-	void SetVisibility(bool visibility);
-
 	float Brightness() const;
-	void SetBrightness(float brightness);
 
 	float Specularity() const;
 	void SetSpecularity(float specularity);
@@ -119,7 +116,6 @@ class Sphere : public Object
 {
 public:
 	Sphere();
-	void SetDiameter(float diameter);
 	float GetDistance(const Vec3f &from) const;
 	Vec3f GetNormalVector(const Vec3f &point) const;
 };
@@ -128,7 +124,6 @@ class Cube : public Object
 {
 public:
 	Cube();
-	void SetLength(float length);
 	float GetDistance(const Vec3f &from) const;
 };
 
@@ -136,9 +131,6 @@ class Cuboid : public Object
 {
 public:
 	Cuboid();
-	void SetLengthX(float length);
-	void SetLengthY(float length);
-	void SetLengthZ(float length);
 	float GetDistance(const Vec3f &from) const;
 };
 

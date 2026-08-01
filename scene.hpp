@@ -58,10 +58,7 @@ public:
 	Object::ObjectType GetObjectType(uint32_t object_id) const;
 
 	bool GetObjectVisibility(uint32_t object_id) const;
-	void SetObjectVisibility(uint32_t object_id, bool visibility);
-
 	float GetObjectBrightness(uint32_t object_id) const;
-	void SetObjectBrightness(uint32_t object_id, float brightness);
 
 	float GetObjectSpecularity(uint32_t object_id) const;
 	void SetObjectSpecularity(uint32_t object_id, float specularity);

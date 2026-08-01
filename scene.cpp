@@ -424,19 +424,9 @@ bool Scene::GetObjectVisibility(uint32_t object_id) const
 	return ((*pSceneObjects)[object_id]->Visibility());
 }
 
-void Scene::SetObjectVisibility(uint32_t object_id, bool visibility)
-{
-	(*pSceneObjects)[object_id]->SetVisibility(visibility);
-}
-
 float Scene::GetObjectBrightness(uint32_t object_id) const
 {
 	return ((*pSceneObjects)[object_id]->Brightness());
-}
-
-void Scene::SetObjectBrightness(uint32_t object_id, float brightness)
-{
-	(*pSceneObjects)[object_id]->SetBrightness(brightness);
 }
 
 float Scene::GetObjectSpecularity(uint32_t object_id) const

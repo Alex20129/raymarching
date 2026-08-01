@@ -51,26 +51,12 @@ uint64_t Object::PassthroughChance() const
 
 bool Object::Visibility() const
 {
-	return (pVisibility);
-}
-
-void Object::SetVisibility(bool visibility)
-{
-	pVisibility=visibility;
+	return (pProperties[ObjectProperty::VISIBILITY]>0.0);
 }
 
 float Object::Brightness() const
 {
-	return (pBrightness);
-}
-
-void Object::SetBrightness(float brightness)
-{
-	if(brightness<0.0)
-	{
-		brightness=0.0;
-	}
-	pBrightness=brightness;
+	return (pProperties[ObjectProperty::BRIGHTNESS]);
 }
 
 float Object::Specularity() const
@@ -111,10 +97,7 @@ void Object::SetTransparency(float transparency)
 	{
 		transparency=1.0;
 	}
-	if(transparency==1.0)
-	{
-		pVisibility=false;
-	}
+	pProperties[ObjectProperty::VISIBILITY]=1.0-transparency;
 	pTransparency=transparency;
 	uint64_t multiplicationTrick=transparency*512.0;
 	uint64_t remainder=transparency*511.0;
@@ -175,7 +158,16 @@ float Object::Property(uint32_t property) const
 
 void Object::SetProperty(uint32_t property, float value)
 {
-	pProperties[property]=value/2.0;
+	if(property<ObjectProperty::SCALE)
+	{
+		// Dimensional properties are stored as values ​​divided by two
+		// which is helpful for speeding up distance calculations
+		pProperties[property]=value/2.0;
+	}
+	else
+	{
+		pProperties[property]=value;
+	}
 }
 
 float Object::GetDistance(const Vec3f &from) const
@@ -209,11 +201,11 @@ Difference::Difference(Object *object_a, Object *object_b)
 	ObjectB=object_b;
 	pPosition=object_a->Position();
 	SetColor((object_a->Color()+object_b->Color())/2.0);
-	SetBrightness((object_a->Brightness()+object_b->Brightness())/2.0);
 	SetSpecularity((object_a->Specularity()+object_b->Specularity())/2.0);
 	SetTransparency((object_a->Transparency()+object_b->Transparency())/2.0);
-	object_a->SetVisibility(false);
-	object_b->SetVisibility(false);
+	SetProperty(ObjectProperty::BRIGHTNESS, (object_a->Brightness()+object_b->Brightness())/2.0);
+	object_a->SetProperty(ObjectProperty::VISIBILITY, 0.0);
+	object_b->SetProperty(ObjectProperty::VISIBILITY, 0.0);
 }
 
 float Difference::GetDistance(const Vec3f &from) const
@@ -238,11 +230,11 @@ Union::Union(Object *object_a, Object *object_b)
 	ObjectB=object_b;
 	pPosition=(object_a->Position()+object_b->Position())/2.0;
 	SetColor((object_a->Color()+object_b->Color())/2.0);
-	SetBrightness((object_a->Brightness()+object_b->Brightness())/2.0);
 	SetSpecularity((object_a->Specularity()+object_b->Specularity())/2.0);
 	SetTransparency((object_a->Transparency()+object_b->Transparency())/2.0);
-	object_a->SetVisibility(false);
-	object_b->SetVisibility(false);
+	SetProperty(ObjectProperty::BRIGHTNESS, (object_a->Brightness()+object_b->Brightness())/2.0);
+	object_a->SetProperty(ObjectProperty::VISIBILITY, 0.0);
+	object_b->SetProperty(ObjectProperty::VISIBILITY, 0.0);
 }
 
 float Union::GetDistance(const Vec3f &from) const
@@ -267,11 +259,11 @@ Intersection::Intersection(Object *object_a, Object *object_b)
 	ObjectB=object_b;
 	pPosition=(object_a->Position()+object_b->Position())/2.0;
 	SetColor((object_a->Color()+object_b->Color())/2.0);
-	SetBrightness((object_a->Brightness()+object_b->Brightness())/2.0);
 	SetSpecularity((object_a->Specularity()+object_b->Specularity())/2.0);
 	SetTransparency((object_a->Transparency()+object_b->Transparency())/2.0);
-	object_a->SetVisibility(false);
-	object_b->SetVisibility(false);
+	SetProperty(ObjectProperty::BRIGHTNESS, (object_a->Brightness()+object_b->Brightness())/2.0);
+	object_a->SetProperty(ObjectProperty::VISIBILITY, 0.0);
+	object_b->SetProperty(ObjectProperty::VISIBILITY, 0.0);
 }
 
 float Intersection::GetDistance(const Vec3f &from) const
@@ -287,11 +279,6 @@ Sphere::Sphere()
 {
 	pType=SPHERE;
 	pProperties[ObjectProperty::DIAMETER]=0.5;
-}
-
-void Sphere::SetDiameter(float diameter)
-{
-	pProperties[ObjectProperty::DIAMETER]=diameter/2.0;
 }
 
 float Sphere::GetDistance(const Vec3f &from) const
@@ -312,11 +299,6 @@ Cube::Cube()
 	pProperties[ObjectProperty::LENGTH]=0.5;
 }
 
-void Cube::SetLength(float length)
-{
-	pProperties[ObjectProperty::LENGTH]=length/2.0;
-}
-
 float Cube::GetDistance(const Vec3f &from) const
 {
 	Vec3f d = WorldToLocal(from).Abs() - Vec3f(pProperties[ObjectProperty::LENGTH], pProperties[ObjectProperty::LENGTH], pProperties[ObjectProperty::LENGTH]);
@@ -331,21 +313,6 @@ Cuboid::Cuboid()
 	pProperties[ObjectProperty::LENGTH_X]=0.5;
 	pProperties[ObjectProperty::LENGTH_Y]=0.5;
 	pProperties[ObjectProperty::LENGTH_Z]=0.5;
-}
-
-void Cuboid::SetLengthX(float length)
-{
-	pProperties[ObjectProperty::LENGTH_X]=length/2.0;
-}
-
-void Cuboid::SetLengthY(float length)
-{
-	pProperties[ObjectProperty::LENGTH_Y]=length/2.0;
-}
-
-void Cuboid::SetLengthZ(float length)
-{
-	pProperties[ObjectProperty::LENGTH_Z]=length/2.0;
 }
 
 float Cuboid::GetDistance(const Vec3f &from) const
