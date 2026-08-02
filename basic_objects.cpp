@@ -3,6 +3,16 @@
 #include <cmath>
 #include "basic_objects.hpp"
 
+static inline uint64_t fpToUint64(float v)
+{
+	uint64_t result=UINT64_MAX>>9;
+	uint64_t multiplicationTrick=(1.0-v)*512.0;
+	uint64_t remainder=(1.0-v)*511.0;
+	result*=multiplicationTrick;
+	result+=remainder;
+	return (result);
+}
+
 Vec3f Object::WorldToLocal(const Vec3f &point) const
 {
 	Vec3f dir=point-pPosition;
@@ -31,6 +41,11 @@ void Object::UpdateBasis(const Vec3f &forward, float roll)
 Object::Object()
 {
 	pType=OBJECT;
+	pProperties[ObjectProperty::SCALE]=1.0;
+	pProperties[ObjectProperty::VISIBILITY]=1.0;
+	pProperties[ObjectProperty::BRIGHTNESS]=0.0;
+	pProperties[ObjectProperty::SPECULARITY]=0.0;
+	pProperties[ObjectProperty::TRASPARENCY]=0.0;
 	UpdateBasis({0, 0, 1}, 0.0F);
 }
 
@@ -49,9 +64,14 @@ uint64_t Object::PassthroughChance() const
 	return (pPassthroughChance);
 }
 
-bool Object::Visibility() const
+float Object::Scale() const
 {
-	return (pProperties[ObjectProperty::VISIBILITY]>0.0);
+	return (pProperties[ObjectProperty::SCALE]);
+}
+
+float Object::Visibility() const
+{
+	return (pProperties[ObjectProperty::VISIBILITY]);
 }
 
 float Object::Brightness() const
@@ -61,49 +81,12 @@ float Object::Brightness() const
 
 float Object::Specularity() const
 {
-	return (pSpecularity);
-}
-
-void Object::SetSpecularity(float specularity)
-{
-	if(specularity<0.0)
-	{
-		specularity=0.0;
-	}
-	if(specularity>1.0)
-	{
-		specularity=1.0;
-	}
-	pSpecularity=specularity;
-	uint64_t multiplicationTrick=(1.0-specularity)*512.0;
-	uint64_t remainder=(1.0-specularity)*511.0;
-	pDiffusionChance=UINT64_MAX>>9;
-	pDiffusionChance*=multiplicationTrick;
-	pDiffusionChance+=remainder;
+	return (pProperties[ObjectProperty::SPECULARITY]);
 }
 
 float Object::Transparency() const
 {
-	return (pTransparency);
-}
-
-void Object::SetTransparency(float transparency)
-{
-	if(transparency<0.0)
-	{
-		transparency=0.0;
-	}
-	if(transparency>1.0)
-	{
-		transparency=1.0;
-	}
-	pProperties[ObjectProperty::VISIBILITY]=1.0-transparency;
-	pTransparency=transparency;
-	uint64_t multiplicationTrick=transparency*512.0;
-	uint64_t remainder=transparency*511.0;
-	pPassthroughChance=UINT64_MAX>>9;
-	pPassthroughChance*=multiplicationTrick;
-	pPassthroughChance+=remainder;
+	return (pProperties[ObjectProperty::TRASPARENCY]);
 }
 
 const Vec3f &Object::Color() const
@@ -166,6 +149,103 @@ void Object::SetProperty(uint32_t property, float value)
 	}
 	else
 	{
+		switch (property)
+		{
+			case ObjectProperty::DIAMETER_1:
+			{
+				if(value<EPSILON)
+				{
+					value=EPSILON;
+				}
+				break;
+			}
+			case ObjectProperty::DIAMETER_2:
+			{
+				if(value<EPSILON)
+				{
+					value=EPSILON;
+				}
+				break;
+			}
+			case ObjectProperty::LENGTH_X:
+			{
+				if(value<EPSILON)
+				{
+					value=EPSILON;
+				}
+				break;
+			}
+			case ObjectProperty::LENGTH_Y:
+			{
+				if(value<EPSILON)
+				{
+					value=EPSILON;
+				}
+				break;
+			}
+			case ObjectProperty::LENGTH_Z:
+			{
+				if(value<EPSILON)
+				{
+					value=EPSILON;
+				}
+				break;
+			}
+			case ObjectProperty::SCALE:
+			{
+				if(value<EPSILON)
+				{
+					value=EPSILON;
+				}
+				break;
+			}
+			case ObjectProperty::VISIBILITY:
+			{
+				if(value<0.0)
+				{
+					value=0.0;
+				}
+				break;
+			}
+			case ObjectProperty::BRIGHTNESS:
+			{
+				if(value<0.0)
+				{
+					value=0.0;
+				}
+				break;
+			}
+			case ObjectProperty::SPECULARITY:
+			{
+				if(value<0.0)
+				{
+					value=0.0;
+				}
+				if(value>1.0)
+				{
+					value=1.0;
+				}
+				pDiffusionChance=fpToUint64(1.0-value);
+				break;
+			}
+			case ObjectProperty::TRASPARENCY:
+			{
+				if(value<0.0)
+				{
+					value=0.0;
+				}
+				if(value>1.0)
+				{
+					value=1.0;
+				}
+				pPassthroughChance=fpToUint64(value);
+				break;
+			}
+			default:
+			{
+				break;
+			}
+		}
 		pProperties[property]=value;
 	}
 }
@@ -201,8 +281,8 @@ Difference::Difference(Object *object_a, Object *object_b)
 	ObjectB=object_b;
 	pPosition=object_a->Position();
 	SetColor((object_a->Color()+object_b->Color())/2.0);
-	SetSpecularity((object_a->Specularity()+object_b->Specularity())/2.0);
-	SetTransparency((object_a->Transparency()+object_b->Transparency())/2.0);
+	SetProperty(ObjectProperty::SPECULARITY, (object_a->Specularity()+object_b->Specularity())/2.0);
+	SetProperty(ObjectProperty::TRASPARENCY, (object_a->Transparency()+object_b->Transparency())/2.0);
 	SetProperty(ObjectProperty::BRIGHTNESS, (object_a->Brightness()+object_b->Brightness())/2.0);
 	object_a->SetProperty(ObjectProperty::VISIBILITY, 0.0);
 	object_b->SetProperty(ObjectProperty::VISIBILITY, 0.0);
@@ -230,8 +310,8 @@ Union::Union(Object *object_a, Object *object_b)
 	ObjectB=object_b;
 	pPosition=(object_a->Position()+object_b->Position())/2.0;
 	SetColor((object_a->Color()+object_b->Color())/2.0);
-	SetSpecularity((object_a->Specularity()+object_b->Specularity())/2.0);
-	SetTransparency((object_a->Transparency()+object_b->Transparency())/2.0);
+	SetProperty(ObjectProperty::SPECULARITY, (object_a->Specularity()+object_b->Specularity())/2.0);
+	SetProperty(ObjectProperty::TRASPARENCY, (object_a->Transparency()+object_b->Transparency())/2.0);
 	SetProperty(ObjectProperty::BRIGHTNESS, (object_a->Brightness()+object_b->Brightness())/2.0);
 	object_a->SetProperty(ObjectProperty::VISIBILITY, 0.0);
 	object_b->SetProperty(ObjectProperty::VISIBILITY, 0.0);
@@ -259,8 +339,8 @@ Intersection::Intersection(Object *object_a, Object *object_b)
 	ObjectB=object_b;
 	pPosition=(object_a->Position()+object_b->Position())/2.0;
 	SetColor((object_a->Color()+object_b->Color())/2.0);
-	SetSpecularity((object_a->Specularity()+object_b->Specularity())/2.0);
-	SetTransparency((object_a->Transparency()+object_b->Transparency())/2.0);
+	SetProperty(ObjectProperty::SPECULARITY, (object_a->Specularity()+object_b->Specularity())/2.0);
+	SetProperty(ObjectProperty::TRASPARENCY, (object_a->Transparency()+object_b->Transparency())/2.0);
 	SetProperty(ObjectProperty::BRIGHTNESS, (object_a->Brightness()+object_b->Brightness())/2.0);
 	object_a->SetProperty(ObjectProperty::VISIBILITY, 0.0);
 	object_b->SetProperty(ObjectProperty::VISIBILITY, 0.0);

@@ -39,16 +39,16 @@ public:
 		static constexpr uint8_t SCALE=5;
 		static constexpr uint8_t VISIBILITY=6;
 		static constexpr uint8_t BRIGHTNESS=7;
+		static constexpr uint8_t SPECULARITY=8;
+		static constexpr uint8_t TRASPARENCY=9;
 	};
 private:
-	float pSpecularity=0.0;
-	float pTransparency=0.0;
 	uint64_t pDiffusionChance=UINT64_MAX;
 	uint64_t pPassthroughChance=0;
 	Vec3f pColor;
 protected:
 	ObjectType pType;
-	float pProperties[8];
+	float pProperties[10];
 	Vec3f pPosition;
 	Vec3f pVForward, pVRight, pVUp;
 	Vec3f WorldToLocal(const Vec3f &point) const;
@@ -60,14 +60,11 @@ public:
 	uint64_t DiffusionChance() const;
 	uint64_t PassthroughChance() const;
 
-	bool Visibility() const;
+	float Scale() const;
+	float Visibility() const;
 	float Brightness() const;
-
 	float Specularity() const;
-	void SetSpecularity(float specularity);
-
 	float Transparency() const;
-	void SetTransparency(float transparency);
 
 	const Vec3f &Color() const;
 	void SetColor(const Vec3f &color);

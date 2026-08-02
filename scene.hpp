@@ -57,14 +57,10 @@ public:
 
 	Object::ObjectType GetObjectType(uint32_t object_id) const;
 
-	bool GetObjectVisibility(uint32_t object_id) const;
+	float GetObjectVisibility(uint32_t object_id) const;
 	float GetObjectBrightness(uint32_t object_id) const;
-
 	float GetObjectSpecularity(uint32_t object_id) const;
-	void SetObjectSpecularity(uint32_t object_id, float specularity);
-
 	float GetObjectTransparency(uint32_t object_id) const;
-	void SetObjectTransparency(uint32_t object_id, float transparency);
 
 	const Vec3f &GetObjectColor(uint32_t object_id) const;
 	void SetObjectColor(uint32_t object_id, const Vec3f &color);

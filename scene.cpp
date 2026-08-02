@@ -331,7 +331,7 @@ void Scene::Render()
 	pVisibleObjects->clear();
 	for(Object *object : *pSceneObjects)
 	{
-		if(object->Visibility())
+		if(object->Visibility()>0.0)
 		{
 			pVisibleObjects->push_back(object);
 		}
@@ -419,7 +419,7 @@ Object::ObjectType Scene::GetObjectType(uint32_t object_id) const
 	return ((*pSceneObjects)[object_id]->Type());
 }
 
-bool Scene::GetObjectVisibility(uint32_t object_id) const
+float Scene::GetObjectVisibility(uint32_t object_id) const
 {
 	return ((*pSceneObjects)[object_id]->Visibility());
 }
@@ -434,19 +434,9 @@ float Scene::GetObjectSpecularity(uint32_t object_id) const
 	return ((*pSceneObjects)[object_id]->Specularity());
 }
 
-void Scene::SetObjectSpecularity(uint32_t object_id, float specularity)
-{
-	(*pSceneObjects)[object_id]->SetSpecularity(specularity);
-}
-
 float Scene::GetObjectTransparency(uint32_t object_id) const
 {
 	return ((*pSceneObjects)[object_id]->Transparency());
-}
-
-void Scene::SetObjectTransparency(uint32_t object_id, float transparency)
-{
-	(*pSceneObjects)[object_id]->SetTransparency(transparency);
 }
 
 const Vec3f &Scene::GetObjectColor(uint32_t object_id) const
