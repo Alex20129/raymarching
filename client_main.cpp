@@ -205,7 +205,7 @@ int main(int argc, char *argv[])
 	int32_t i;
 	Ray::REFLECTIONS_LIMIT=7;
 	Scene::SAMPLES_PER_PIXEL=1024;
-	for(i=0; i<50; i++)
+	for(i=0; i<100; i++)
 	{
 		// float spec=i*0.1;
 

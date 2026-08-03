@@ -6,8 +6,8 @@
 static inline uint64_t fpToUint64(float v)
 {
 	uint64_t result=UINT64_MAX>>9;
-	uint64_t multiplicationTrick=(1.0-v)*512.0;
-	uint64_t remainder=(1.0-v)*511.0;
+	uint64_t multiplicationTrick=v*512.0;
+	uint64_t remainder=v*511.0;
 	result*=multiplicationTrick;
 	result+=remainder;
 	return (result);
