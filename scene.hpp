@@ -11,10 +11,20 @@ static constexpr uint64_t DefaultRenderThreads=1;
 
 using namespace std;
 
+struct CollisionRecord
+{
+	Vec3f Position;
+	Vec3f Normal;
+	float Visibility=0.0f;
+	float Brightness=0.0f;
+	float Specularity=0.0f;
+	float Transparency=0.0f;
+};
+
 class Ray
 {
 	Vec3f pDefaultDirection;
-	Vec3f pFirstCollisionPoint;
+	CollisionRecord pFirstCollision;
 	const Object *RunOnce(Vec3f &position, Vec3f direction, const Object *skip);
 public:
 	static uint32_t STEPS_PER_RUN_LIMIT;
@@ -24,7 +34,7 @@ public:
 	uint64_t PRNGSeedValue=0;
 	void SetDefaultDirection(float x, float y, float z);
 	void Reset();
-	void Trace();
+	void Trace(uint64_t samples);
 };
 
 class Scene
@@ -43,6 +53,7 @@ public:
 	~Scene();
 	uint32_t AddObject(Object *object);
 	uint32_t AddObject(Object::ObjectType object_type, uint32_t parent_a_id=UINT32_MAX, uint32_t parent_b_id=UINT32_MAX);
+	void Clear();
 	void Render();
 	uint64_t ScreenWidth() const;
 	uint64_t ScreenHeight() const;

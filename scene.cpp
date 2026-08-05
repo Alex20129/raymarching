@@ -55,80 +55,87 @@ void Ray::Reset()
 	Color.X=
 	Color.Y=
 	Color.Z=0.0f;
-	pFirstCollisionPoint.X=
-	pFirstCollisionPoint.Y=
-	pFirstCollisionPoint.Z=0.0f;
+	pFirstCollision.Position.X=
+	pFirstCollision.Position.Y=
+	pFirstCollision.Position.Z=0.0f;
+	pFirstCollision.Normal.X=
+	pFirstCollision.Normal.Y=
+	pFirstCollision.Normal.Z=0.0f;
 }
 
-void Ray::Trace()
+void Ray::Trace(uint64_t samples)
 {
-	uint32_t ReflectionsLimit=Ray::REFLECTIONS_LIMIT;
-	Vec3f ColorSample(1.0, 1.0, 1.0);
-
 	prng64 StackLocalPRNG;
 	StackLocalPRNG.set_seed_value(PRNGSeedValue);
+	float colorDiv=samples;
 
-	const Object *TransparentObject=nullptr;
-	Vec3f Position=pFirstCollisionPoint, Direction=pDefaultDirection;
-
-	if(pFirstCollisionPoint.X==0.0f && pFirstCollisionPoint.Y==0.0f && pFirstCollisionPoint.Z==0.0f)
+	for(uint64_t sample=0; sample<samples; sample++)
 	{
-		if(nullptr==RunOnce(pFirstCollisionPoint, Direction, TransparentObject))
-		{
-			pFirstCollisionPoint.X=
-			pFirstCollisionPoint.Y=
-			pFirstCollisionPoint.Z=0.0f;
-		}
-	}
+		uint32_t ReflectionsLimit=Ray::REFLECTIONS_LIMIT;
+		Vec3f ColorSample(1.0, 1.0, 1.0);
+		const Object *TransparentObject=nullptr;
+		Vec3f Position=pFirstCollision.Position, Direction=pDefaultDirection;
 
-	for(uint32_t ReflectionsHappened=0; ReflectionsHappened<ReflectionsLimit; ReflectionsHappened++)
-	{
-		const Object *Obstacle=RunOnce(Position, Direction, TransparentObject);
-		if(Obstacle==nullptr)
+		if(pFirstCollision.Position.X==0.0f && pFirstCollision.Position.Y==0.0f && pFirstCollision.Position.Z==0.0f)
 		{
-			break;
-		}
-		if(Obstacle->Brightness()>0.0)
-		{
-			ColorSample=ColorSample * Obstacle->Color() * Obstacle->Brightness();
-			break;
-		}
-		else
-		{
-			ColorSample=ColorSample * Obstacle->Color() / 255.0;
-		}
-		StackLocalPRNG.generate_xorshift_star();
-		if(StackLocalPRNG.get_rn_uint()<Obstacle->PassthroughChance())
-		{
-			TransparentObject=Obstacle;
-			continue;
-		}
-		else
-		{
-			TransparentObject=nullptr;
-		}
-		Vec3f SurfaceNormalVec=Obstacle->GetNormalVector(Position);
-		SurfaceNormalVec.Normalize();
-		if(StackLocalPRNG.get_rn_uint()<Obstacle->DiffusionChance())
-		{
-			Vec3f randomVector;
-			do
+			if(nullptr==RunOnce(pFirstCollision.Position, Direction, TransparentObject))
 			{
-				ui64toVec3f(StackLocalPRNG.get_rn_uint(), randomVector);
-				StackLocalPRNG.generate_xorshift_star();
+				pFirstCollision.Position.X=
+				pFirstCollision.Position.Y=
+				pFirstCollision.Position.Z=0.0f;
 			}
-			while(randomVector.LengthSquared()>1.0);
-			Direction=SurfaceNormalVec + randomVector;
 		}
-		else
+
+		for(uint32_t ReflectionsHappened=0; ReflectionsHappened<ReflectionsLimit; ReflectionsHappened++)
 		{
-			Direction=Direction - (SurfaceNormalVec*2.0) * SurfaceNormalVec.Dot(Direction);
+			const Object *Obstacle=RunOnce(Position, Direction, TransparentObject);
+			if(Obstacle==nullptr)
+			{
+				break;
+			}
+			if(Obstacle->Brightness()>0.0)
+			{
+				ColorSample=ColorSample * Obstacle->Color() * Obstacle->Brightness();
+				break;
+			}
+			else
+			{
+				ColorSample=ColorSample * Obstacle->Color() / 255.0;
+			}
+			StackLocalPRNG.generate_xorshift_star();
+			if(StackLocalPRNG.get_rn_uint()<Obstacle->PassthroughChance())
+			{
+				TransparentObject=Obstacle;
+				continue;
+			}
+			else
+			{
+				TransparentObject=nullptr;
+			}
+			Vec3f SurfaceNormalVec=Obstacle->GetNormalVector(Position);
+			SurfaceNormalVec.Normalize();
+			if(StackLocalPRNG.get_rn_uint()<Obstacle->DiffusionChance())
+			{
+				Vec3f randomVector;
+				do
+				{
+					ui64toVec3f(StackLocalPRNG.get_rn_uint(), randomVector);
+					StackLocalPRNG.generate_xorshift_star();
+				}
+				while(randomVector.LengthSquared()>1.0);
+				Direction=SurfaceNormalVec + randomVector;
+			}
+			else
+			{
+				Direction=Direction - (SurfaceNormalVec*2.0) * SurfaceNormalVec.Dot(Direction);
+			}
+			Direction.Normalize();
+			Position=Position+Direction;
 		}
-		Direction.Normalize();
-		Position=Position+Direction;
+		PRNGSeedValue=StackLocalPRNG.get_rn_uint();
+		Color=Color+ColorSample;
 	}
-	PRNGSeedValue=StackLocalPRNG.get_rn_uint();
-	Color=Color+ColorSample;
+	Color=Vec3f::Min(Color/colorDiv, {255.0,255.0,255.0});
 }
 
 const Object *Ray::RunOnce(Vec3f &position, Vec3f direction, const Object *skip)
@@ -308,23 +315,30 @@ uint32_t Scene::AddObject(Object::ObjectType object_type, uint32_t parent_a_id, 
 	return (ObjectID);
 }
 
-static void RayRunningWrapper(vector <Ray> *rays, uint64_t thread_id, uint64_t rays_per_thread, uint64_t samples_per_pixel)
+void Scene::Clear()
+{
+	while(!pSceneObjects->empty())
+	{
+		Object *object=pSceneObjects->back();
+		pSceneObjects->pop_back();
+		delete object;
+	}
+	pVisibleObjects->clear();
+}
+
+static void RayRunningWrapper(vector <Ray> *rays, uint64_t thread_id, uint64_t rays_per_thread)
 {
 	uint64_t rayid, sample;
 	for(rayid=thread_id*rays_per_thread; rayid<(thread_id+1)*rays_per_thread; rayid++)
 	{
 		(*rays)[rayid].Reset();
-		for(sample=0; sample<samples_per_pixel; sample++)
-		{
-			(*rays)[rayid].Trace();
-		}
+		(*rays)[rayid].Trace(Scene::SAMPLES_PER_PIXEL);
 	}
 }
 
 void Scene::Render()
 {
 	uint64_t threadid, samplesPerPixel=Scene::SAMPLES_PER_PIXEL;
-	float colorDiv=samplesPerPixel;
 	thread *renderThread;
 	queue<thread *> renderThreads;
 
@@ -342,7 +356,7 @@ void Scene::Render()
 
 	for(threadid=0; threadid<pRenderThreads; threadid++)
 	{
-		renderThread=new thread(RayRunningWrapper, &SceneRays, threadid, SceneRays.size()/pRenderThreads, samplesPerPixel);
+		renderThread=new thread(RayRunningWrapper, &SceneRays, threadid, SceneRays.size()/pRenderThreads);
 		renderThreads.push(renderThread);
 	}
 	while(!renderThreads.empty())
@@ -356,11 +370,10 @@ void Scene::Render()
 		for(uint64_t x=0; x < pScreenWidth; x++)
 		{
 			int64_t rayID=x+y*pScreenWidth;
-			Vec3f color=SceneRays.at(rayID).Color/colorDiv;
-			uint8_t r = fmin(color.X, 255.0f);
-			uint8_t g = fmin(color.Y, 255.0f);
-			uint8_t b = fmin(color.Z, 255.0f);
-			RenderedImage[y][x] = png::rgb_pixel(r, g, b);
+			RenderedImage[y][x] = png::rgb_pixel(
+				SceneRays.at(rayID).Color.X,
+				SceneRays.at(rayID).Color.Y,
+				SceneRays.at(rayID).Color.Z);
 		}
 	}
 	finish=chrono::high_resolution_clock::now();

@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
 	gScene->SetObjectPosition(Sphere2ObjectID, 0, 50, ObjectZpos);
 
 	uint32_t GyroidObjectID=gScene->AddObject(Object::ObjectType::GYROID);
-	gScene->SetObjectProperty(GyroidObjectID, Object::ObjectProperty::SCALE, 12.0);
+	gScene->SetObjectProperty(GyroidObjectID, Object::ObjectProperty::SCALE, 6.0);
 	gScene->SetObjectPosition(GyroidObjectID, 0, 50, ObjectZpos);
 	gScene->SetObjectOrientation(GyroidObjectID, 1, 0, 0, 0);
 
@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
 	// gScene->SetObjectPosition(Sphere3ObjectID, 0, 50, ObjectZpos);
 
 	// uint32_t SchwarzPrimitive1ObjectID=gScene->AddObject(Object::ObjectType::SCHWARZ_PRIMITIVE);
-	// gScene->SetObjectProperty(SchwarzPrimitive1ObjectID, Object::ObjectProperty::SCALE, 13.0);
+	// gScene->SetObjectProperty(SchwarzPrimitive1ObjectID, Object::ObjectProperty::SCALE, 6.0);
 	// gScene->SetObjectPosition(SchwarzPrimitive1ObjectID, 0, 50, ObjectZpos);
 
 	// uint32_t SchwarzPrimitiveInSphereObjectID=gScene->AddObject(Object::ObjectType::INTERSECTION, Sphere3ObjectID, SchwarzPrimitive1ObjectID);
@@ -205,7 +205,7 @@ int main(int argc, char *argv[])
 	int32_t i;
 	Ray::REFLECTIONS_LIMIT=7;
 	Scene::SAMPLES_PER_PIXEL=1024;
-	for(i=0; i<100; i++)
+	for(i=0; i<50; i++)
 	{
 		// float spec=i*0.1;
 
