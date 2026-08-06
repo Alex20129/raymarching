@@ -204,7 +204,7 @@ int main(int argc, char *argv[])
 	char fileName[128];
 	int32_t i;
 	Ray::REFLECTIONS_LIMIT=7;
-	Scene::SAMPLES_PER_PIXEL=1024;
+	Scene::SAMPLES_PER_PIXEL=128;
 	for(i=0; i<50; i++)
 	{
 		// float spec=i*0.1;
@@ -221,7 +221,7 @@ int main(int argc, char *argv[])
 		sprintf(fileName, "render_%02i_%luspp.png", i, Scene::SAMPLES_PER_PIXEL);
 		gScene->RenderedImage.write(fileName);
 
-		// Scene::SAMPLES_PER_PIXEL*=2;
+		Scene::SAMPLES_PER_PIXEL*=2;
 	}
 
 	return 0;

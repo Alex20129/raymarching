@@ -67,28 +67,38 @@ void Ray::Trace(uint64_t samples)
 {
 	prng64 StackLocalPRNG;
 	StackLocalPRNG.set_seed_value(PRNGSeedValue);
-	float colorDiv=samples;
 
+	float ColorDiv=samples;
 	for(uint64_t sample=0; sample<samples; sample++)
 	{
-		uint32_t ReflectionsLimit=Ray::REFLECTIONS_LIMIT;
 		Vec3f ColorSample(1.0, 1.0, 1.0);
-		const Object *TransparentObject=nullptr;
-		Vec3f Position=pFirstCollision.Position, Direction=pDefaultDirection;
 
-		if(pFirstCollision.Position.X==0.0f && pFirstCollision.Position.Y==0.0f && pFirstCollision.Position.Z==0.0f)
+		const Object *TransparentObject=nullptr;
+		Vec3f CurrentPosition=pFirstCollision.Position, Direction=pDefaultDirection;
+
+		if(CurrentPosition.X==0.0f && CurrentPosition.Y==0.0f && CurrentPosition.Z==0.0f)
 		{
-			if(nullptr==RunOnce(pFirstCollision.Position, Direction, TransparentObject))
+			const Object *FirstCollisionObject=RunOnce(CurrentPosition, Direction, TransparentObject);
+			if(nullptr==FirstCollisionObject)
 			{
 				pFirstCollision.Position.X=
 				pFirstCollision.Position.Y=
 				pFirstCollision.Position.Z=0.0f;
+				pFirstCollision.Normal.X=
+				pFirstCollision.Normal.Y=
+				pFirstCollision.Normal.Z=0.0f;
+			}
+			else
+			{
+				pFirstCollision.Position=CurrentPosition;
+				pFirstCollision.Normal=FirstCollisionObject->GetNormalVector(CurrentPosition);
 			}
 		}
 
+		uint32_t ReflectionsLimit=Ray::REFLECTIONS_LIMIT;
 		for(uint32_t ReflectionsHappened=0; ReflectionsHappened<ReflectionsLimit; ReflectionsHappened++)
 		{
-			const Object *Obstacle=RunOnce(Position, Direction, TransparentObject);
+			const Object *Obstacle=RunOnce(CurrentPosition, Direction, TransparentObject);
 			if(Obstacle==nullptr)
 			{
 				break;
@@ -112,7 +122,7 @@ void Ray::Trace(uint64_t samples)
 			{
 				TransparentObject=nullptr;
 			}
-			Vec3f SurfaceNormalVec=Obstacle->GetNormalVector(Position);
+			Vec3f SurfaceNormalVec=Obstacle->GetNormalVector(CurrentPosition);
 			SurfaceNormalVec.Normalize();
 			if(StackLocalPRNG.get_rn_uint()<Obstacle->DiffusionChance())
 			{
@@ -130,12 +140,12 @@ void Ray::Trace(uint64_t samples)
 				Direction=Direction - (SurfaceNormalVec*2.0) * SurfaceNormalVec.Dot(Direction);
 			}
 			Direction.Normalize();
-			Position=Position+Direction;
+			CurrentPosition=CurrentPosition+Direction;
 		}
 		PRNGSeedValue=StackLocalPRNG.get_rn_uint();
 		Color=Color+ColorSample;
 	}
-	Color=Vec3f::Min(Color/colorDiv, {255.0,255.0,255.0});
+	Color=Vec3f::Min(Color/ColorDiv, {255.0,255.0,255.0});
 }
 
 const Object *Ray::RunOnce(Vec3f &position, Vec3f direction, const Object *skip)
