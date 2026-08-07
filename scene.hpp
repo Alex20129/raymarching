@@ -34,7 +34,7 @@ public:
 	uint64_t PRNGSeedValue=0;
 	void SetDefaultDirection(float x, float y, float z);
 	void Reset();
-	void Trace(uint64_t samples);
+	void Trace();
 };
 
 class Scene

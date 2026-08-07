@@ -63,13 +63,13 @@ void Ray::Reset()
 	pFirstCollision.Normal.Z=0.0f;
 }
 
-void Ray::Trace(uint64_t samples)
+void Ray::Trace()
 {
+	uint64_t Samples=Scene::SAMPLES_PER_PIXEL;
+	float ColorDiv=Samples;
 	prng64 StackLocalPRNG;
 	StackLocalPRNG.set_seed_value(PRNGSeedValue);
-
-	float ColorDiv=samples;
-	for(uint64_t sample=0; sample<samples; sample++)
+	for(uint64_t sample=0; sample<Samples; sample++)
 	{
 		Vec3f ColorSample(1.0, 1.0, 1.0);
 
@@ -142,9 +142,9 @@ void Ray::Trace(uint64_t samples)
 			Direction.Normalize();
 			CurrentPosition=CurrentPosition+Direction;
 		}
-		PRNGSeedValue=StackLocalPRNG.get_rn_uint();
 		Color=Color+ColorSample;
 	}
+	PRNGSeedValue=StackLocalPRNG.get_rn_uint();
 	Color=Vec3f::Min(Color/ColorDiv, {255.0,255.0,255.0});
 }
 
@@ -342,13 +342,13 @@ static void RayRunningWrapper(vector <Ray> *rays, uint64_t thread_id, uint64_t r
 	for(rayid=thread_id*rays_per_thread; rayid<(thread_id+1)*rays_per_thread; rayid++)
 	{
 		(*rays)[rayid].Reset();
-		(*rays)[rayid].Trace(Scene::SAMPLES_PER_PIXEL);
+		(*rays)[rayid].Trace();
 	}
 }
 
 void Scene::Render()
 {
-	uint64_t threadid, samplesPerPixel=Scene::SAMPLES_PER_PIXEL;
+	uint64_t threadid;
 	thread *renderThread;
 	queue<thread *> renderThreads;
 
@@ -388,7 +388,7 @@ void Scene::Render()
 	}
 	finish=chrono::high_resolution_clock::now();
 	pRenderTime=(finish - start).count()/1000000;
-	fprintf(stdout, "SamplesPerPixel: %lu\n", samplesPerPixel);
+	fprintf(stdout, "SamplesPerPixel: %lu\n", Scene::SAMPLES_PER_PIXEL);
 	fprintf(stdout, "RenderThreads: %lu\n", pRenderThreads);
 	fprintf(stdout, "RenderTime: %li ms\n", pRenderTime);
 }
