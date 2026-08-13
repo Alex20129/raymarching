@@ -136,7 +136,12 @@ void Object::SetOrientation(float x, float y, float z, float roll)
 
 float Object::Property(uint32_t property) const
 {
-	return (pProperties[property]*2.0);
+	float prValue=pProperties[property];
+	if(property<ObjectProperty::SCALE)
+	{
+		prValue*=2.0;
+	}
+	return (prValue);
 }
 
 void Object::SetProperty(uint32_t property, float value)
