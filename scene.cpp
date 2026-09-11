@@ -317,9 +317,17 @@ uint32_t Scene::AddObject(Object::ObjectType object_type, uint32_t parent_a_id, 
 		{
 			return (AddObject(new Gyroid));
 		}
+		case Object::ObjectType::GYROID_THIN_WALL:
+		{
+			return (AddObject(new GyroidThinWall));
+		}
 		case Object::ObjectType::SCHWARZ_PRIMITIVE:
 		{
 			return (AddObject(new SchwarzPrimitive));
+		}
+		case Object::ObjectType::SCHWARZ_PRIMITIVE_THIN_WALL:
+		{
+			return (AddObject(new SchwarzPrimitiveThinWall));
 		}
 	}
 	return (ObjectID);

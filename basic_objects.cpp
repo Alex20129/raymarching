@@ -64,6 +64,11 @@ uint64_t Object::PassthroughChance() const
 	return (pPassthroughChance);
 }
 
+float Object::Thickness() const
+{
+	return (pProperties[ObjectProperty::THICKNESS]);
+}
+
 float Object::Scale() const
 {
 	return (pProperties[ObjectProperty::SCALE]);
@@ -263,9 +268,9 @@ float Object::GetDistance(const Vec3f &from) const
 Vec3f Object::GetNormalVector(const Vec3f &point) const
 {
 	Vec3f normalVec(
-		GetDistance(point + Vec3f(EPSILON, 0, 0)) - GetDistance(point - Vec3f(EPSILON, 0, 0)),
-		GetDistance(point + Vec3f(0, EPSILON, 0)) - GetDistance(point - Vec3f(0, EPSILON, 0)),
-		GetDistance(point + Vec3f(0, 0, EPSILON)) - GetDistance(point - Vec3f(0, 0, EPSILON)));
+		GetDistance(point+Vec3f(EPSILON, 0, 0)) - GetDistance(point - Vec3f(EPSILON, 0, 0)),
+		GetDistance(point+Vec3f(0, EPSILON, 0)) - GetDistance(point - Vec3f(0, EPSILON, 0)),
+		GetDistance(point+Vec3f(0, 0, EPSILON)) - GetDistance(point - Vec3f(0, 0, EPSILON)));
 	return (normalVec);
 }
 
@@ -387,7 +392,7 @@ Cube::Cube()
 float Cube::GetDistance(const Vec3f &from) const
 {
 	Vec3f d = WorldToLocal(from).Abs() - Vec3f(pProperties[ObjectProperty::LENGTH], pProperties[ObjectProperty::LENGTH], pProperties[ObjectProperty::LENGTH]);
-	return (Vec3f::Max(d, Vec3f(0.0F, 0.0F, 0.0F)).Length() + fmin(fmax(d.X, fmax(d.Y, d.Z)), 0.0F));
+	return (Vec3f::Max(d, Vec3f(0.0F, 0.0F, 0.0F)).Length()+fmin(fmax(d.X, fmax(d.Y, d.Z)), 0.0F));
 }
 
 Vec3f Cube::GetNormalVector(const Vec3f &from) const
@@ -399,7 +404,7 @@ Vec3f Cube::GetNormalVector(const Vec3f &from) const
 		fmaxf(-hl, fminf(localFrom.Y, hl)),
 		fmaxf(-hl, fminf(localFrom.Z, hl)));
 	Vec3f localNormal = localFrom - sPoint;
-	return (pVRight * localNormal.X) + (pVUp * localNormal.Y) + (pVForward * localNormal.Z);
+	return (pVRight * localNormal.X)+(pVUp * localNormal.Y)+(pVForward * localNormal.Z);
 }
 
 // ========= CUBOID ===
@@ -415,7 +420,7 @@ Cuboid::Cuboid()
 float Cuboid::GetDistance(const Vec3f &from) const
 {
 	Vec3f d = WorldToLocal(from).Abs() - Vec3f(pProperties[ObjectProperty::LENGTH_X], pProperties[ObjectProperty::LENGTH_Y], pProperties[ObjectProperty::LENGTH_Z]);
-	return (Vec3f::Max(d, Vec3f(0.0F, 0.0F, 0.0F)).Length() + fmin(fmax(d.X, fmax(d.Y, d.Z)), 0.0F));
+	return (Vec3f::Max(d, Vec3f(0.0F, 0.0F, 0.0F)).Length()+fmin(fmax(d.X, fmax(d.Y, d.Z)), 0.0F));
 }
 
 Vec3f Cuboid::GetNormalVector(const Vec3f &from) const
@@ -429,7 +434,7 @@ Vec3f Cuboid::GetNormalVector(const Vec3f &from) const
 		fmaxf(-hlY, fminf(localFrom.Y, hlY)),
 		fmaxf(-hlZ, fminf(localFrom.Z, hlZ)));
 	Vec3f localNormal = localFrom - sPoint;
-	return (pVRight * localNormal.X) + (pVUp * localNormal.Y) + (pVForward * localNormal.Z);
+	return (pVRight * localNormal.X)+(pVUp * localNormal.Y)+(pVForward * localNormal.Z);
 }
 
 // ========= CYLINDER ===
@@ -446,7 +451,7 @@ float Cylinder::GetDistance(const Vec3f &from) const
 	Vec3f localFrom = WorldToLocal(from);
 	float dXY=Vec2f(localFrom.X, localFrom.Y).Length() - pProperties[ObjectProperty::DIAMETER];
 	float dZ=fabs(localFrom.Z) - pProperties[ObjectProperty::LENGTH];
-	return fmin(fmax(dXY, dZ), 0.0) + Vec2f::Max({dXY, dZ}, {0.0, 0.0}).Length();
+	return fmin(fmax(dXY, dZ), 0.0)+Vec2f::Max({dXY, dZ}, {0.0, 0.0}).Length();
 }
 
 // ========= INFINITE CYLINDER ===
@@ -480,7 +485,7 @@ float EllipticCylinder::GetDistance(const Vec3f &from) const
 	float StretchFactor=Rx/pProperties[Object::ObjectProperty::DIAMETER_2];
 	float dXY=Vec2f(localFrom.X, localFrom.Y*StretchFactor).Length() - Rx;
 	float dZ=fabs(localFrom.Z) - pProperties[ObjectProperty::LENGTH];
-	return fmin(fmax(dXY, dZ), 0.0) + Vec2f::Max({dXY, dZ}, {0.0, 0.0}).Length();
+	return fmin(fmax(dXY, dZ), 0.0)+Vec2f::Max({dXY, dZ}, {0.0, 0.0}).Length();
 }
 
 // ========= INFINITE ELLIPTIC CYLINDER ===
@@ -538,13 +543,26 @@ Vec3f Plane::GetNormalVector(const Vec3f &point) const
 Gyroid::Gyroid()
 {
 	pType=GYROID;
-	pProperties[ObjectProperty::SCALE]=1.0;
 }
 
 float Gyroid::GetDistance(const Vec3f &from) const
 {
 	Vec3f localFrom=WorldToLocal(from)/pProperties[ObjectProperty::SCALE];
-	return (cos(localFrom.X)*sin(localFrom.Y) + cos(localFrom.Y)*sin(localFrom.Z) + cos(localFrom.Z)*sin(localFrom.X));
+	return (cos(localFrom.X)*sin(localFrom.Y)+cos(localFrom.Y)*sin(localFrom.Z)+cos(localFrom.Z)*sin(localFrom.X));
+}
+
+// ========= GYROID THIN WALL===
+
+GyroidThinWall::GyroidThinWall()
+{
+	pType=GYROID_THIN_WALL;
+	pProperties[ObjectProperty::THICKNESS]=0.5;
+}
+
+float GyroidThinWall::GetDistance(const Vec3f &from) const
+{
+	Vec3f localFrom=WorldToLocal(from)/pProperties[ObjectProperty::SCALE];
+	return (fabs(cos(localFrom.X)*sin(localFrom.Y)+cos(localFrom.Y)*sin(localFrom.Z)+cos(localFrom.Z)*sin(localFrom.X))-pProperties[ObjectProperty::THICKNESS]);
 }
 
 // ========= SCHWARZ PRIMITIVE ===
@@ -552,11 +570,24 @@ float Gyroid::GetDistance(const Vec3f &from) const
 SchwarzPrimitive::SchwarzPrimitive()
 {
 	pType=SCHWARZ_PRIMITIVE;
-	pProperties[ObjectProperty::SCALE]=1.0;
 }
 
 float SchwarzPrimitive::GetDistance(const Vec3f &from) const
 {
 	Vec3f localFrom=WorldToLocal(from)/pProperties[ObjectProperty::SCALE];
-	return (cos(localFrom.X) + cos(localFrom.Y) + cos(localFrom.Z));
+	return (cos(localFrom.X)+cos(localFrom.Y)+cos(localFrom.Z));
+}
+
+// ========= SCHWARZ PRIMITIVE THIN WALL===
+
+SchwarzPrimitiveThinWall::SchwarzPrimitiveThinWall()
+{
+	pType=SCHWARZ_PRIMITIVE_THIN_WALL;
+	pProperties[ObjectProperty::THICKNESS]=0.5;
+}
+
+float SchwarzPrimitiveThinWall::GetDistance(const Vec3f &from) const
+{
+	Vec3f localFrom=WorldToLocal(from)/pProperties[ObjectProperty::SCALE];
+	return (fabs(cos(localFrom.X)+cos(localFrom.Y)+cos(localFrom.Z)) - pProperties[ObjectProperty::THICKNESS]);
 }

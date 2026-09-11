@@ -25,22 +25,26 @@ public:
 		TORUS,
 		PLANE,
 		GYROID,
+		GYROID_THIN_WALL,
 		SCHWARZ_PRIMITIVE,
+		SCHWARZ_PRIMITIVE_THIN_WALL,
 	};
 	struct ObjectProperty
 	{
 		static constexpr uint8_t DIAMETER=0;
 		static constexpr uint8_t DIAMETER_1=0;
 		static constexpr uint8_t DIAMETER_2=1;
-		static constexpr uint8_t LENGTH=2;
-		static constexpr uint8_t LENGTH_X=2;
-		static constexpr uint8_t LENGTH_Y=3;
-		static constexpr uint8_t LENGTH_Z=4;
-		static constexpr uint8_t SCALE=5;
-		static constexpr uint8_t VISIBILITY=6;
-		static constexpr uint8_t BRIGHTNESS=7;
-		static constexpr uint8_t SPECULARITY=8;
-		static constexpr uint8_t TRASPARENCY=9;
+		static constexpr uint8_t DIAMETER_3=2;
+		static constexpr uint8_t LENGTH=3;
+		static constexpr uint8_t LENGTH_X=3;
+		static constexpr uint8_t LENGTH_Y=4;
+		static constexpr uint8_t LENGTH_Z=5;
+		static constexpr uint8_t THICKNESS=6;
+		static constexpr uint8_t SCALE=7;
+		static constexpr uint8_t VISIBILITY=8;
+		static constexpr uint8_t BRIGHTNESS=9;
+		static constexpr uint8_t SPECULARITY=10;
+		static constexpr uint8_t TRASPARENCY=11;
 	};
 private:
 	uint64_t pDiffusionChance=UINT64_MAX;
@@ -48,7 +52,7 @@ private:
 	Vec3f pColor;
 protected:
 	ObjectType pType;
-	float pProperties[10];
+	float pProperties[12];
 	Vec3f pPosition;
 	Vec3f pVForward, pVRight, pVUp;
 	Vec3f WorldToLocal(const Vec3f &point) const;
@@ -60,6 +64,7 @@ public:
 	uint64_t DiffusionChance() const;
 	uint64_t PassthroughChance() const;
 
+	float Thickness() const;
 	float Scale() const;
 	float Visibility() const;
 	float Brightness() const;
@@ -183,10 +188,24 @@ public:
 	float GetDistance(const Vec3f &from) const;
 };
 
+class GyroidThinWall : public Object
+{
+public:
+	GyroidThinWall();
+	float GetDistance(const Vec3f &from) const;
+};
+
 class SchwarzPrimitive : public Object
 {
 public:
 	SchwarzPrimitive();
+	float GetDistance(const Vec3f &from) const;
+};
+
+class SchwarzPrimitiveThinWall : public Object
+{
+public:
+	SchwarzPrimitiveThinWall();
 	float GetDistance(const Vec3f &from) const;
 };
 

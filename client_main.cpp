@@ -67,16 +67,28 @@ int main(int argc, char *argv[])
 
 	// ======== CSG: gyroid in sphere
 	uint32_t Sphere2ObjectID=gScene->AddObject(Object::ObjectType::SPHERE);
-	gScene->SetObjectProperty(Sphere2ObjectID, Object::ObjectProperty::DIAMETER, 100.0);
-	gScene->SetObjectPosition(Sphere2ObjectID, 0, 50, ObjectZpos);
+	gScene->SetObjectProperty(Sphere2ObjectID, Object::ObjectProperty::DIAMETER, 90.0);
+	gScene->SetObjectPosition(Sphere2ObjectID, -50, 50, ObjectZpos);
 
 	uint32_t GyroidObjectID=gScene->AddObject(Object::ObjectType::GYROID);
-	gScene->SetObjectProperty(GyroidObjectID, Object::ObjectProperty::SCALE, 6.0);
-	gScene->SetObjectPosition(GyroidObjectID, 0, 50, ObjectZpos);
-	gScene->SetObjectOrientation(GyroidObjectID, 1, 0, 0, 0);
+	gScene->SetObjectProperty(GyroidObjectID, Object::ObjectProperty::SCALE, 6.5);
+	gScene->SetObjectPosition(GyroidObjectID, -50, 50, ObjectZpos);
 
 	uint32_t GyroidInSphereObjectID=gScene->AddObject(Object::ObjectType::INTERSECTION, Sphere2ObjectID, GyroidObjectID);
 	gScene->SetObjectColor(GyroidInSphereObjectID, 30, 130, 130);
+
+	// ======== CSG: thin-wall gyroid in sphere
+	uint32_t Sphere3ObjectID=gScene->AddObject(Object::ObjectType::SPHERE);
+	gScene->SetObjectProperty(Sphere3ObjectID, Object::ObjectProperty::DIAMETER, 90.0);
+	gScene->SetObjectPosition(Sphere3ObjectID, 50, 50, ObjectZpos);
+
+	uint32_t GyroidThinWallObjectID=gScene->AddObject(Object::ObjectType::GYROID_THIN_WALL);
+	gScene->SetObjectProperty(GyroidThinWallObjectID, Object::ObjectProperty::SCALE, 6.5);
+	gScene->SetObjectProperty(GyroidThinWallObjectID, Object::ObjectProperty::THICKNESS, 1.0);
+	gScene->SetObjectPosition(GyroidThinWallObjectID, 50, 50, ObjectZpos);
+
+	uint32_t GyroidThinWallInSphereObjectID=gScene->AddObject(Object::ObjectType::INTERSECTION, Sphere3ObjectID, GyroidThinWallObjectID);
+	gScene->SetObjectColor(GyroidThinWallInSphereObjectID, 30, 130, 130);
 
 	// ======== CSG: Schwarz primitive in sphere
 	// uint32_t Sphere3ObjectID=gScene->AddObject(Object::ObjectType::SPHERE);
@@ -214,7 +226,7 @@ int main(int argc, char *argv[])
 
 		// gScene->SetObjectOrientation(Cylinder1ObjectID, std::sin(i*M_PI_2/50.0), 0, std::cos(i*M_PI_2/50.0), 0);
 		// gScene->SetObjectOrientation(GyroidObjectID, std::sin(i*M_PI_2/50.0), 0, std::cos(i*M_PI_2/50.0), 0);
-		gScene->SetObjectPosition(GyroidObjectID, i/2.0, 50, ObjectZpos);
+		// gScene->SetObjectPosition(GyroidObjectID, i/2.0, 50, ObjectZpos);
 
 		gScene->Render();
 
